@@ -62,4 +62,23 @@ module MultiXml
     engine.parse(string, options)
   end
 
+  def symbolize_keys(hash)
+    hash.inject({}) do |result, (key, value)|
+      new_key = case key
+      when String
+        key.to_sym
+      else
+        key
+      end
+      new_value = case value
+      when Hash
+        symbolize_keys(value)
+      else
+        value
+      end
+      result[new_key] = new_value
+      result
+    end
+  end
+
 end

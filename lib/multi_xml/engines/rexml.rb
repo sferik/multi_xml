@@ -31,23 +31,9 @@ module MultiXml
           end
         end
         hash = (stack.length > 0 ? stack.pop.to_hash : {})
-        options[:symbolize_keys] ? symbolize_keys(hash) : hash
+        options[:symbolize_keys] ? MultiXml.symbolize_keys(hash) : hash
       end
 
-      def self.symbolize_keys(hash) #:nodoc:
-        hash.inject({}){|result, (key, value)|
-          new_key = case key
-                    when String then key.to_sym
-                    else key
-                    end
-          new_value = case value
-                      when Hash then symbolize_keys(value)
-                      else value
-                      end
-          result[new_key] = new_value
-          result
-        }
-      end
     end
 
     class RexmlUtilityNode #:nodoc:
