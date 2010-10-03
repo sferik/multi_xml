@@ -15,7 +15,7 @@ The <tt>engine</tt> setter takes either a symbol or a class (to allow for custom
 
 MultiXML tries to have intelligent defaulting. That is, if you have any of the supported engines already loaded, it will utilize them before attempting to load any. When loading, libraries are ordered by speed. First LibXML, then Nokogiri, then Hpricot, then REXML.
 
-== Inspriation
+== Inspiration
 
 MultiXML was inspired by MultiJSON[http://github.com/intridea/multi_json/].
 
