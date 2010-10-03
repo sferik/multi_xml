@@ -20,7 +20,7 @@ module MultiXml
           when :end_document
             break
           when :start_element
-            stack.push RexmlUtilityNode.new(event[1], event[2])
+            stack.push MultiXml::UtilityNode.new(event[1], event[2])
           when :end_element
             if stack.size > 1
               temp = stack.pop
@@ -200,6 +200,7 @@ module MultiXml
       def unnormalize_xml_entities value
         ::REXML::Text.unnormalize(value)
       end
+
     end
 
   end
