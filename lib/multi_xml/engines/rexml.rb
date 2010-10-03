@@ -11,7 +11,6 @@ module MultiXml
     class Rexml
 
       def self.parse(string, options = {}) #:nodoc:
-        string.strip!
         stack = []
         parser = ::REXML::Parsers::BaseParser.new(string)
 
