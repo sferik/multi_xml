@@ -1,11 +1,16 @@
+require 'date'
+require 'time'
+require 'yaml'
+require 'bigdecimal'
+
 module MultiXml
   module_function
 
-  # Get the current engine class.
-  def engine
-    return @engine if @engine
-    self.engine = self.default_engine
-    @engine
+  # Get the current parser class.
+  def parser
+    return @parser if @parser
+    self.parser = self.default_parser
+    @parser
   end
 
   REQUIREMENT_MAP = [
@@ -15,19 +20,19 @@ module MultiXml
     ['rexml/document', :rexml]
   ]
 
-  # The default engine based on what you currently
+  # The default parser based on what you currently
   # have loaded and installed. First checks to see
-  # if any engines are already loaded, then checks
+  # if any parsers are already loaded, then checks
   # to see which are installed if none are loaded.
-  def default_engine
+  def default_parser
     return :libxml if defined?(::LibXML)
     return :nokogiri if defined?(::Nokogiri)
     return :hpricot if defined?(::Hpricot)
 
-    REQUIREMENT_MAP.each do |(library, engine)|
+    REQUIREMENT_MAP.each do |(library, parser)|
       begin
         require library
-        return engine
+        return parser
       rescue LoadError
         next
       end
@@ -41,15 +46,15 @@ module MultiXml
   # * <tt>:nokogiri</tt>
   # * <tt>:hpricot</tt>
   # * <tt>:rexml</tt>
-  def engine=(new_engine)
-    case new_engine
+  def parser=(new_parser)
+    case new_parser
       when String, Symbol
-        require "multi_xml/engines/#{new_engine}"
-        @engine = MultiXml::Engines.const_get("#{new_engine.to_s.split('_').map{|s| s.capitalize}.join('')}")
+        require "multi_xml/parsers/#{new_parser}"
+        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
       when Class
-        @engine = new_engine
+        @parser = new_parser
       else
-        raise "Did not recognize your engine specification. Please specify either a symbol or a class."
+        raise "Did not recognize your parser specification. Please specify either a symbol or a class."
     end
   end
 
@@ -59,7 +64,7 @@ module MultiXml
   #
   # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
   def parse(string, options = {})
-    engine.parse(string, options)
+    parser.parse(string, options)
   end
 
   def symbolize_keys(hash)
@@ -102,7 +107,7 @@ module MultiXml
 
     self.typecasts = {}
     self.typecasts["integer"]       = lambda{|v| v.nil? ? nil : v.to_i}
-    self.typecasts["boolean"]       = lambda{|v| v.nil? ? nil : (v.strip != "false")}
+    self.typecasts["boolean"]       = lambda{|v| v.nil? ? nil : !["0", "false"].include?(v.strip)}
     self.typecasts["datetime"]      = lambda{|v| v.nil? ? nil : Time.parse(v).utc}
     self.typecasts["date"]          = lambda{|v| v.nil? ? nil : Date.parse(v)}
     self.typecasts["dateTime"]      = lambda{|v| v.nil? ? nil : Time.parse(v).utc}
