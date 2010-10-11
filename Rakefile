@@ -13,7 +13,6 @@ end
 
 desc "Run all examples"
 RSpec::Core::RakeTask.new(:spec) do |t|
-  t.rspec_path = '/opt/local/bin/rspec'
 end
 
 task :default => :spec
