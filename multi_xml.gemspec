@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Erik Michaels-Ober"]
   s.email       = ["sferik@gmail.com"]
   s.homepage    = "http://rubygems.org/gems/multi_xml"
-  s.summary     = %q{A gem to provide swappable XML backends utilizing LibXML, Nokogiri, Hpricot, or REXML.}
-  s.description = s.summary
+  s.summary     = %q{A generic swappable back-end for XML parsing}
+  s.description = %q{A gem to provide swappable XML backends utilizing LibXML, Nokogiri, or REXML.}
   s.rubyforge_project = "multi_xml"
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
