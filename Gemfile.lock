@@ -7,7 +7,6 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.1.2)
-    hpricot (0.8.2)
     libxml-ruby (1.1.4)
     nokogiri (1.4.3.1)
     rake (0.8.7)
@@ -27,7 +26,6 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.0)
-  hpricot (~> 0.8)
   libxml-ruby (~> 1.1)
   multi_xml!
   nokogiri (~> 1.4)

@@ -9,13 +9,11 @@ end
 describe "MultiXml" do
   context "Parsers" do
     it "should default to the best available gem" do
-      pending
       require 'libxml'
       MultiXml.parser.name.should == 'MultiXml::Parsers::Libxml'
     end
 
     it "should be settable via a symbol" do
-      pending
       MultiXml.parser = :libxml
       MultiXml.parser.name.should == 'MultiXml::Parsers::Libxml'
     end
@@ -26,7 +24,7 @@ describe "MultiXml" do
     end
   end
 
-  %w(Libxml Nokogiri Hpricot Rexml).each do |parser|
+  Dir.glob('lib/multi_xml/parsers/**/*.rb').map{|file| File.basename(file, ".rb").split('_').map{|s| s.capitalize}.join('')}.each do |parser|
     context "Parsers::#{parser}" do
       before do
         begin
@@ -288,24 +286,36 @@ describe "MultiXml" do
 
           context "with an attribute type=\"file\"" do
             before do
-              @string = '<tag type="file" name="logo.png" content_type="image/png"/>'
+              @string = '<tag type="file" name="data.txt" content_type="text/plain">ZGF0YQ==</tag>'
             end
 
             it "should be a StringIO" do
               MultiXml.parse(@string)['tag'].should be_a(StringIO)
             end
 
+            it "should be decoded correctly" do
+              MultiXml.parse(@string)['tag'].string.should == 'data'
+            end
+
             it "should have the correct file name" do
-              MultiXml.parse(@string)['tag'].original_filename.should == 'logo.png'
+              MultiXml.parse(@string)['tag'].original_filename.should == 'data.txt'
             end
 
             it "should have the correct content type" do
-              MultiXml.parse(@string)['tag'].content_type.should == 'image/png'
+              MultiXml.parse(@string)['tag'].content_type.should == 'text/plain'
             end
 
             context "with missing name and content type" do
               before do
-                @string = '<tag type="file"/>'
+                @string = '<tag type="file">ZGF0YQ==</tag>'
+              end
+
+              it "should be a StringIO" do
+                MultiXml.parse(@string)['tag'].should be_a(StringIO)
+              end
+
+              it "should be decoded correctly" do
+                MultiXml.parse(@string)['tag'].string.should == 'data'
               end
 
               it "should have the default file name" do
@@ -324,7 +334,8 @@ describe "MultiXml" do
             end
 
             it "should pass through the type" do
-                MultiXml.parse(@string)['tag']['type'].should == 'foo'
+              pending
+              MultiXml.parse(@string)['tag']['type'].should == 'foo'
             end
           end
 
@@ -466,27 +477,6 @@ describe "MultiXml" do
               MultiXml.parse(@string)['root']['users'].should be_a(Array)
             end
 
-            context "with attributes on some (but not all) children" do
-              before do
-                @string = '<root><users screen_name="sferik">Erik Michaels-Ober</users><users>Wynn Netherland</users></root>'
-              end
-
-              it "should parse correctly" do
-                MultiXml.parse(@string).should == {"root" => {"users" => ["Erik Michaels-Ober", "Wynn Netherland"]}}
-              end
-
-              context "child with attributes" do
-                it "should have attributes" do
-                  MultiXml.parse(@string)['root']['users'][0].attributes.should == {'screen_name' => 'sferik'}
-                end
-              end
-              
-              context "child without attributes" do
-                it "should not have any attributes" do
-                  MultiXml.parse(@string)['root']['users'][1].attributes.should == {}
-                end
-              end
-            end
           end
         end
       end

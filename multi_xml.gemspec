@@ -3,12 +3,11 @@ $:.push File.expand_path("../lib", __FILE__)
 require "multi_xml/version"
 
 Gem::Specification.new do |s|
-  s.add_development_dependency("bundler", ["~> 1.0"])
-  s.add_development_dependency("hpricot", ["~> 0.8"])
-  s.add_development_dependency("libxml-ruby", ["~> 1.1"])
-  s.add_development_dependency("nokogiri", ["~> 1.4"])
-  s.add_development_dependency("rake", ["~> 0.8"])
-  s.add_development_dependency("rspec", ["~> 2.0"])
+  s.add_development_dependency("bundler", "~> 1.0")
+  s.add_development_dependency("libxml-ruby", "~> 1.1")
+  s.add_development_dependency("nokogiri", "~> 1.4")
+  s.add_development_dependency("rake", "~> 0.8")
+  s.add_development_dependency("rspec", "~> 2.0")
   s.name        = "multi_xml"
   s.version     = MultiXml::VERSION
   s.platform    = Gem::Platform::RUBY
