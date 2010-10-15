@@ -452,6 +452,21 @@ describe "MultiXml" do
               end
             end
 
+            context "with newlines and whitepsace" do
+              before do
+                @string = <<-XML
+                  <user>
+                    <name>Erik Michaels-Ober</name>
+                  </user>
+                XML
+              end
+
+              it "should parse correctly" do
+                pending
+                MultiXml.parse(@string).should == {"user"=>{"name"=>"Erik Michaels-Ober"}}
+              end
+            end
+
             # Babies having babies
             context "with children" do
               before do
@@ -473,7 +488,7 @@ describe "MultiXml" do
               MultiXml.parse(@string).should == {"root" => {"users" => ["Erik Michaels-Ober", "Wynn Netherland"]}}
             end
 
-            it "should make an Array of children" do
+            it "should be Array" do
               MultiXml.parse(@string)['root']['users'].should be_a(Array)
             end
 
