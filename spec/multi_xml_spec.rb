@@ -328,17 +328,6 @@ describe "MultiXml" do
             end
           end
 
-          context "with an unrecognized attribute type" do
-            before do
-              @string = '<tag type="foo"/>'
-            end
-
-            it "should pass through the type" do
-              pending
-              MultiXml.parse(@string)['tag']['type'].should == 'foo'
-            end
-          end
-
           %w(integer boolean date datetime yaml).each do |type|
             context "with an empty attribute type=\"#{type}\"" do
               before do
@@ -449,6 +438,16 @@ describe "MultiXml" do
 
               it "should parse correctly" do
                 MultiXml.parse(@string).should == {"user" => {"name" => "Erik Michaels-Ober"}}
+              end
+            end
+
+            context "with an unrecognized attribute type" do
+              before do
+                @string = '<user type="admin"><name>Erik Michaels-Ober</name></user>'
+              end
+
+              it "should pass through the type" do
+                MultiXml.parse(@string)['user']['type'].should == 'admin'
               end
             end
 
