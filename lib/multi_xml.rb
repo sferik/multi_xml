@@ -176,7 +176,7 @@ module MultiXml
       when Hash
         if value['type'] == 'array'
           _, entries = wrap(value.detect{|key, value| key != 'type'})
-          if entries.nil? || entries.strip.empty? || (c = value[CONTENT_ROOT] && c.blank?)
+          if entries.blank? || (c = value[CONTENT_ROOT] && c.blank?)
             []
           else
             case entries

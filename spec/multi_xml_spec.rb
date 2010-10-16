@@ -461,7 +461,6 @@ describe "MultiXml" do
               end
 
               it "should parse correctly" do
-                pending
                 MultiXml.parse(@xml).should == {"user"=>{"name"=>"Erik Michaels-Ober"}}
               end
             end

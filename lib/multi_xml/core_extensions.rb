@@ -8,7 +8,7 @@ class Object #:nodoc:
   # Returns true if the object is nil or empty (if applicable)
   def blank?
     nil? || (respond_to?(:empty?) && empty?)
-  end unless method_defined?(:blank?)
+  end
 end
 
 class Numeric #:nodoc:
@@ -17,7 +17,7 @@ class Numeric #:nodoc:
   # Numerics can't be blank
   def blank?
     false
-  end unless method_defined?(:blank?)
+  end
 end
 
 class NilClass #:nodoc:
@@ -26,7 +26,7 @@ class NilClass #:nodoc:
   # Nils are always blank
   def blank?
     true
-  end unless method_defined?(:blank?)
+  end
 end
 
 class TrueClass #:nodoc:
@@ -35,14 +35,14 @@ class TrueClass #:nodoc:
   # True is not blank.  
   def blank?
     false
-  end unless method_defined?(:blank?)
+  end
 end
 
 class FalseClass #:nodoc:
   # False is always blank.
   def blank?
     true
-  end unless method_defined?(:blank?)
+  end
 end
 
 class String #:nodoc:
@@ -55,5 +55,5 @@ class String #:nodoc:
   # Strips out whitespace then tests if the string is empty.
   def blank?
     strip.empty?
-  end unless method_defined?(:blank?)
+  end
 end
