@@ -161,22 +161,12 @@ module MultiXml
       end
     end
 
-    def wrap(object)
-      if object.nil?
-        []
-      elsif object.respond_to?(:to_ary)
-        object.to_ary
-      else
-        [object]
-      end
-    end
-
     def typecast_xml_value(value)
       case value
       when Hash
         if value['type'] == 'array'
-          _, entries = wrap(value.detect{|key, value| key != 'type'})
-          if entries.blank? || (c = value[CONTENT_ROOT] && c.blank?)
+          _, entries = Array.wrap(value.detect{|key, value| key != 'type'})
+          if entries.blank? || (value.is_a?(Hash) && c = value[CONTENT_ROOT] && c.blank?)
             []
           else
             case entries
