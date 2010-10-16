@@ -89,9 +89,8 @@ module MultiXml
     # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
     def parse(xml, options={})
       xml.strip!
-      hash = typecast_xml_value(undasherize_keys(parser.parse(xml)))
+      hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
       hash = symbolize_keys(hash) if options[:symbolize_keys]
-      hash = {} if hash.nil?
       hash
     end
 
@@ -177,7 +176,7 @@ module MultiXml
       when Hash
         if value['type'] == 'array'
           _, entries = wrap(value.detect{|key, value| key != 'type'})
-          if entries.nil? || entries.strip == '' || (c = value[CONTENT_ROOT] && c.nil?)
+          if entries.nil? || entries.strip.empty? || (c = value[CONTENT_ROOT] && c.blank?)
             []
           else
             case entries
@@ -199,7 +198,7 @@ module MultiXml
         elsif value['type'] == 'string' && value['nil'] != 'true'
           ''
         # blank or nil parsed values are represented by nil
-        elsif value.nil? || value.empty? || value['nil'] == 'true'
+        elsif value.blank? || value['nil'] == 'true'
           nil
         # If the type is the only element which makes it then
         # this still makes the value nil, except if type is
@@ -226,4 +225,9 @@ module MultiXml
       end
     end
   end
+end
+
+library_files = Dir[File.join(File.dirname(__FILE__), "/multi_xml/**/*.rb")].sort
+library_files.each do |file|
+  require file
 end

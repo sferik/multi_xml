@@ -60,7 +60,7 @@ module MultiXml
             end
 
             # Remove content node if it is blank and there are child tags
-            if node_hash.length > 1 && (node_hash[CONTENT_ROOT].nil? || node_hash[CONTENT_ROOT].empty?)
+            if node_hash.length > 1 && node_hash[CONTENT_ROOT].blank?
               node_hash.delete(CONTENT_ROOT)
             end
 
