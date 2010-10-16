@@ -55,7 +55,7 @@ describe "MultiXml" do
           end
         end
 
-        context "a single-node document" do
+        context "an XML document" do
 
           before do
             @xml = '<user/>'
@@ -70,8 +70,8 @@ describe "MultiXml" do
               @xml = '<user><![CDATA[Erik Michaels-Ober]]></user>'
             end
 
-            it "should parse correctly" do
-              MultiXml.parse(@xml).should == {"user" => "Erik Michaels-Ober"}
+            it "should return the correct CDATA" do
+              MultiXml.parse(@xml)['user'].should == "Erik Michaels-Ober"
             end
           end
 
@@ -80,8 +80,8 @@ describe "MultiXml" do
               @xml = '<user>Erik Michaels-Ober</user>'
             end
 
-            it "should parse correctly" do
-              MultiXml.parse(@xml).should == {"user" => "Erik Michaels-Ober"}
+            it "should return the correct content" do
+              MultiXml.parse(@xml)['user'].should == "Erik Michaels-Ober"
             end
           end
 
@@ -90,8 +90,8 @@ describe "MultiXml" do
               @xml = '<user name="Erik Michaels-Ober"/>'
             end
 
-            it "should parse correctly" do
-              MultiXml.parse(@xml).should == {"user" => {"name" => "Erik Michaels-Ober"}}
+            it "should return the correct attribute" do
+              MultiXml.parse(@xml)['user']['name'].should == "Erik Michaels-Ober"
             end
           end
 
@@ -100,14 +100,15 @@ describe "MultiXml" do
               @xml = '<user name="Erik Michaels-Ober" screen_name="sferik"/>'
             end
 
-            it "should parse correctly" do
-              MultiXml.parse(@xml).should == {"user" => {"name" => "Erik Michaels-Ober", "screen_name" => "sferik"}}
+            it "should return the correct attributes" do
+              MultiXml.parse(@xml)['user']['name'].should == "Erik Michaels-Ober"
+              MultiXml.parse(@xml)['user']['screen_name'].should == "sferik"
             end
           end
 
           context "with :symbolize_keys => true" do
             before do
-              @xml = '<user name="Erik Michaels-Ober"/>'
+              @xml = '<user><name>Erik Michaels-Ober</name></user>'
             end
 
             it "should symbolize keys" do
@@ -118,7 +119,7 @@ describe "MultiXml" do
           context "with an attribute type=\"boolean\"" do
             %w(true false).each do |boolean|
               context "when #{boolean}" do
-                it "should be #{boolean}" do
+                it "should return #{boolean}" do
                   xml = "<tag type=\"boolean\">#{boolean}</tag>"
                   MultiXml.parse(xml)['tag'].should instance_eval("be_#{boolean}")
                 end
@@ -130,7 +131,7 @@ describe "MultiXml" do
                 @xml = '<tag type="boolean">1</tag>'
               end
 
-              it "should be true" do
+              it "should return true" do
                 MultiXml.parse(@xml)['tag'].should be_true
               end
             end
@@ -140,7 +141,7 @@ describe "MultiXml" do
                 @xml = '<tag type="boolean">0</tag>'
               end
 
-              it "should be false" do
+              it "should return false" do
                 MultiXml.parse(@xml)['tag'].should be_false
               end
             end
@@ -152,11 +153,15 @@ describe "MultiXml" do
                 @xml = '<tag type="integer">1</tag>'
               end
 
-              it "should be a Fixnum" do
+              it "should return a Fixnum" do
                 MultiXml.parse(@xml)['tag'].should be_a(Fixnum)
               end
 
-              it "should be the correct number" do
+              it "should return a positive number" do
+                MultiXml.parse(@xml)['tag'].should > 0
+              end
+
+              it "should return the correct number" do
                 MultiXml.parse(@xml)['tag'].should == 1
               end
             end
@@ -166,11 +171,15 @@ describe "MultiXml" do
                 @xml = '<tag type="integer">-1</tag>'
               end
 
-              it "should be a Fixnum" do
+              it "should return a Fixnum" do
                 MultiXml.parse(@xml)['tag'].should be_a(Fixnum)
               end
 
-              it "should be the correct number" do
+              it "should return a negative number" do
+                MultiXml.parse(@xml)['tag'].should < 0
+              end
+
+              it "should return the correct number" do
                 MultiXml.parse(@xml)['tag'].should == -1
               end
             end
@@ -181,11 +190,11 @@ describe "MultiXml" do
               @xml = '<tag type="string"></tag>'
             end
 
-            it "should be a String" do
+            it "should return a String" do
               MultiXml.parse(@xml)['tag'].should be_a(String)
             end
 
-            it "should be the correct string" do
+            it "should return the correct string" do
               MultiXml.parse(@xml)['tag'].should == ""
             end
           end
@@ -195,11 +204,11 @@ describe "MultiXml" do
               @xml = '<tag type="date">1970-01-01</tag>'
             end
 
-            it "should be a Date" do
+            it "should return a Date" do
               MultiXml.parse(@xml)['tag'].should be_a(Date)
             end
 
-            it "should be the correct date" do
+            it "should return the correct date" do
               MultiXml.parse(@xml)['tag'].should == Date.parse('1970-01-01')
             end
           end
@@ -209,11 +218,11 @@ describe "MultiXml" do
               @xml = '<tag type="datetime">1970-01-01 00:00</tag>'
             end
 
-            it "should be a Time" do
+            it "should return a Time" do
               MultiXml.parse(@xml)['tag'].should be_a(Time)
             end
 
-            it "should be the correct time" do
+            it "should return the correct time" do
               MultiXml.parse(@xml)['tag'].should == Time.parse('1970-01-01 00:00')
             end
           end
@@ -223,11 +232,11 @@ describe "MultiXml" do
               @xml = '<tag type="datetime">1970-01-01 00:00</tag>'
             end
 
-            it "should be a Time" do
+            it "should return a Time" do
               MultiXml.parse(@xml)['tag'].should be_a(Time)
             end
 
-            it "should be the correct time" do
+            it "should return the correct time" do
               MultiXml.parse(@xml)['tag'].should == Time.parse('1970-01-01 00:00')
             end
           end
@@ -237,11 +246,11 @@ describe "MultiXml" do
               @xml = '<tag type="double">3.14159265358979</tag>'
             end
 
-            it "should be a Float" do
+            it "should return a Float" do
               MultiXml.parse(@xml)['tag'].should be_a(Float)
             end
 
-            it "should be the correct number" do
+            it "should return the correct number" do
               MultiXml.parse(@xml)['tag'].should == 3.14159265358979
             end
           end
@@ -251,11 +260,11 @@ describe "MultiXml" do
               @xml = '<tag type="decimal">3.14159265358979323846264338327950288419716939937510</tag>'
             end
 
-            it "should be a BigDecimal" do
+            it "should return a BigDecimal" do
               MultiXml.parse(@xml)['tag'].should be_a(BigDecimal)
             end
 
-            it "should be the correct number" do
+            it "should return the correct number" do
               MultiXml.parse(@xml)['tag'].should == 3.14159265358979323846264338327950288419716939937510
             end
           end
@@ -265,22 +274,26 @@ describe "MultiXml" do
               @xml = '<tag type="base64Binary">aW1hZ2UucG5n</tag>'
             end
 
-            it "should be a String" do
+            it "should return a String" do
               MultiXml.parse(@xml)['tag'].should be_a(String)
             end
 
-            it "should be the correct string" do
+            it "should return the correct string" do
               MultiXml.parse(@xml)['tag'].should == "image.png"
             end
           end
 
           context "with an attribute type=\"yaml\"" do
             before do
-              @xml = "<tag type=\"yaml\">--- \n1: should be an integer\n:message: Have a nice day\narray: \n- should-have-dashes: true\n  should_have_underscores: true\n</tag>"
+              @xml = "<tag type=\"yaml\">--- \n1: should return an integer\n:message: Have a nice day\narray: \n- should-have-dashes: true\n  should_have_underscores: true\n</tag>"
             end
 
-            it "should parse correctly" do
-              MultiXml.parse(@xml)['tag'].should == {:message => "Have a nice day", 1 => "should be an integer", "array" => [{"should-have-dashes" => true, "should_have_underscores" => true}]}
+            it "should return a Hash" do
+              MultiXml.parse(@xml)['tag'].should be_a(Hash)
+            end
+
+            it "should return the correctly parsed YAML" do
+              MultiXml.parse(@xml)['tag'].should == {:message => "Have a nice day", 1 => "should return an integer", "array" => [{"should-have-dashes" => true, "should_have_underscores" => true}]}
             end
           end
 
@@ -289,7 +302,7 @@ describe "MultiXml" do
               @xml = '<tag type="file" name="data.txt" content_type="text/plain">ZGF0YQ==</tag>'
             end
 
-            it "should be a StringIO" do
+            it "should return a StringIO" do
               MultiXml.parse(@xml)['tag'].should be_a(StringIO)
             end
 
@@ -310,7 +323,7 @@ describe "MultiXml" do
                 @xml = '<tag type="file">ZGF0YQ==</tag>'
               end
 
-              it "should be a StringIO" do
+              it "should return a StringIO" do
                 MultiXml.parse(@xml)['tag'].should be_a(StringIO)
               end
 
@@ -328,13 +341,27 @@ describe "MultiXml" do
             end
           end
 
-          %w(integer boolean date datetime yaml).each do |type|
+          context "with an attribute type=\"array\"" do
+            before do
+              @xml = '<users type="array"><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
+            end
+
+            it "should return an Array" do
+              MultiXml.parse(@xml)['users'].should be_a(Array)
+            end
+
+            it "should return the correct array" do
+              MultiXml.parse(@xml)['users'].should == ["Erik Michaels-Ober", "Wynn Netherland"]
+            end
+          end
+
+          %w(integer boolean date datetime yaml file).each do |type|
             context "with an empty attribute type=\"#{type}\"" do
               before do
                 @xml = "<tag type=\"#{type}\"/>"
               end
 
-              it "should be nil" do
+              it "should return nil" do
                 MultiXml.parse(@xml)['tag'].should be_nil
               end
             end
@@ -342,20 +369,20 @@ describe "MultiXml" do
 
           context "with an empty attribute type=\"array\"" do
             before do
-              @xml = '<users type="array"/>'
+              @xml = '<tag type="array"/>'
             end
 
-            it "should be an empty Array" do
-              MultiXml.parse(@xml)['users'].should == []
+            it "should return an empty Array" do
+              MultiXml.parse(@xml)['tag'].should == []
             end
 
             context "with whitespace" do
               before do
-                @xml = '<users type="array"> </users>'
+                @xml = '<tag type="array"> </tag>'
               end
 
-              it "should be an empty Array" do
-                MultiXml.parse(@xml)['users'].should == []
+              it "should return an empty Array" do
+                MultiXml.parse(@xml)['tag'].should == []
               end
             end
           end
@@ -372,7 +399,7 @@ describe "MultiXml" do
             end
 
             context "in content" do
-              it "should unescape XML entities" do
+              it "should return unescaped XML entities" do
                 @xml_entities.each do |key, value|
                   xml = "<tag>#{value}</tag>"
                   MultiXml.parse(xml)['tag'].should == key
@@ -381,7 +408,7 @@ describe "MultiXml" do
             end
 
             context "in attribute" do
-              it "should unescape XML entities" do
+              it "should return unescaped XML entities" do
                 @xml_entities.each do |key, value|
                   xml = "<tag attribute=\"#{value}\"/>"
                   MultiXml.parse(xml)['tag']['attribute'].should == key
@@ -395,7 +422,7 @@ describe "MultiXml" do
               @xml = '<tag-1/>'
             end
 
-            it "should undasherize tag" do
+            it "should return undasherize tag" do
               MultiXml.parse(@xml).keys.should include('tag_1')
             end
           end
@@ -405,30 +432,20 @@ describe "MultiXml" do
               @xml = '<tag attribute-1="1"></tag>'
             end
 
-            it "should undasherize attribute" do
+            it "should return undasherize attribute" do
               MultiXml.parse(@xml)['tag'].keys.should include('attribute_1')
-            end
-          end
-        end
-
-        context "a document" do
-          context "with :symbolize_keys => true" do
-            before do
-              @xml = '<user><name>Erik Michaels-Ober</name></user>'
-            end
-
-            it "should symbolize keys" do
-              MultiXml.parse(@xml, :symbolize_keys => true).should == {:user => {:name => "Erik Michaels-Ober"}}
             end
           end
 
           context "with children" do
-            before do
-              @xml = '<root><user name="Erik Michaels-Ober"/></root>'
-            end
+            context "with attributes" do
+              before do
+                @xml = '<users><user name="Erik Michaels-Ober"/></users>'
+              end
 
-            it "should parse correctly" do
-              MultiXml.parse(@xml).should == {"root" => {"user" => {"name"=>"Erik Michaels-Ober"}}}
+              it "should return the correct attributes" do
+                MultiXml.parse(@xml)['users']['user']['name'].should == "Erik Michaels-Ober"
+              end
             end
 
             context "with text" do
@@ -436,8 +453,8 @@ describe "MultiXml" do
                 @xml = '<user><name>Erik Michaels-Ober</name></user>'
               end
 
-              it "should parse correctly" do
-                MultiXml.parse(@xml).should == {"user" => {"name" => "Erik Michaels-Ober"}}
+              it "should return the correct text" do
+                MultiXml.parse(@xml)['user']['name'].should == "Erik Michaels-Ober"
               end
             end
 
@@ -461,35 +478,34 @@ describe "MultiXml" do
               end
 
               it "should parse correctly" do
-                MultiXml.parse(@xml).should == {"user"=>{"name"=>"Erik Michaels-Ober"}}
+                MultiXml.parse(@xml).should == {"user" => {"name" => "Erik Michaels-Ober"}}
               end
             end
 
             # Babies having babies
             context "with children" do
               before do
-                @xml = '<root><user name="Erik Michaels-Ober"><status text="Hello"/></user></root>'
+                @xml = '<users><user name="Erik Michaels-Ober"><status text="Hello"/></user></users>'
               end
 
               it "should parse correctly" do
-                MultiXml.parse(@xml).should == {"root" => {"user" => {"name" => "Erik Michaels-Ober", "status" => {"text" => "Hello"}}}}
+                MultiXml.parse(@xml).should == {"users" => {"user" => {"name" => "Erik Michaels-Ober", "status" => {"text" => "Hello"}}}}
               end
             end
           end
 
           context "with sibling children" do
             before do
-              @xml = '<root><users>Erik Michaels-Ober</users><users>Wynn Netherland</users></root>'
+              @xml = '<users><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
+            end
+
+            it "should return an Array" do
+              MultiXml.parse(@xml)['users']['user'].should be_a(Array)
             end
 
             it "should parse correctly" do
-              MultiXml.parse(@xml).should == {"root" => {"users" => ["Erik Michaels-Ober", "Wynn Netherland"]}}
+              MultiXml.parse(@xml).should == {"users" => {"user" => ["Erik Michaels-Ober", "Wynn Netherland"]}}
             end
-
-            it "should be Array" do
-              MultiXml.parse(@xml)['root']['users'].should be_a(Array)
-            end
-
           end
         end
       end
