@@ -10,19 +10,19 @@ module MultiXml
 
       # Parse an XML Document string or IO into a simple hash
       #
-      # data::
+      # xml::
       #   XML Document string or IO to parse
-      def parse(data)
-        if !data.respond_to?(:read)
-          data = StringIO.new(data || '')
+      def parse(xml)
+        if !xml.respond_to?(:read)
+          xml = StringIO.new(xml || '')
         end
 
-        char = data.getc
+        char = xml.getc
         if char.nil?
           {}
         else
-          data.ungetc(char)
-          doc = REXML::Document.new(data)
+          xml.ungetc(char)
+          doc = REXML::Document.new(xml)
 
           if doc.root
             merge_element!({}, doc.root)
