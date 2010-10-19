@@ -5,6 +5,8 @@ require 'time'
 require 'yaml'
 
 module MultiXml
+  class ParseError < StandardError; end
+
   class << self
 
     REQUIREMENT_MAP = [
@@ -89,7 +91,11 @@ module MultiXml
     # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
     def parse(xml, options={})
       xml.strip!
-      hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
+      begin
+        hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
+      rescue StandardError => exception
+        raise ParseError, exception.inspect
+      end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
     end
@@ -215,6 +221,7 @@ module MultiXml
       end
     end
   end
+
 end
 
 library_files = Dir[File.join(File.dirname(__FILE__), "/multi_xml/**/*.rb")].sort

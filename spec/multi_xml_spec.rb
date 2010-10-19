@@ -55,8 +55,19 @@ describe "MultiXml" do
           end
         end
 
-        context "an XML document" do
+        context "an invalid XML document" do
+          before do
+            @xml = '<open></close>'
+          end
 
+          it "should raise MultiXml::ParseError" do
+            lambda do
+              MultiXml.parse(@xml)
+            end.should raise_error(MultiXml::ParseError)
+          end
+        end
+
+        context "a valid XML document" do
           before do
             @xml = '<user/>'
           end
