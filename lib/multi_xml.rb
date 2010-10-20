@@ -13,7 +13,7 @@ module MultiXml
       ['libxml', :libxml],
       ['nokogiri', :nokogiri],
       ['rexml/document', :rexml]
-    ]
+    ] unless defined?(REQUIREMENT_MAP)
 
     CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
 
