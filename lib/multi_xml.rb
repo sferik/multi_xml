@@ -93,8 +93,8 @@ module MultiXml
       xml.strip!
       begin
         hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
-      rescue StandardError => exception
-        raise ParseError, exception.inspect
+      rescue parser.parse_error => error
+        raise ParseError, error.to_s, error.backtrace
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash

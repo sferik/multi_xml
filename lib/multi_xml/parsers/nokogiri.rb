@@ -5,6 +5,7 @@ module MultiXml
     # Use Nokogiri to parse XML.
     module Nokogiri #:nodoc:
       extend self
+      def parse_error; ::Nokogiri::XML::SyntaxError; end
 
       # Parse an XML Document string or IO into a simple hash using libxml / nokogiri.
       # xml::

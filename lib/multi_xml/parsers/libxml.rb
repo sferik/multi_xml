@@ -5,6 +5,7 @@ module MultiXml
     # Use LibXML to parse XML.
     module Libxml #:nodoc:
       extend self
+      def parse_error; ::LibXML::XML::Error; end
 
       # Parse an XML Document string or IO into a simple hash using libxml.
       # xml::
