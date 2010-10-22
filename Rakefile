@@ -12,7 +12,6 @@ Rake::RDocTask.new do |rdoc|
 end
 
 desc "Run all examples"
-RSpec::Core::RakeTask.new(:spec) do |t|
-end
+RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec
