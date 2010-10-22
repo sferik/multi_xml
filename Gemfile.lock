@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    multi_xml (0.1.4)
+    multi_xml (0.2.0)
 
 GEM
   remote: http://rubygems.org/
