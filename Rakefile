@@ -7,10 +7,9 @@ RSpec::Core::RakeTask.new(:spec)
 
 namespace :spec do
   desc "Run all examples using rcov"
-  RSpec::Core::RakeTask.new :rcov => :cleanup_rcov_files do |t|
-    t.rcov = true
-    t.rcov_opts =  %[-Ilib -Ispec]
-    t.rcov_opts << %[--text-report --sort coverage]
+  RSpec::Core::RakeTask.new(:rcov => :cleanup_rcov_files) do |task|
+    task.rcov = true
+    task.rcov_opts =  %[--text-report --sort coverage]
   end
 end
 
@@ -18,7 +17,7 @@ task :cleanup_rcov_files do
   rm_rf 'coverage'
 end
 
-task :default => :spec
+task :default => ["spec:rcov"]
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
