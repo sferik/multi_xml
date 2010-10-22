@@ -1,6 +1,7 @@
 require 'base64'
 require 'bigdecimal'
 require 'date'
+require 'multi_xml/core_extensions'
 require 'time'
 require 'yaml'
 
@@ -222,9 +223,4 @@ module MultiXml
     end
   end
 
-end
-
-library_files = Dir[File.join(File.dirname(__FILE__), "/multi_xml/**/*.rb")].sort
-library_files.each do |file|
-  require file
 end
