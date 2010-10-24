@@ -1,14 +1,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-class MockDecoder
-  def self.parse(xml)
-    '<tag>This is the contents</tag>'
-  end
-end
+class MockDecoder; end
 
 describe "MultiXml" do
   context "Parsers" do
     it "should default to the best available gem" do
+      pending
+      MultiXml.parser.name.should == 'MultiXml::Parsers::Rexml'
+      require 'nokogiri'
+      MultiXml.parser.name.should == 'MultiXml::Parsers::Nokogiri'
       require 'libxml'
       MultiXml.parser.name.should == 'MultiXml::Parsers::Libxml'
     end
@@ -124,6 +124,58 @@ describe "MultiXml" do
 
             it "should symbolize keys" do
               MultiXml.parse(@xml, :symbolize_keys => true).should == {:user => {:name => "Erik Michaels-Ober"}}
+            end
+          end
+
+          context "when value is true" do
+            before do
+              pending
+              @xml = '<tag>true</tag>'
+            end
+
+            it "should return true" do
+              MultiXml.parse(@xml)['tag'].should be_true
+            end
+          end
+
+          context "when value is false" do
+            before do
+              pending
+              @xml = '<tag>false</tag>'
+            end
+
+            it "should return false" do
+              MultiXml.parse(@xml)['tag'].should be_false
+            end
+          end
+
+          context "when key is id" do
+            before do
+              pending
+              @xml = '<id>1</id>'
+            end
+
+            it "should return a Fixnum" do
+              MultiXml.parse(@xml)['id'].should be_a(Fixnum)
+            end
+
+            it "should return the correct number" do
+              MultiXml.parse(@xml)['id'].should == 1
+            end
+          end
+
+          context "when key contains _id" do
+            before do
+              pending
+              @xml = '<tag_id>1</tag_id>'
+            end
+
+            it "should return a Fixnum" do
+              MultiXml.parse(@xml)['tag_id'].should be_a(Fixnum)
+            end
+
+            it "should return the correct number" do
+              MultiXml.parse(@xml)['tag_id'].should == 1
             end
           end
 
