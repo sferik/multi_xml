@@ -2,12 +2,11 @@ require 'nokogiri' unless defined?(Nokogiri)
 
 module MultiXml
   module Parsers
-    # Use Nokogiri to parse XML.
     module Nokogiri #:nodoc:
       extend self
       def parse_error; ::Nokogiri::XML::SyntaxError; end
 
-      # Parse an XML Document string or IO into a simple hash using libxml / nokogiri.
+      # Parse an XML Document string or IO into a simple hash using Nokogiri.
       # xml::
       #   XML Document string or IO to parse
       def parse(xml)

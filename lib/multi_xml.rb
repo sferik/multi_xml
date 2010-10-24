@@ -75,13 +75,13 @@ module MultiXml
     # * <tt>:rexml</tt>
     def parser=(new_parser)
       case new_parser
-        when String, Symbol
-          require "multi_xml/parsers/#{new_parser.to_s.downcase}"
-          @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
-        when Class, Module
-          @parser = new_parser
-        else
-          raise "Did not recognize your parser specification. Please specify either a symbol or a class."
+      when String, Symbol
+        require "multi_xml/parsers/#{new_parser.to_s.downcase}"
+        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
+      when Class, Module
+        @parser = new_parser
+      else
+        raise "Did not recognize your parser specification. Please specify either a symbol or a class."
       end
     end
 

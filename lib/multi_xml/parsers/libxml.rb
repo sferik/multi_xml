@@ -2,12 +2,11 @@ require 'libxml' unless defined?(LibXML)
 
 module MultiXml
   module Parsers
-    # Use LibXML to parse XML.
     module Libxml #:nodoc:
       extend self
       def parse_error; ::LibXML::XML::Error; end
 
-      # Parse an XML Document string or IO into a simple hash using libxml.
+      # Parse an XML Document string or IO into a simple hash using LibXML.
       # xml::
       #   XML Document string or IO to parse
       def parse(xml)

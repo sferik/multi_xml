@@ -2,14 +2,13 @@ require 'rexml/document' unless defined?(REXML::Document)
 
 module MultiXml
   module Parsers
-    # Use REXML to parse XML.
     module Rexml #:nodoc:
       extend self
       def parse_error; ::REXML::ParseException; end
 
       CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
 
-      # Parse an XML Document string or IO into a simple hash
+      # Parse an XML Document string or IO into a simple hash using REXML
       #
       # xml::
       #   XML Document string or IO to parse
