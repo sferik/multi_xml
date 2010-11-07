@@ -1,5 +1,4 @@
 require 'bundler'
-Bundler.setup
 Bundler::GemHelper.install_tasks
 
 require 'rspec/core/rake_task'
@@ -19,10 +18,15 @@ end
 
 task :default => ["spec:rcov"]
 
-require 'rake/rdoctask'
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "multi_xml #{MultiXml::VERSION}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+namespace :doc do
+  require 'yard'
+  YARD::Rake::YardocTask.new do |task|
+    task.files   = ['LICENSE.mkd', 'lib/**/*.rb']
+    task.options = [
+      '--no-private',
+      '--protected',
+      '--output-dir', 'doc/yard',
+      '--markup', 'markdown',
+    ]
+  end
 end

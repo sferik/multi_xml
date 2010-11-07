@@ -1,5 +1,8 @@
 *.gem
+.DS_Store
 .bundle
+.yardoc
 coverage/*
+doc/*
+log/*
 pkg/*
-rdoc/*
