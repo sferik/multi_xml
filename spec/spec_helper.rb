@@ -1,7 +1,8 @@
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-require 'multi_xml'
-require 'rspec/core'
-require 'rubygems'
-require 'bundler'
-Bundler.setup
+require 'simplecov'
+SimpleCov.start do
+  add_group 'Libraries', 'lib'
+end
+
+require File.expand_path('../../lib/multi_xml', __FILE__)
+
+require 'rspec'

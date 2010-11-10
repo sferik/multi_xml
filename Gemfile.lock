@@ -10,7 +10,6 @@ GEM
     libxml-ruby (1.1.4)
     nokogiri (1.4.3.1)
     rake (0.8.7)
-    rcov (0.9.9)
     rspec (2.1.0)
       rspec-core (~> 2.1.0)
       rspec-expectations (~> 2.1.0)
@@ -19,6 +18,9 @@ GEM
     rspec-expectations (2.1.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.1.0)
+    simplecov (0.3.7)
+      simplecov-html (>= 0.3.7)
+    simplecov-html (0.3.9)
     yard (0.6.1)
 
 PLATFORMS
@@ -30,6 +32,6 @@ DEPENDENCIES
   multi_xml!
   nokogiri (~> 1.4)
   rake (~> 0.8)
-  rcov (~> 0.9)
   rspec (~> 2.1)
+  simplecov (~> 0.3)
   yard (~> 0.6)
