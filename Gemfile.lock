@@ -8,6 +8,8 @@ GEM
   specs:
     diff-lcs (1.1.2)
     libxml-ruby (1.1.4)
+    maruku (0.6.0)
+      syntax (>= 1.0.0)
     nokogiri (1.4.3.1)
     rake (0.8.7)
     rspec (2.1.0)
@@ -21,6 +23,7 @@ GEM
     simplecov (0.3.7)
       simplecov-html (>= 0.3.7)
     simplecov-html (0.3.9)
+    syntax (1.0.0)
     yard (0.6.1)
 
 PLATFORMS
@@ -29,6 +32,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.0)
   libxml-ruby (~> 1.1)
+  maruku (~> 0.6)
   multi_xml!
   nokogiri (~> 1.4)
   rake (~> 0.8)
