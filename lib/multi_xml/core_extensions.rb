@@ -4,7 +4,7 @@ class Object #:nodoc:
   # @example [].blank?         #=>  true
   # @example [1].blank?        #=>  false
   # @example [nil].blank?      #=>  false
-  # 
+  #
   # Returns true if the object is nil or empty (if applicable)
   def blank?
     nil? || (respond_to?(:empty?) && empty?)
@@ -13,7 +13,7 @@ end
 
 class Numeric #:nodoc:
   # @return <TrueClass, FalseClass>
-  # 
+  #
   # Numerics can't be blank
   def blank?
     false
@@ -22,7 +22,7 @@ end
 
 class NilClass #:nodoc:
   # @return <TrueClass, FalseClass>
-  # 
+  #
   # Nils are always blank
   def blank?
     true
@@ -31,8 +31,8 @@ end
 
 class TrueClass #:nodoc:
   # @return <TrueClass, FalseClass>
-  # 
-  # True is not blank.  
+  #
+  # True is not blank.
   def blank?
     false
   end
@@ -49,9 +49,9 @@ class String #:nodoc:
   # @example "".blank?         #=>  true
   # @example "     ".blank?    #=>  true
   # @example " hey ho ".blank? #=>  false
-  # 
+  #
   # @return <TrueClass, FalseClass>
-  # 
+  #
   # Strips out whitespace then tests if the string is empty.
   def blank?
     strip.empty?

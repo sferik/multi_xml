@@ -12,7 +12,6 @@ Documentation
 
 Usage Examples
 --------------
-
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their favorite XML library.
 In order to best support multiple XML parsers and libraries, <tt>multi_xml</tt> is a general-purpose
 swappable XML backend library. You use it like so:
@@ -77,11 +76,9 @@ Submitting a Pull Request
 
 Inspiration
 -----------
-
 MultiXML was inspired by [MultiJSON](http://github.com/intridea/multi_json/).
 
 Copyright
 ---------
-
 Copyright (c) 2010 Erik Michaels-Ober.
 See [LICENSE](https://github.com/sferik/multi_xml/blob/master/LICENSE.mkd) for details.
