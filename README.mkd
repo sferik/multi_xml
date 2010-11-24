@@ -17,17 +17,17 @@ In order to best support multiple XML parsers and libraries, <tt>multi_xml</tt> 
 swappable XML backend library. You use it like so:
 
     require 'multi_xml'
-    
+
     MultiXml.parser = :libxml
-    MultiXml.parser = MultiJson::Parser::Libxml # Same as above
+    MultiXml.parser = MultiXml::Parsers::Libxml # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using LibXML
-    
+
     MultiXml.parser = :nokogiri
-    MultiXml.parser = MultiJson::Parser::Nokogiri # Same as above
+    MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
-    
+
     MultiXml.parser = :rexml
-    MultiXml.parser = MultiJson::Parser::Rexml # Same as above
+    MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using REXML
 
 The <tt>parser</tt> setter takes either a symbol or a class (to allow for custom XML parsers) that
