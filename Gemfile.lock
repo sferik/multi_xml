@@ -24,7 +24,7 @@ GEM
       simplecov-html (>= 0.3.7)
     simplecov-html (0.3.9)
     syntax (1.0.0)
-    yard (0.6.2)
+    yard (0.6.3)
 
 PLATFORMS
   ruby
