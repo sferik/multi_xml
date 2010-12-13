@@ -8,9 +8,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency('maruku', '~> 0.6')
   s.add_development_dependency('nokogiri', '~> 1.4')
   s.add_development_dependency('rake', '~> 0.8')
-  s.add_development_dependency('rspec', '~> 2.2')
+  s.add_development_dependency('rspec', '~> 2.3')
   s.add_development_dependency('simplecov', '~> 0.3')
   s.add_development_dependency('yard', '~> 0.6')
+  s.add_development_dependency('ZenTest', '~> 4.4')
   s.name        = 'multi_xml'
   s.version     = MultiXml::VERSION
   s.platform    = Gem::Platform::RUBY
