@@ -10,6 +10,10 @@ Documentation
 -------------
 <http://rdoc.info/gems/multi_xml>
 
+Continuous Integration
+----------------------
+[![Build Status](http://travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
+
 Usage Examples
 --------------
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their favorite XML library.
