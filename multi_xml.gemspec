@@ -2,7 +2,6 @@
 require File.expand_path('../lib/multi_xml/version', __FILE__)
 
 Gem::Specification.new do |s|
-  s.add_development_dependency('libxml-ruby', '1.1.3')
   s.add_development_dependency('maruku', '~> 0.6')
   s.add_development_dependency('nokogiri', '~> 1.4')
   s.add_development_dependency('rake', '~> 0.8')
@@ -10,6 +9,12 @@ Gem::Specification.new do |s|
   s.add_development_dependency('simplecov', '~> 0.4')
   s.add_development_dependency('yard', '~> 0.6')
   s.add_development_dependency('ZenTest', '~> 4.5')
+
+  # only use if not rubinius or java
+  unless ENV['RUBY_VERSION'].match(/^(rbx|jruby)-/)
+    s.add_development_dependency('libxml-ruby', '1.1.3')
+  end
+
   s.name        = 'multi_xml'
   s.version     = MultiXml::VERSION
   s.platform    = Gem::Platform::RUBY
