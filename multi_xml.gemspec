@@ -2,7 +2,7 @@
 require File.expand_path('../lib/multi_xml/version', __FILE__)
 
 Gem::Specification.new do |s|
-  s.add_development_dependency('libxml-ruby', '~> 1.1')
+  s.add_development_dependency('libxml-ruby', '1.1.3')
   s.add_development_dependency('maruku', '~> 0.6')
   s.add_development_dependency('nokogiri', '~> 1.4')
   s.add_development_dependency('rake', '~> 0.8')
