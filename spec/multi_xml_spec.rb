@@ -25,16 +25,16 @@ describe "MultiXml" do
     end
   end
 
-  [['libxml',   'libxml'],
-   ['rexml',    'rexml/document'],
-   ['nokogiri', 'nokogiri']].each do |parser|
+  [['LibXML', 'libxml'],
+   ['REXML', 'rexml/document'],
+   ['Nokogiri', 'nokogiri']].each do |parser|
     begin
       require parser.last
       context "#{parser.first} parser" do
-        it_should_behave_like "a Parser", parser.first
+        it_should_behave_like "a parser", parser.first
       end
     rescue LoadError => e
-      puts "tests not run for #{parser} due to a LoadError"
+      puts "Tests not run for #{parser.first} due to a LoadError"
     end
   end
 end

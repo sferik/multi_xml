@@ -1,4 +1,4 @@
-shared_examples_for "a Parser" do |parser|
+shared_examples_for "a parser" do |parser|
 
   before do
     begin
