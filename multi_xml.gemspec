@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
 
   # only use if not rubinius or java
   unless ENV['RUBY_VERSION'].match(/^(rbx|jruby)-/)
-    s.add_development_dependency('libxml-ruby', '1.1.3')
+    s.add_development_dependency('libxml-ruby', '~> 2.0')
   end
 
   s.name        = 'multi_xml'
