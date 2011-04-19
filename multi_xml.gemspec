@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('ZenTest', '~> 4.5')
 
   # only use if not rubinius or java
-  unless ENV['RUBY_VERSION'].match(/^(rbx|jruby)-/)
+  unless defined?(RUBY_ENGINE) && %w{rbx jruby}.include?(RUBY_ENGINE)
     s.add_development_dependency('libxml-ruby', '~> 2.0')
   end
 
