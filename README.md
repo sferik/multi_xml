@@ -85,4 +85,4 @@ MultiXML was inspired by [MultiJSON](http://github.com/intridea/multi_json/).
 Copyright
 ---------
 Copyright (c) 2010 Erik Michaels-Ober.
-See [LICENSE](https://github.com/sferik/multi_xml/blob/master/LICENSE.mkd) for details.
+See [LICENSE](https://github.com/sferik/multi_xml/blob/master/LICENSE.md) for details.
