@@ -4,7 +4,7 @@ A generic swappable back-end for XML parsing
 
 Installation
 ------------
-    $ [sudo] gem install multi_xml
+    gem install multi_xml
 
 Documentation
 -------------
