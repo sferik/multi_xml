@@ -54,12 +54,12 @@ Here are some ways *you* can contribute:
 * by writing specifications
 * by writing code (**no patch is too small**: fix typos, add comments, clean up inconsistent whitespace)
 * by refactoring code
-* by resolving [issues](http://github.com/sferik/multi_xml/issues)
+* by resolving [issues](https://github.com/sferik/multi_xml/issues)
 * by reviewing patches
 
 Submitting an Issue
 -------------------
-We use the [GitHub issue tracker](http://github.com/sferik/multi_xml/issues) to track bugs and
+We use the [GitHub issue tracker](https://github.com/sferik/multi_xml/issues) to track bugs and
 features. Before submitting a bug report or feature request, check to make sure it hasn't already
 been submitted. You can indicate support for an existing issuse by voting it up. When submitting a
 bug report, please include a [Gist](http://gist.github.com/) that includes a stack trace and any
@@ -80,7 +80,7 @@ Submitting a Pull Request
 
 Inspiration
 -----------
-MultiXML was inspired by [MultiJSON](http://github.com/intridea/multi_json/).
+MultiXML was inspired by [MultiJSON](https://github.com/intridea/multi_json/).
 
 Copyright
 ---------
