@@ -8,7 +8,7 @@ Installation
 
 Documentation
 -------------
-<http://rdoc.info/gems/multi_xml>
+[http://rdoc.info/gems/multi_xml](http://rdoc.info/gems/multi_xml)
 
 Continuous Integration
 ----------------------
