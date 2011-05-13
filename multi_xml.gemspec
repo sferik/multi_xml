@@ -1,31 +1,25 @@
 # -*- encoding: utf-8 -*-
 require File.expand_path('../lib/multi_xml/version', __FILE__)
 
-Gem::Specification.new do |s|
-  s.add_development_dependency('maruku', '~> 0.6')
-  s.add_development_dependency('nokogiri', '~> 1.4')
-  s.add_development_dependency('rake', '~> 0.8')
-  s.add_development_dependency('rspec', '~> 2.5')
-  s.add_development_dependency('simplecov', '~> 0.4')
-  s.add_development_dependency('yard', '~> 0.6')
-  s.add_development_dependency('ZenTest', '~> 4.5')
-
-  # only use if not rubinius or java
-  unless defined?(RUBY_ENGINE) && %w{rbx jruby}.include?(RUBY_ENGINE)
-    s.add_development_dependency('libxml-ruby', '~> 2.0')
-  end
-
-  s.name        = 'multi_xml'
-  s.version     = MultiXml::VERSION
-  s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Erik Michaels-Ober"]
-  s.email       = ['sferik@gmail.com']
-  s.homepage    = 'http://rubygems.org/gems/multi_xml'
-  s.summary     = %q{A generic swappable back-end for XML parsing}
-  s.description = %q{A gem to provide swappable XML backends utilizing LibXML, Nokogiri, or REXML.}
-  s.rubyforge_project = 'multi_xml'
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ['lib']
+Gem::Specification.new do |gem|
+  gem.add_development_dependency 'maruku', '~> 0.6'
+  gem.add_development_dependency 'nokogiri', '~> 1.4'
+  gem.add_development_dependency 'rake', '~> 0.8'
+  gem.add_development_dependency 'rspec', '~> 2.6'
+  gem.add_development_dependency 'simplecov', '~> 0.4'
+  gem.add_development_dependency 'yard', '~> 0.6'
+  gem.add_development_dependency 'ZenTest', '~> 4.5'
+  gem.add_development_dependency 'libxml-ruby', '~> 2.0'
+  gem.name = 'multi_xml'
+  gem.version = MultiXml::VERSION
+  gem.platform = Gem::Platform::RUBY
+  gem.author = "Erik Michaels-Ober"
+  gem.email = 'sferik@gmail.com'
+  gem.homepage = 'https://github.com/sferik/multi_xml'
+  gem.summary = %q{A generic swappable back-end for XML parsing}
+  gem.description = %q{A gem to provide swappable XML backends utilizing LibXML, Nokogiri, or REXML.}
+  gem.files = `git ls-files`.split("\n")
+  gem.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
+  gem.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  gem.require_paths = ['lib']
 end
