@@ -2,14 +2,13 @@
 require File.expand_path('../lib/multi_xml/version', __FILE__)
 
 Gem::Specification.new do |gem|
+  gem.add_development_dependency 'ZenTest', '~> 4.5'
   gem.add_development_dependency 'maruku', '~> 0.6'
   gem.add_development_dependency 'nokogiri', '~> 1.4'
   gem.add_development_dependency 'rake', '~> 0.8'
   gem.add_development_dependency 'rspec', '~> 2.6'
   gem.add_development_dependency 'simplecov', '~> 0.4'
-  gem.add_development_dependency 'yard', '~> 0.6'
-  gem.add_development_dependency 'ZenTest', '~> 4.5'
-  gem.add_development_dependency 'libxml-ruby', '~> 2.0'
+  # gem.add_development_dependency 'yard', '~> 0.7'
   gem.name = 'multi_xml'
   gem.version = MultiXml::VERSION
   gem.platform = Gem::Platform::RUBY
