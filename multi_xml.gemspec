@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake', '~> 0.8'
   gem.add_development_dependency 'rspec', '~> 2.6'
   gem.add_development_dependency 'simplecov', '~> 0.4'
-  # gem.add_development_dependency 'yard', '~> 0.7'
+  gem.add_development_dependency 'yard', '~> 0.7'
   gem.name = 'multi_xml'
   gem.version = MultiXml::VERSION
   gem.platform = Gem::Platform::RUBY
