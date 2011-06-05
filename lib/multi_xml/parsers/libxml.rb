@@ -42,7 +42,7 @@ module LibXML #:nodoc:
       # hash::
       #   Hash to merge the converted element into.
       def to_hash(hash={})
-        node_hash = {}
+        node_hash = {CONTENT_ROOT => ''}
 
         # Insert node hash into parent hash correctly.
         case hash[name]
@@ -56,13 +56,12 @@ module LibXML #:nodoc:
           if c.element?
             c.to_hash(node_hash)
           elsif c.text? || c.cdata?
-            node_hash[CONTENT_ROOT] ||= ''
             node_hash[CONTENT_ROOT] << c.content
           end
         end
 
-        # Remove content node if it is blank
-        if node_hash.length > 1 && node_hash[CONTENT_ROOT].blank?
+        # Remove content node if it is empty
+        if node_hash[CONTENT_ROOT].strip.empty?
           node_hash.delete(CONTENT_ROOT)
         end
 

@@ -118,7 +118,7 @@ module MultiXml
       # element::
       #   XML element to be checked.
       def empty_content?(element)
-        element.texts.join.blank?
+        element.texts.join.strip.empty?
       end
     end
   end
