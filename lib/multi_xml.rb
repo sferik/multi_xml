@@ -1,7 +1,6 @@
 require 'base64'
 require 'bigdecimal'
 require 'date'
-require 'multi_xml/core_extensions'
 require 'time'
 require 'yaml'
 
@@ -172,8 +171,9 @@ module MultiXml
       case value
       when Hash
         if value['type'] == 'array'
-          _, entries = Array.wrap(value.detect{|key, value| key != 'type'})
-          if entries.blank? || (value.is_a?(Hash) && c = value[CONTENT_ROOT] && c.blank?)
+          _, entries = value.detect {|key, value| key != 'type'}
+
+          if entries.nil? || (entries.is_a?(String) && entries.strip.empty?)
             []
           else
             case entries
@@ -195,7 +195,7 @@ module MultiXml
         elsif value['type'] == 'string' && value['nil'] != 'true'
           ''
         # blank or nil parsed values are represented by nil
-        elsif value.blank? || value['nil'] == 'true'
+        elsif value.empty? || value['nil'] == 'true'
           nil
         # If the type is the only element which makes it then
         # this still makes the value nil, except if type is
