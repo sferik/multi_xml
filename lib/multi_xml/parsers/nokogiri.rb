@@ -25,7 +25,7 @@ module MultiXml
       end
 
       def node_name(node)
-        node.node_name 
+        node.node_name
       end
     end
   end

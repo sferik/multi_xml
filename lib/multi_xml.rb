@@ -1,6 +1,7 @@
 require 'base64'
 require 'bigdecimal'
 require 'date'
+require 'stringio'
 require 'time'
 require 'yaml'
 
