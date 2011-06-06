@@ -6,23 +6,13 @@ module MultiXml
       extend self
       def parse_error; ::Nokogiri::XML::SyntaxError; end
 
-      # Parse an XML Document string or IO into a simple hash using Nokogiri.
+      # Parse an XML Document IO into a simple hash using Nokogiri.
       # xml::
-      #   XML Document string or IO to parse
+      #   XML Document IO to parse
       def parse(xml)
-        if !xml.respond_to?(:read)
-          xml = StringIO.new(xml || '')
-        end
-
-        char = xml.getc
-        if char.nil?
-          {}
-        else
-          xml.ungetc(char)
-          doc = ::Nokogiri::XML(xml)
-          raise doc.errors.first if doc.errors.length > 0
-          doc.to_hash
-        end
+        doc = ::Nokogiri::XML(xml)
+        raise doc.errors.first if doc.errors.length > 0
+        doc.to_hash
       end
 
       module Conversions #:nodoc:

@@ -6,26 +6,16 @@ module MultiXml
       extend self
       def parse_error; ::REXML::ParseException; end
 
-      # Parse an XML Document string or IO into a simple hash using REXML
+      # Parse an XML Document IO into a simple hash using REXML
       #
       # xml::
-      #   XML Document string or IO to parse
+      #   XML Document IO to parse
       def parse(xml)
-        if !xml.respond_to?(:read)
-          xml = StringIO.new(xml || '')
-        end
-
-        char = xml.getc
-        if char.nil?
-          {}
+        doc = REXML::Document.new(xml)
+        if doc.root
+          merge_element!({}, doc.root)
         else
-          xml.ungetc(char)
-          doc = REXML::Document.new(xml)
-          if doc.root
-            merge_element!({}, doc.root)
-          else
-            raise REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root"
-          end
+          raise REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root"
         end
       end
 

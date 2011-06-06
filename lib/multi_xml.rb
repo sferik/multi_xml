@@ -83,13 +83,22 @@ module MultiXml
       end
     end
 
-    # Parse an XML string into Ruby.
+    # Parse an XML string or IO into Ruby.
     #
     # <b>Options</b>
     #
     # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
     def parse(xml, options={})
-      xml.strip!
+      xml ||= ''
+
+      xml.strip! if xml.respond_to?(:strip!)
+
+      xml = StringIO.new(xml) unless xml.respond_to?(:read)
+
+      char = xml.getc
+      return {} if char.nil?
+      xml.ungetc(char)
+
       begin
         hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
       rescue parser.parse_error => error

@@ -6,21 +6,11 @@ module MultiXml
       extend self
       def parse_error; ::LibXML::XML::Error; end
 
-      # Parse an XML Document string or IO into a simple hash using LibXML.
+      # Parse an XML Document IO into a simple hash using LibXML.
       # xml::
-      #   XML Document string or IO to parse
+      #   XML Document IO to parse
       def parse(xml)
-        if !xml.respond_to?(:read)
-          xml = StringIO.new(xml || '')
-        end
-
-        char = xml.getc
-        if char.nil?
-          {}
-        else
-          xml.ungetc(char)
-          LibXML::XML::Parser.io(xml).parse.to_hash
-        end
+        LibXML::XML::Parser.io(xml).parse.to_hash
       end
     end
   end
