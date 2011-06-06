@@ -7,40 +7,39 @@ require 'yaml'
 module MultiXml
   class ParseError < StandardError; end
 
+  REQUIREMENT_MAP = [
+    ['libxml', :libxml],
+    ['nokogiri', :nokogiri],
+    ['rexml/document', :rexml]
+  ] unless defined?(REQUIREMENT_MAP)
+
+  CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
+
+  # TODO: use Time.xmlschema instead of Time.parse;
+  #       use regexp instead of Date.parse
+  unless defined?(PARSING)
+    PARSING = {
+      'symbol'       => Proc.new{|symbol| symbol.to_sym},
+      'date'         => Proc.new{|date| Date.parse(date)},
+      'datetime'     => Proc.new{|time| Time.parse(time).utc rescue DateTime.parse(time).utc},
+      'integer'      => Proc.new{|integer| integer.to_i},
+      'float'        => Proc.new{|float| float.to_f},
+      'decimal'      => Proc.new{|number| BigDecimal(number)},
+      'boolean'      => Proc.new{|boolean| !%w(0 false).include?(boolean.strip)},
+      'string'       => Proc.new{|string| string.to_s},
+      'yaml'         => Proc.new{|yaml| YAML::load(yaml) rescue yaml},
+      'base64Binary' => Proc.new{|binary| binary.unpack('m').first},
+      'binary'       => Proc.new{|binary, entity| parse_binary(binary, entity)},
+      'file'         => Proc.new{|file, entity| parse_file(file, entity)}
+    }
+
+    PARSING.update(
+      'double'   => PARSING['float'],
+      'dateTime' => PARSING['datetime']
+    )
+  end
+
   class << self
-
-    REQUIREMENT_MAP = [
-      ['libxml', :libxml],
-      ['nokogiri', :nokogiri],
-      ['rexml/document', :rexml]
-    ] unless defined?(REQUIREMENT_MAP)
-
-    CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
-
-    # TODO: use Time.xmlschema instead of Time.parse;
-    #       use regexp instead of Date.parse
-    unless defined?(PARSING)
-      PARSING = {
-        'symbol'       => Proc.new{|symbol| symbol.to_sym},
-        'date'         => Proc.new{|date| Date.parse(date)},
-        'datetime'     => Proc.new{|time| Time.parse(time).utc rescue DateTime.parse(time).utc},
-        'integer'      => Proc.new{|integer| integer.to_i},
-        'float'        => Proc.new{|float| float.to_f},
-        'decimal'      => Proc.new{|number| BigDecimal(number)},
-        'boolean'      => Proc.new{|boolean| !%w(0 false).include?(boolean.strip)},
-        'string'       => Proc.new{|string| string.to_s},
-        'yaml'         => Proc.new{|yaml| YAML::load(yaml) rescue yaml},
-        'base64Binary' => Proc.new{|binary| binary.unpack('m').first},
-        'binary'       => Proc.new{|binary, entity| parse_binary(binary, entity)},
-        'file'         => Proc.new{|file, entity| parse_file(file, entity)}
-      }
-
-      PARSING.update(
-        'double'   => PARSING['float'],
-        'dateTime' => PARSING['datetime']
-      )
-    end
-
     # Get the current parser class.
     def parser
       return @parser if @parser
@@ -117,7 +116,7 @@ module MultiXml
     private
 
     # TODO: Add support for other encodings
-    def self.parse_binary(binary, entity) #:nodoc:
+    def parse_binary(binary, entity) #:nodoc:
       case entity['encoding']
       when 'base64'
         Base64.decode64(binary)
@@ -126,7 +125,7 @@ module MultiXml
       end
     end
 
-    def self.parse_file(file, entity)
+    def parse_file(file, entity)
       f = StringIO.new(Base64.decode64(file))
       f.extend(FileLike)
       f.original_filename = entity['name']
