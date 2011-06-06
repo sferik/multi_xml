@@ -35,14 +35,12 @@ module LibXML #:nodoc:
     end
 
     module Node #:nodoc:
-      CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
-
       # Convert XML document to hash
       #
       # hash::
       #   Hash to merge the converted element into.
       def to_hash(hash={})
-        node_hash = {CONTENT_ROOT => ''}
+        node_hash = {MultiXml::CONTENT_ROOT => ''}
 
         # Insert node hash into parent hash correctly.
         case hash[name]
@@ -56,13 +54,13 @@ module LibXML #:nodoc:
           if c.element?
             c.to_hash(node_hash)
           elsif c.text? || c.cdata?
-            node_hash[CONTENT_ROOT] << c.content
+            node_hash[MultiXml::CONTENT_ROOT] << c.content
           end
         end
 
         # Remove content node if it is empty
-        if node_hash[CONTENT_ROOT].strip.empty?
-          node_hash.delete(CONTENT_ROOT)
+        if node_hash[MultiXml::CONTENT_ROOT].strip.empty?
+          node_hash.delete(MultiXml::CONTENT_ROOT)
         end
 
         # Handle attributes

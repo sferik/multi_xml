@@ -6,8 +6,6 @@ module MultiXml
       extend self
       def parse_error; ::REXML::ParseException; end
 
-      CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
-
       # Parse an XML Document string or IO into a simple hash using REXML
       #
       # xml::
@@ -72,7 +70,7 @@ module MultiXml
           # must use value to prevent double-escaping
           texts = ''
           element.texts.each { |t| texts << t.value }
-          merge!(hash, CONTENT_ROOT, texts)
+          merge!(hash, MultiXml::CONTENT_ROOT, texts)
         end
       end
 
