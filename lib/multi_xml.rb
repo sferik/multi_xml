@@ -180,14 +180,14 @@ module MultiXml
       case value
       when Hash
         if value['type'] == 'array'
-          _, entries = value.detect {|key, value| key != 'type'}
+          _, entries = value.detect {|key, _| key != 'type'}
 
           if entries.nil? || (entries.is_a?(String) && entries.strip.empty?)
             []
           else
             case entries
             when Array
-              entries.map{|value| typecast_xml_value(value)}
+              entries.map {|entry| typecast_xml_value(entry)}
             when Hash
               [typecast_xml_value(entries)]
             else
@@ -212,8 +212,8 @@ module MultiXml
         elsif value['type'] && value.size == 1 && !value['type'].is_a?(Hash)
           nil
         else
-          xml_value = value.inject({}) do |hash, (key, value)|
-            hash[key] = typecast_xml_value(value)
+          xml_value = value.inject({}) do |hash, (k, v)|
+            hash[k] = typecast_xml_value(v)
             hash
           end
 

@@ -86,8 +86,8 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct attributes" do
-          MultiXml.parse(@xml)['user']['name'].should == "Erik Michaels-Ober"
-          MultiXml.parse(@xml)['user']['screen_name'].should == "sferik"
+          MultiXml.parse(@xml)['user']['name'].should be == "Erik Michaels-Ober"
+          MultiXml.parse(@xml)['user']['screen_name'].should be == "sferik"
         end
       end
 
