@@ -7,9 +7,9 @@ describe "MultiXml" do
   context "Parsers" do
     it "should default to the best available gem" do
       pending
-      MultiXml.parser.name.should == 'MultiXml::Parsers::Rexml'
+      MultiXml.parser.name.should be == 'MultiXml::Parsers::Rexml'
       require 'nokogiri'
-      MultiXml.parser.name.should == 'MultiXml::Parsers::Nokogiri'
+      MultiXml.parser.name.should be == 'MultiXml::Parsers::Nokogiri'
       require 'libxml'
       MultiXml.parser.name.should == 'MultiXml::Parsers::Libxml'
     end
