@@ -12,7 +12,7 @@ Documentation
 
 Continuous Integration
 ----------------------
-[![Build Status](http://travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
+[![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
 
 Usage Examples
 --------------
