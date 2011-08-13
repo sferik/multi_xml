@@ -2,19 +2,19 @@ MultiXML
 ========
 A generic swappable back-end for XML parsing
 
-Installation
+<a name="installation">Installation</a>
 ------------
     gem install multi_xml
 
-Documentation
+<a name="documentation">Documentation</a>
 -------------
 [http://rdoc.info/gems/multi_xml](http://rdoc.info/gems/multi_xml)
 
-Continuous Integration
+<a name="ci">Continuous Integration</a>
 ----------------------
 [![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
 
-Usage Examples
+<a name="examples">Usage Examples</a>
 --------------
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their favorite XML library.
 In order to best support multiple XML parsers and libraries, <tt>multi_xml</tt> is a general-purpose
@@ -41,7 +41,7 @@ MultiXML tries to have intelligent defaulting. That is, if you have any of the s
 already loaded, it will utilize them before attempting to load any. When loading, libraries are
 ordered by speed: first LibXML, then Nokogiri, then REXML.
 
-Contributing
+<a name="contributing">Contributing</a>
 ------------
 In the spirit of [free software](http://www.fsf.org/licensing/essays/free-sw.html), **everyone** is encouraged to help improve this project.
 
@@ -57,7 +57,7 @@ Here are some ways *you* can contribute:
 * by resolving [issues](https://github.com/sferik/multi_xml/issues)
 * by reviewing patches
 
-Submitting an Issue
+<a name="issues">Submitting an Issue</a>
 -------------------
 We use the [GitHub issue tracker](https://github.com/sferik/multi_xml/issues) to track bugs and
 features. Before submitting a bug report or feature request, check to make sure it hasn't already
@@ -66,7 +66,7 @@ bug report, please include a [Gist](https://gist.github.com/) that includes a st
 details that may be necessary to reproduce the bug, including your gem version, Ruby version, and
 operating system. Ideally, a bug report should include a pull request with failing specs.
 
-Submitting a Pull Request
+<a name="pulls">Submitting a Pull Request</a>
 -------------------------
 1. Fork the project.
 2. Create a topic branch.
@@ -78,7 +78,7 @@ Submitting a Pull Request
 8. Commit and push your changes.
 9. Submit a pull request. Please do not include changes to the gemspec, version, or history file. (If you want to create your own version for some reason, please do so in a separate commit.)
 
-Supported Rubies
+<a name="rubies">Supported Rubies</a>
 ----------------
 This library aims to support and is [tested
 against](http://travis-ci.org/sferik/multi_xml) the following Ruby
@@ -109,7 +109,7 @@ Inspiration
 -----------
 MultiXML was inspired by [MultiJSON](https://github.com/intridea/multi_json/).
 
-Copyright
+<a name="copyright">Copyright</a>
 ---------
 Copyright (c) 2010 Erik Michaels-Ober.
 See [LICENSE](https://github.com/sferik/multi_xml/blob/master/LICENSE.md) for details.
