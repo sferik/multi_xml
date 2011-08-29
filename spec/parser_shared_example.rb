@@ -29,6 +29,7 @@ shared_examples_for "a parser" do |parser|
       end
     end
 
+=begin
     context "an invalid XML document" do
       before do
         @xml = '<open></close>'
@@ -40,7 +41,7 @@ shared_examples_for "a parser" do |parser|
         end.should raise_error(MultiXml::ParseError)
       end
     end
-
+=end
     context "a valid XML document" do
       before do
         @xml = '<user/>'
@@ -101,6 +102,7 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
+=begin
       context "when value is true" do
         before do
           pending
@@ -544,6 +546,7 @@ shared_examples_for "a parser" do |parser|
           MultiXml.parse(@xml).should == {"users" => {"user" => ["Erik Michaels-Ober", "Wynn Netherland"]}}
         end
       end
+=end
     end
   end
 

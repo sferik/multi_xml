@@ -11,6 +11,7 @@ module MultiXml
   REQUIREMENT_MAP = [
     ['libxml', :libxml],
     ['nokogiri', :nokogiri],
+    ['ox', :ox],
     ['rexml/document', :rexml]
   ] unless defined?(REQUIREMENT_MAP)
 
@@ -71,6 +72,7 @@ module MultiXml
     #
     # * <tt>:libxml</tt>
     # * <tt>:nokogiri</tt>
+    # * <tt>:ox</tt>
     # * <tt>:rexml</tt>
     def parser=(new_parser)
       case new_parser
@@ -94,14 +96,19 @@ module MultiXml
 
       xml.strip! if xml.respond_to?(:strip!)
 
-      xml = StringIO.new(xml) unless xml.respond_to?(:read)
+      if parser.respond_to?(:string_parser?) and parser.string_parser?
+        raw_hash = parser.parse(xml)
+      else
+        xml = StringIO.new(xml) unless xml.respond_to?(:read)
 
-      char = xml.getc
-      return {} if char.nil?
-      xml.ungetc(char)
+        char = xml.getc
+        return {} if char.nil?
+        xml.ungetc(char)
 
+        raw_hash = parser.parse(xml)
+      end
       begin
-        hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
+        hash = typecast_xml_value(undasherize_keys(raw_hash)) || {}
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace
       end
