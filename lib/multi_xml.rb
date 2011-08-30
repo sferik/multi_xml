@@ -4,6 +4,7 @@ require 'date'
 require 'stringio'
 require 'time'
 require 'yaml'
+require 'pp' # TBD remove
 
 module MultiXml
   class ParseError < StandardError; end
@@ -96,18 +97,24 @@ module MultiXml
 
       xml.strip! if xml.respond_to?(:strip!)
 
-      if parser.respond_to?(:string_parser?) and parser.string_parser?
-        raw_hash = parser.parse(xml)
-      else
-        xml = StringIO.new(xml) unless xml.respond_to?(:read)
-
-        char = xml.getc
-        return {} if char.nil?
-        xml.ungetc(char)
-
-        raw_hash = parser.parse(xml)
-      end
       begin
+        if parser.respond_to?(:string_parser?) and parser.string_parser?
+          raw_hash = parser.parse(xml)
+        else
+          xml = StringIO.new(xml) unless xml.respond_to?(:read)
+
+          char = xml.getc
+          return {} if char.nil?
+          xml.ungetc(char)
+
+          raw_hash = parser.parse(xml)
+        end
+        if xml.is_a?(StringIO)
+          puts xml.string
+        else
+          puts xml
+        end
+        pp raw_hash
         hash = typecast_xml_value(undasherize_keys(raw_hash)) || {}
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace
