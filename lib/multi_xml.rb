@@ -4,7 +4,6 @@ require 'date'
 require 'stringio'
 require 'time'
 require 'yaml'
-require 'pp' # TBD remove
 
 module MultiXml
   class ParseError < StandardError; end
