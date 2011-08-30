@@ -7,54 +7,36 @@ module MultiXml
       extend self
       
       def parse_error
-        ::MultiXml::ParseError
+        Exception
       end
 
       def parse(xml)
-        begin
-          doc = ::Ox.parse(xml)
-          h = { }
-          unless doc.nil?
-            element_to_hash(doc, h)
-          end
-          h
-        rescue Exception => e
-          puts "*** #{e.class}: #{e.message}"
-          raise MultiXml::ParseError(e.message, e.backtrace)
-        end
+        doc = ::Ox.parse(xml)
+        h = { }
+        element_to_hash(doc, h) unless doc.nil?
+        h
       end
 
       def element_to_hash(e, h)
-        ch = { }
+        content = { }
         e.attributes.each do |k,v|
-          ch = { } if ch.nil?
-          ch[k.to_s] = v
+          content[k.to_s] = v
         end
         e.nodes.each do |n|
           if n.is_a?(::Ox::Element)
-            k = n.name
-            v = ch[k]
-            element_to_hash(n, ch)
-            if v.nil?
-              h[k] = ch
-            elsif v.is_a?(Array)
-              v << ch
-            else
-              h[k] = [v, ch]
-            end
+            element_to_hash(n, content)
           elsif n.is_a?(String)
-            ch = n
+            content['__content__'] = n
           elsif n.is_a?(::Ox::Node)
-            ch = n.value
+            content['__content__'] = n.value
           end
         end
-        v = h[e.name]
-        if v.nil?
-          h[e.name] = ch
-        elsif v.is_a?(Array)
-          v << ch unless ch.nil?
+        if (ex = h[e.name]).nil?
+          h[e.name] = content
+        elsif ex.is_a?(Array)
+          ex << content
         else
-          h[e.name] = [v, ch] unless ch.nil?
+          h[e.name] = [ex, content]
         end
       end
       
@@ -62,8 +44,6 @@ module MultiXml
         true
       end
 
-      class Error < Exception
-      end
     end
   end
 end

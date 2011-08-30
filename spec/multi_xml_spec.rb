@@ -25,11 +25,11 @@ describe "MultiXml" do
     end
   end
 
-#  [['LibXML', 'libxml'],
-#   ['REXML', 'rexml/document'],
-#   ['Nokogiri', 'nokogiri']].each do |parser|
-
-  [['Ox', 'ox']].each do |parser|
+  [
+   #['LibXML', 'libxml'],
+   #['REXML', 'rexml/document'],
+   ['Nokogiri', 'nokogiri'],
+   ['Ox', 'ox']].each do |parser|
     begin
       require parser.last
       context "#{parser.first} parser" do
