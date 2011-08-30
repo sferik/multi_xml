@@ -109,12 +109,6 @@ module MultiXml
 
           raw_hash = parser.parse(xml)
         end
-        if xml.is_a?(StringIO)
-          puts xml.string
-        else
-          puts xml
-        end
-        pp raw_hash
         hash = typecast_xml_value(undasherize_keys(raw_hash)) || {}
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace

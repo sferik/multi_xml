@@ -25,9 +25,8 @@ describe "MultiXml" do
     end
   end
 
-  [
-   #['LibXML', 'libxml'],
-   #['REXML', 'rexml/document'],
+  [['LibXML', 'libxml'],
+   ['REXML', 'rexml/document'],
    ['Nokogiri', 'nokogiri'],
    ['Ox', 'ox']].each do |parser|
     begin
@@ -36,7 +35,6 @@ describe "MultiXml" do
         it_should_behave_like "a parser", parser.first
       end
     rescue LoadError => e
-      puts "*** #{e.class}: #{e.message}"
       puts "Tests not run for #{parser.first} due to a LoadError"
     end
   end
