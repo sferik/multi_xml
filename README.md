@@ -8,7 +8,7 @@ A generic swappable back-end for XML parsing
 [http://rdoc.info/gems/multi_xml](http://rdoc.info/gems/multi_xml)
 
 ## <a name="ci">Continuous Integration</a>
-[![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
+[![Build Status](https://travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
 
 ## <a name="examples">Usage Examples</a>
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their
