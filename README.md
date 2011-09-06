@@ -26,6 +26,10 @@ library. You use it like so:
     MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
 
+    MultiXml.parser = :ox
+    MultiXml.parser = MultiXml::Parsers::Ox # Same as above
+    MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
+
     MultiXml.parser = :rexml
     MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using REXML
@@ -35,7 +39,7 @@ responds to <tt>.parse</tt> at the class level.
 
 MultiXML tries to have intelligent defaulting. That is, if you have any of the supported parsers
 already loaded, it will utilize them before attempting to load any. When loading, libraries are
-ordered by speed: first LibXML, then Nokogiri, then REXML.
+ordered by speed: first LibXML, then Nokogiri, then Ox, then REXML.
 
 ## <a name="contributing">Contributing</a>
 In the spirit of [free
