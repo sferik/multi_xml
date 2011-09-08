@@ -8,7 +8,7 @@ A generic swappable back-end for XML parsing
 [http://rdoc.info/gems/multi_xml](http://rdoc.info/gems/multi_xml)
 
 ## <a name="ci">Continuous Integration</a>
-[![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
+[![Build Status](https://travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
 
 ## <a name="examples">Usage Examples</a>
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their
@@ -26,6 +26,10 @@ library. You use it like so:
     MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
 
+    MultiXml.parser = :ox
+    MultiXml.parser = MultiXml::Parsers::Ox # Same as above
+    MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
+
     MultiXml.parser = :rexml
     MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using REXML
@@ -35,7 +39,7 @@ responds to <tt>.parse</tt> at the class level.
 
 MultiXML tries to have intelligent defaulting. That is, if you have any of the supported parsers
 already loaded, it will utilize them before attempting to load any. When loading, libraries are
-ordered by speed: first LibXML, then Nokogiri, then REXML.
+ordered by speed: first LibXML, then Nokogiri, then Ox, then REXML.
 
 ## <a name="contributing">Contributing</a>
 In the spirit of [free
