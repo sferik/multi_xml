@@ -12,6 +12,14 @@ module MultiXml
 
       def parse(xml)
         doc = ::Ox.parse(xml)
+        if doc.is_a?(::Ox::Document)
+          doc.nodes.each do |n|
+            if n.is_a?(::Ox::Element)
+              doc = n
+              break;
+            end
+          end
+        end
         h = { }
         element_to_hash(doc, h) unless doc.nil?
         h
@@ -27,7 +35,7 @@ module MultiXml
             element_to_hash(n, content)
           elsif n.is_a?(String)
             content['__content__'] = n
-          elsif n.is_a?(::Ox::Node)
+          elsif n.is_a?(::Ox::Node) and !n.is_a?(::Ox::Comment)
             content['__content__'] = n.value
           end
         end

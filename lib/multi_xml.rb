@@ -4,6 +4,7 @@ require 'date'
 require 'stringio'
 require 'time'
 require 'yaml'
+require 'pp' # tmp
 
 module MultiXml
   class ParseError < StandardError; end
@@ -56,7 +57,6 @@ module MultiXml
     def default_parser
       return :libxml if defined?(::LibXML)
       return :nokogiri if defined?(::Nokogiri)
-      return :ox if defined?(::Ox)
 
       REQUIREMENT_MAP.each do |(library, parser)|
         begin
@@ -99,6 +99,7 @@ module MultiXml
 
       begin
         if parser.respond_to?(:string_parser?) and parser.string_parser?
+          xml = xml.read if xml.respond_to?(:read)
           raw_hash = parser.parse(xml)
         else
           xml = StringIO.new(xml) unless xml.respond_to?(:read)
