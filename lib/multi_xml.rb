@@ -99,6 +99,7 @@ module MultiXml
 
       begin
         if parser.respond_to?(:string_parser?) and parser.string_parser?
+          xml = xml.read if xml.respond_to?(:read)
           raw_hash = parser.parse(xml)
         else
           xml = StringIO.new(xml) unless xml.respond_to?(:read)
