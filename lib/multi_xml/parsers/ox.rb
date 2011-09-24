@@ -1,5 +1,23 @@
 require 'ox' unless defined?(Ox)
 
+# Each MultiXml parser is expected to parse an XML document into a Hash. The
+# conversion rules are:
+#
+# - Each document starts out as an empty Hash.
+#
+# - Reading an element created an entry in the parent Hash that has a key of
+#   the element name and a value of a Hash with attributes as key value
+#   pairs. Children are added as described by this rule.
+#
+# - Text and CDATE is stored in the parent element Hash with a key of
+#   '__content__' and a value of the text itself.
+#
+# - If a key already exists in the Hash then the value associated with the key
+#   is converted to an Array with the old and new value in it.
+#
+# - Other elements such as the xml prolog, doctype, and comments are ignored.
+#
+
 module MultiXml
   module Parsers
     module Ox #:nodoc:
@@ -10,48 +28,70 @@ module MultiXml
         Exception
       end
 
-      def parse(xml)
-        doc = ::Ox.parse(xml)
-        if doc.is_a?(::Ox::Document)
-          doc.nodes.each do |n|
-            if n.is_a?(::Ox::Element)
-              doc = n
-              break;
+      def parse(io)
+        handler = Handler.new
+        ::Ox.sax_parse(handler, io, :convert_special => true)
+        handler.doc
+      end
+
+      class Handler
+        attr_accessor :stack
+
+        def initialize()
+          @stack = []
+        end
+        
+        def doc
+          @stack[0]
+        end
+
+        def attr(name, value)
+          unless @stack.empty?
+            append(name, value)
+          end
+        end
+
+        def text(value)
+          append('__content__', value)
+        end
+
+        def cdata(value)
+          append('__content__', value)
+        end
+
+        def start_element(name)
+          if @stack.empty?
+            @stack.push(Hash.new)
+          end
+          h = Hash.new
+          append(name, h)
+          @stack.push(h)
+        end
+
+        def end_element(name)
+          @stack.pop()
+        end
+
+        def error(message, line, column)
+          raise Exception.new("#{message} at #{line}:#{column}")
+        end
+
+        def append(key, value)
+          key = key.to_s
+          h = @stack.last
+          if h.has_key?(key)
+            v = h[key]
+            if v.is_a?(Array)
+              v << value
+            else
+              h[key] = [v, value]
             end
+          else
+            h[key] = value
           end
         end
-        h = { }
-        element_to_hash(doc, h) unless doc.nil?
-        h
-      end
 
-      def element_to_hash(e, h)
-        content = { }
-        e.attributes.each do |k,v|
-          content[k.to_s] = v
-        end
-        e.nodes.each do |n|
-          if n.is_a?(::Ox::Element)
-            element_to_hash(n, content)
-          elsif n.is_a?(String)
-            content['__content__'] = n
-          elsif n.is_a?(::Ox::Node) and !n.is_a?(::Ox::Comment)
-            content['__content__'] = n.value
-          end
-        end
-        if (ex = h[e.name]).nil?
-          h[e.name] = content
-        elsif ex.is_a?(Array)
-          ex << content
-        else
-          h[e.name] = [ex, content]
-        end
-      end
-      
-      def string_parser?
-        true
-      end
-
-    end
-  end
-end
+      end # Handler
+    end # Ox
+  end # Parsers
+end # MultiXml
