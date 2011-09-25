@@ -96,9 +96,6 @@ module MultiXml
       xml ||= ''
 
       xml.strip! if xml.respond_to?(:strip!)
-
-      # DEBUG uncomment the next line to debug parsers
-      #puts "*** #{xml}" if xml.is_a?(String)
       begin
         xml = StringIO.new(xml) unless xml.respond_to?(:read)
 
@@ -106,14 +103,7 @@ module MultiXml
         return {} if char.nil?
         xml.ungetc(char)
 
-        raw_hash = parser.parse(xml)
-
-        # DEBUG uncomment the next lines to debug parsers
-        #puts "*** #{parser}"
-        #require 'pp'
-        #pp raw_hash
-
-        hash = typecast_xml_value(undasherize_keys(raw_hash)) || {}
+        hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace
       end
