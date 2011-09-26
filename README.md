@@ -18,6 +18,10 @@ library. You use it like so:
 
     require 'multi_xml'
 
+    MultiXml.parser = :ox
+    MultiXml.parser = MultiXml::Parsers::Ox # Same as above
+    MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
+
     MultiXml.parser = :libxml
     MultiXml.parser = MultiXml::Parsers::Libxml # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using LibXML
@@ -25,10 +29,6 @@ library. You use it like so:
     MultiXml.parser = :nokogiri
     MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above
     MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
-
-    MultiXml.parser = :ox
-    MultiXml.parser = MultiXml::Parsers::Ox # Same as above
-    MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
 
     MultiXml.parser = :rexml
     MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
@@ -39,7 +39,7 @@ responds to <tt>.parse</tt> at the class level.
 
 MultiXML tries to have intelligent defaulting. That is, if you have any of the supported parsers
 already loaded, it will utilize them before attempting to load any. When loading, libraries are
-ordered by speed: first LibXML, then Nokogiri, then Ox, then REXML.
+ordered by speed: first Ox, then LibXML, then Nokogiri, and finally REXML.
 
 ## <a name="contributing">Contributing</a>
 In the spirit of [free
