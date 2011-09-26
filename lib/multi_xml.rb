@@ -54,9 +54,9 @@ module MultiXml
     # if any parsers are already loaded, then checks
     # to see which are installed if none are loaded.
     def default_parser
-      return :ox if defined?(::Ox)
       return :libxml if defined?(::LibXML)
       return :nokogiri if defined?(::Nokogiri)
+      return :ox if defined?(::Ox)
 
       REQUIREMENT_MAP.each do |(library, parser)|
         begin
