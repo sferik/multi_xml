@@ -54,9 +54,9 @@ module MultiXml
     # if any parsers are already loaded, then checks
     # to see which are installed if none are loaded.
     def default_parser
+      return :ox if defined?(::Ox)
       return :libxml if defined?(::LibXML)
       return :nokogiri if defined?(::Nokogiri)
-      return :ox if defined?(::Ox)
 
       REQUIREMENT_MAP.each do |(library, parser)|
         begin
@@ -96,21 +96,14 @@ module MultiXml
       xml ||= ''
 
       xml.strip! if xml.respond_to?(:strip!)
-
       begin
-        if parser.respond_to?(:string_parser?) and parser.string_parser?
-          xml = xml.read if xml.respond_to?(:read)
-          raw_hash = parser.parse(xml)
-        else
-          xml = StringIO.new(xml) unless xml.respond_to?(:read)
+        xml = StringIO.new(xml) unless xml.respond_to?(:read)
 
-          char = xml.getc
-          return {} if char.nil?
-          xml.ungetc(char)
+        char = xml.getc
+        return {} if char.nil?
+        xml.ungetc(char)
 
-          raw_hash = parser.parse(xml)
-        end
-        hash = typecast_xml_value(undasherize_keys(raw_hash)) || {}
+        hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace
       end
