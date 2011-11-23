@@ -1,16 +1,16 @@
 # MultiXML
 A generic swappable back-end for XML parsing
 
-## <a name="installation">Installation</a>
+## <a name="installation"></a>Installation
     gem install multi_xml
 
-## <a name="documentation">Documentation</a>
+## <a name="documentation"></a>Documentation
 [http://rdoc.info/gems/multi_xml](http://rdoc.info/gems/multi_xml)
 
-## <a name="ci">Continuous Integration</a>
+## <a name="ci"></a>Continuous Integration
 [![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png)](http://travis-ci.org/sferik/multi_xml)
 
-## <a name="examples">Usage Examples</a>
+## <a name="examples"></a>Usage Examples
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their
 favorite XML library. In order to best support multiple XML parsers and
 libraries, <tt>multi_xml</tt> is a general-purpose swappable XML backend
@@ -41,7 +41,7 @@ MultiXML tries to have intelligent defaulting. That is, if you have any of the s
 already loaded, it will utilize them before attempting to load any. When loading, libraries are
 ordered by speed: first Ox, then LibXML, then Nokogiri, and finally REXML.
 
-## <a name="contributing">Contributing</a>
+## <a name="contributing"></a>Contributing
 In the spirit of [free
 software](http://www.fsf.org/licensing/essays/free-sw.html), **everyone** is
 encouraged to help improve this project.
@@ -58,7 +58,7 @@ Here are some ways *you* can contribute:
 * by resolving [issues](https://github.com/sferik/multi_xml/issues)
 * by reviewing patches
 
-## <a name="issues">Submitting an Issue</a>
+## <a name="issues"></a>Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/sferik/multi_xml/issues)
 to track bugs and features. Before submitting a bug report or feature request,
 check to make sure it hasn't already been submitted. You can indicate support
@@ -68,7 +68,7 @@ details that may be necessary to reproduce the bug, including your gem version,
 Ruby version, and operating system. Ideally, a bug report should include a pull
 request with failing specs.
 
-## <a name="pulls">Submitting a Pull Request</a>
+## <a name="pulls"></a>Submitting a Pull Request
 1. Fork the project.
 2. Create a topic branch.
 3. Implement your feature or bug fix.
@@ -79,7 +79,7 @@ request with failing specs.
 8. Commit and push your changes.
 9. Submit a pull request. Please do not include changes to the gemspec, version, or history file. (If you want to create your own version for some reason, please do so in a separate commit.)
 
-## <a name="rubies">Supported Rubies</a>
+## <a name="versions"></a>Supported Ruby Versions
 This library aims to support and is [tested
 against](http://travis-ci.org/sferik/multi_xml) the following Ruby
 implementations:
@@ -105,9 +105,9 @@ implementation, you will be personally responsible for providing patches in a
 timely fashion. If critical issues for a particular implementation exist at the
 time of a major release, support for that Ruby version may be dropped.
 
-## <a name="inspiration">Inspiration</a>
+## <a name="inspiration"></a>Inspiration
 MultiXML was inspired by [MultiJSON](https://github.com/intridea/multi_json/).
 
-## <a name="copyright">Copyright</a>
+## <a name="copyright"></a>Copyright
 Copyright (c) 2010 Erik Michaels-Ober.
 See [LICENSE](https://github.com/sferik/multi_xml/blob/master/LICENSE.md) for details.
