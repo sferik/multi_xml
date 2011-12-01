@@ -294,7 +294,7 @@ shared_examples_for "a parser" do |parser|
 
       context "with an attribute type=\"decimal\"" do
         before do
-          @xml = '<tag type="decimal">3.14159265358979323846264338327950288419716939937510</tag>'
+          @xml = '<tag type="decimal">3.14159265358979</tag>'
         end
 
         it "should return a BigDecimal" do
@@ -302,7 +302,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct number" do
-          MultiXml.parse(@xml)['tag'].should == 3.14159265358979323846264338327950288419716939937510
+          MultiXml.parse(@xml)['tag'].should == 3.14159265358979
         end
       end
 
