@@ -14,6 +14,11 @@ A generic swappable back-end for XML parsing
 
 [ci]: http://travis-ci.org/sferik/multi_xml
 
+## <a name="dependencies"></a>Dependency Status
+[![Dependency Status](https://gemnasium.com/sferik/multi_xml.png)][gemnasium]
+
+[gemnasium]: https://gemnasium.com/sferik/multi_xml
+
 ## <a name="examples"></a>Usage Examples
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their
 favorite XML library. In order to best support multiple XML parsers and
@@ -97,8 +102,8 @@ This library aims to support and is [tested against][ci] the following Ruby
 implementations:
 
 * Ruby 1.8.7
-* Ruby 1.9.1
 * Ruby 1.9.2
+* Ruby 1.9.3
 * [JRuby][]
 * [Rubinius][]
 * [Ruby Enterprise Edition][ree]
