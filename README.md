@@ -15,7 +15,7 @@ A generic swappable back-end for XML parsing
 [ci]: http://travis-ci.org/sferik/multi_xml
 
 ## <a name="dependencies"></a>Dependency Status
-[![Dependency Status](https://gemnasium.com/sferik/multi_xml.png)][gemnasium]
+[![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
 
 [gemnasium]: https://gemnasium.com/sferik/multi_xml
 
