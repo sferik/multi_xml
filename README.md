@@ -1,5 +1,8 @@
-# MultiXML
+# MultiXML [![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
 A generic swappable back-end for XML parsing
+
+[travis]: http://travis-ci.org/sferik/multi_xml
+[gemnasium]: https://gemnasium.com/sferik/multi_xml
 
 ## <a name="installation"></a>Installation
     gem install multi_xml
@@ -8,16 +11,6 @@ A generic swappable back-end for XML parsing
 [http://rdoc.info/gems/multi_xml][documentation]
 
 [documentation]: http://rdoc.info/gems/multi_xml
-
-## <a name="build"></a>Build Status
-[![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png?branch=master)][travis]
-
-[travis]: http://travis-ci.org/sferik/multi_xml
-
-## <a name="dependencies"></a>Dependency Status
-[![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
-
-[gemnasium]: https://gemnasium.com/sferik/multi_xml
 
 ## <a name="examples"></a>Usage Examples
 Lots of Ruby libraries utilize XML parsing in some form, and everyone has their
