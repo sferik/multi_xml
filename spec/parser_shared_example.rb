@@ -391,6 +391,34 @@ shared_examples_for "a parser" do |parser|
           MultiXml.parse(@xml)['users'].should == ["Erik Michaels-Ober", "Wynn Netherland"]
         end
       end
+      
+      context "with an attribute type=\"array\" in addtion to other attributes" do
+        before do
+          @xml = '<users type="array" foo="bar"><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
+        end
+
+        it "should return an Array" do
+          MultiXml.parse(@xml)['users'].should be_a(Array)
+        end
+
+        it "should return the correct array" do
+          MultiXml.parse(@xml)['users'].should == ["Erik Michaels-Ober", "Wynn Netherland"]
+        end
+      end
+      
+      context "with an attribute type=\"array\" containing only one item" do
+        before do
+          @xml = '<users type="array"><user>Erik Michaels-Ober</user></users>'
+        end
+
+        it "should return an Array" do
+          MultiXml.parse(@xml)['users'].should be_a(Array)
+        end
+
+        it "should return the correct array" do
+          MultiXml.parse(@xml)['users'].should == ["Erik Michaels-Ober"]
+        end
+      end
 
       %w(integer boolean date datetime yaml file).each do |type|
         context "with an empty attribute type=\"#{type}\"" do
