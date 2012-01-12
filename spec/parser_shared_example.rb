@@ -392,7 +392,7 @@ shared_examples_for "a parser" do |parser|
         end
       end
       
-      context "with an attribute type=\"array\" in addtion to other attributes" do
+      context "with an attribute type=\"array\" in addition to other attributes" do
         before do
           @xml = '<users type="array" foo="bar"><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
         end
