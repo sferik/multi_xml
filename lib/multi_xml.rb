@@ -103,10 +103,7 @@ module MultiXml
         return {} if char.nil?
         xml.ungetc(char)
 
-        tmp = undasherize_keys(parser.parse(xml))
-        puts "************ #{parser}\n#{tmp}\n**********"
-        hash = typecast_xml_value(tmp) || {}
-        #hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
+        hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace
       end
@@ -192,11 +189,15 @@ module MultiXml
           # from: https://github.com/jnunemaker/httparty/issues/102
           # 
           # _, entries = value.detect { |k, v| k != 'type' && v.is_a?(Array) } 
+
+          # This attempt fails to consider the order that the detect method
+          # retrieves the entries.
           #_, entries = value.detect {|key, _| key != 'type'}
 
-          _, entries = value.detect {|key, _| !key.is_a?(String) }
+          # This approach ignores attribute entries that are not convertable
+          # to an Array which allows attributes to be ignored.
+          _, entries = value.detect {|k, v| k != 'type' && (v.is_a?(Array) || v.is_a?(Hash)) }
           
-          puts "*** entries: #{entries}"
           if entries.nil? || (entries.is_a?(String) && entries.strip.empty?)
             []
           else
