@@ -103,7 +103,10 @@ module MultiXml
         return {} if char.nil?
         xml.ungetc(char)
 
-        hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
+        tmp = undasherize_keys(parser.parse(xml))
+        puts "************ #{parser}\n#{tmp}\n**********"
+        hash = typecast_xml_value(tmp) || {}
+        #hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace
       end
@@ -182,15 +185,18 @@ module MultiXml
       case value
       when Hash
         if value['type'] == 'array'
-                    
+
           # this commented-out suggestion helps to avoid the multiple attribute 
           # problem, but it breaks when there is only one item in the array.
           # 
           # from: https://github.com/jnunemaker/httparty/issues/102
           # 
           # _, entries = value.detect { |k, v| k != 'type' && v.is_a?(Array) } 
-          _, entries = value.detect {|key, _| key != 'type'}
+          #_, entries = value.detect {|key, _| key != 'type'}
+
+          _, entries = value.detect {|key, _| !key.is_a?(String) }
           
+          puts "*** entries: #{entries}"
           if entries.nil? || (entries.is_a?(String) && entries.strip.empty?)
             []
           else
