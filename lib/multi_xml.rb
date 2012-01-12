@@ -182,14 +182,21 @@ module MultiXml
       case value
       when Hash
         if value['type'] == 'array'
-                    
+
           # this commented-out suggestion helps to avoid the multiple attribute 
           # problem, but it breaks when there is only one item in the array.
           # 
           # from: https://github.com/jnunemaker/httparty/issues/102
           # 
           # _, entries = value.detect { |k, v| k != 'type' && v.is_a?(Array) } 
-          _, entries = value.detect {|key, _| key != 'type'}
+
+          # This attempt fails to consider the order that the detect method
+          # retrieves the entries.
+          #_, entries = value.detect {|key, _| key != 'type'}
+
+          # This approach ignores attribute entries that are not convertable
+          # to an Array which allows attributes to be ignored.
+          _, entries = value.detect {|k, v| k != 'type' && (v.is_a?(Array) || v.is_a?(Hash)) }
           
           if entries.nil? || (entries.is_a?(String) && entries.strip.empty?)
             []
