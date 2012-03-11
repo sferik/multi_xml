@@ -23,7 +23,7 @@ module MultiXml
     module Ox #:nodoc:
 
       extend self
-      
+
       def parse_error
         Exception
       end
@@ -40,7 +40,7 @@ module MultiXml
         def initialize()
           @stack = []
         end
-        
+
         def doc
           @stack[0]
         end
