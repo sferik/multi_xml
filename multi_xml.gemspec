@@ -2,7 +2,6 @@
 require File.expand_path('../lib/multi_xml/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.add_dependency 'bigdecimal'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rdiscount'
   gem.add_development_dependency 'rspec'
