@@ -98,10 +98,8 @@ implementations:
 * Ruby 1.9.2
 * Ruby 1.9.3
 * [JRuby][]
-* [Ruby Enterprise Edition][ree]
 
 [jruby]: http://www.jruby.org/
-[ree]: http://www.rubyenterpriseedition.com/
 
 If something doesn't work on one of these interpreters, it should be considered
 a bug.
