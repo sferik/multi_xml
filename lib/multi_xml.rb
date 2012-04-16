@@ -17,8 +17,6 @@ module MultiXml
 
   CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
 
-  # TODO: use Time.xmlschema instead of Time.parse;
-  #       use regexp instead of Date.parse
   unless defined?(PARSING)
     PARSING = {
       'symbol'       => Proc.new{|symbol| symbol.to_sym},
@@ -30,9 +28,9 @@ module MultiXml
       'boolean'      => Proc.new{|boolean| !%w(0 false).include?(boolean.strip)},
       'string'       => Proc.new{|string| string.to_s},
       'yaml'         => Proc.new{|yaml| YAML::load(yaml) rescue yaml},
-      'base64Binary' => Proc.new{|binary| binary.unpack('m').first},
+      'base64Binary' => Proc.new{|binary| ::Base64.decode64(binary)},
       'binary'       => Proc.new{|binary, entity| parse_binary(binary, entity)},
-      'file'         => Proc.new{|file, entity| parse_file(file, entity)}
+      'file'         => Proc.new{|file, entity| parse_file(file, entity)},
     }
 
     PARSING.update(
@@ -40,6 +38,21 @@ module MultiXml
       'dateTime' => PARSING['datetime']
     )
   end
+
+  TYPE_NAMES = {
+    'Symbol'     => 'symbol',
+    'Fixnum'     => 'integer',
+    'Bignum'     => 'integer',
+    'BigDecimal' => 'decimal',
+    'Float'      => 'float',
+    'TrueClass'  => 'boolean',
+    'FalseClass' => 'boolean',
+    'Date'       => 'date',
+    'DateTime'   => 'datetime',
+    'Time'       => 'datetime',
+    'Array'      => 'array',
+    'Hash'       => 'hash'
+  } unless defined?(TYPE_NAMES)
 
   class << self
     # Get the current parser class.
