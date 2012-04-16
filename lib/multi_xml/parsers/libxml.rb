@@ -15,11 +15,11 @@ module MultiXml
       end
 
       def each_child(node, &block)
-        node.each_child &block
+        node.each_child(&block)
       end
 
       def each_attr(node, &block)
-        node.each_attr &block
+        node.each_attr(&block)
       end
 
       def node_name(node)
