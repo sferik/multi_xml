@@ -57,9 +57,8 @@ module MultiXml
   class << self
     # Get the current parser class.
     def parser
-      return @parser if @parser
+      return @@parser if defined?(@@parser)
       self.parser = self.default_parser
-      @parser
     end
 
     # The default parser based on what you currently
@@ -92,9 +91,9 @@ module MultiXml
       case new_parser
       when String, Symbol
         require "multi_xml/parsers/#{new_parser.to_s.downcase}"
-        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
+        @@parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
       when Class, Module
-        @parser = new_parser
+        @@parser = new_parser
       else
         raise "Did not recognize your parser specification. Please specify either a symbol or a class."
       end
