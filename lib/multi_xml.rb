@@ -59,6 +59,7 @@ module MultiXml
     def parser
       return @@parser if defined?(@@parser)
       self.parser = self.default_parser
+      @@parser
     end
 
     # The default parser based on what you currently
