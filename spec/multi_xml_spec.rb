@@ -5,6 +5,10 @@ class MockDecoder; end
 
 describe "MultiXml" do
   context "Parsers" do
+    before do
+      MultiXml.send :class_variable_set, :@@parser, nil
+    end
+
     it "should pick a default parser" do
       MultiXml.parser.should be_kind_of(Module)
       MultiXml.parser.should respond_to(:parse)
