@@ -57,7 +57,7 @@ module MultiXml
   class << self
     # Get the current parser class.
     def parser
-      return @@parser if defined?(@@parser)
+      return @@parser unless @@parser.nil?
       self.parser = self.default_parser
       @@parser
     end
