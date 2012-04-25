@@ -17,7 +17,7 @@ Lots of Ruby libraries utilize XML parsing in some form, and everyone has their
 favorite XML library. In order to best support multiple XML parsers and
 libraries, `multi_xml` is a general-purpose swappable XML backend library. You
 use it like so:
-
+```ruby
     require 'multi_xml'
 
     MultiXml.parser = :ox MultiXml.parser = MultiXml::Parsers::Ox # Same as
@@ -34,7 +34,7 @@ use it like so:
     MultiXml.parser = :rexml MultiXml.parser = MultiXml::Parsers::Rexml # Same
     as above MultiXml.parse('<tag>This is the contents</tag>') # Parsed using
     REXML
-
+```
 The `parser` setter takes either a symbol or a class (to allow for custom XML
 parsers) that responds to `.parse` at the class level.
 
