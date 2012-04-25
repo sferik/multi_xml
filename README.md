@@ -18,22 +18,19 @@ favorite XML library. In order to best support multiple XML parsers and
 libraries, `multi_xml` is a general-purpose swappable XML backend library. You
 use it like so:
 ```ruby
-    require 'multi_xml'
+require 'multi_xml'
 
-    MultiXml.parser = :ox MultiXml.parser = MultiXml::Parsers::Ox # Same as
-    above MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
+MultiXml.parser = :ox MultiXml.parser = MultiXml::Parsers::Ox # Same as above 
+MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
 
-    MultiXml.parser = :libxml MultiXml.parser = MultiXml::Parsers::Libxml #
-    Same as above MultiXml.parse('<tag>This is the contents</tag>') # Parsed
-    using LibXML
+MultiXml.parser = :libxml MultiXml.parser = MultiXml::Parsers::Libxml # Same as above 
+MultiXml.parse('<tag>This is the contents</tag>') # Parsed using LibXML
 
-    MultiXml.parser = :nokogiri MultiXml.parser = MultiXml::Parsers::Nokogiri #
-    Same as above MultiXml.parse('<tag>This is the contents</tag>') # Parsed
-    using Nokogiri
+MultiXml.parser = :nokogiri MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above 
+MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
 
-    MultiXml.parser = :rexml MultiXml.parser = MultiXml::Parsers::Rexml # Same
-    as above MultiXml.parse('<tag>This is the contents</tag>') # Parsed using
-    REXML
+MultiXml.parser = :rexml MultiXml.parser = MultiXml::Parsers::Rexml # Same as above 
+MultiXml.parse('<tag>This is the contents</tag>') # Parsed using REXML
 ```
 The `parser` setter takes either a symbol or a class (to allow for custom XML
 parsers) that responds to `.parse` at the class level.
