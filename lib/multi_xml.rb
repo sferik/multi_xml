@@ -226,9 +226,19 @@ module MultiXml
         elsif value.has_key?(CONTENT_ROOT)
           content = value[CONTENT_ROOT]
           if block = PARSING[value['type']]
-            block.arity == 1 ? block.call(content) : block.call(content, value)
+            if block.arity == 1
+              value.delete('type') if PARSING[value['type']]
+              if value.keys.size > 1
+                value[CONTENT_ROOT] = block.call(content)
+                value
+              else
+                block.call(content)
+              end
+            else
+              block.call(content, value)
+            end
           else
-            content
+            value.keys.size > 1 ? value : content
           end
         elsif value['type'] == 'string' && value['nil'] != 'true'
           ''
