@@ -534,6 +534,103 @@ shared_examples_for "a parser" do |parser|
           end
         end
 
+        context "with attribute tags on content nodes" do
+          context "non 'type' attributes" do
+            before do
+              @xml = <<-XML
+                <options>
+                  <value currency='USD'>123</value>
+                  <value number='percent'>0.123</value>
+                </options>
+              XML
+              @parsed_xml = MultiXml.parse(@xml)
+            end
+
+            it "should add the attributes to the value hash" do
+              @parsed_xml['options']['value'][0]['__content__'].should == '123'
+              @parsed_xml['options']['value'][0]['currency'].should == 'USD'
+              @parsed_xml['options']['value'][1]['__content__'].should == '0.123'
+              @parsed_xml['options']['value'][1]['number'].should == 'percent'
+            end
+          end
+
+          context "unrecognized type attributes" do
+            before do
+              @xml = <<-XML
+                <options>
+                  <value type='USD'>123</value>
+                  <value type='percent'>0.123</value>
+                  <value currency='USD'>123</value>
+                </options>
+              XML
+              @parsed_xml = MultiXml.parse(@xml)
+            end
+
+            it "should add the attributes to the value hash passing through the type" do
+              @parsed_xml['options']['value'][0]['__content__'].should == '123'
+              @parsed_xml['options']['value'][0]['type'].should == 'USD'
+              @parsed_xml['options']['value'][1]['__content__'].should == '0.123'
+              @parsed_xml['options']['value'][1]['type'].should == 'percent'
+              @parsed_xml['options']['value'][2]['__content__'].should == '123'
+              @parsed_xml['options']['value'][2]['currency'].should == 'USD'
+            end
+          end
+
+          context "mixing attributes and non-attributes content nodes type attributes" do
+            before do
+              @xml = <<-XML
+                <options>
+                  <value type='USD'>123</value>
+                  <value type='percent'>0.123</value>
+                  <value>123</value>
+                </options>
+              XML
+              @parsed_xml = MultiXml.parse(@xml)
+            end
+
+            it "should add the attributes to the value hash passing through the type" do
+              @parsed_xml['options']['value'][0]['__content__'].should == '123'
+              @parsed_xml['options']['value'][0]['type'].should == 'USD'
+              @parsed_xml['options']['value'][1]['__content__'].should == '0.123'
+              @parsed_xml['options']['value'][1]['type'].should == 'percent'
+              @parsed_xml['options']['value'][2].should == '123'
+            end
+          end
+
+          context "mixing recognized type attribute and non-type attributes on content nodes" do
+            before do
+              @xml = <<-XML
+                <options>
+                  <value number='USD' type='integer'>123</value>
+                </options>
+              XML
+              @parsed_xml = MultiXml.parse(@xml)
+            end
+
+            it "should add the the non-type attribute and remove the recognized type attribute and do the typecast" do
+              @parsed_xml['options']['value']['__content__'].should == 123
+              @parsed_xml['options']['value']['number'].should == 'USD'
+            end
+          end
+
+          context "mixing unrecognized type attribute and non-type attributes on content nodes" do
+            before do
+              @xml = <<-XML
+                <options>
+                  <value number='USD' type='currency'>123</value>
+                </options>
+              XML
+              @parsed_xml = MultiXml.parse(@xml)
+            end
+
+            it "should add the the non-type attributes and type attribute to the value hash" do
+              @parsed_xml['options']['value']['__content__'].should == '123'
+              @parsed_xml['options']['value']['number'].should == 'USD'
+              @parsed_xml['options']['value']['type'].should == 'currency'
+            end
+          end
+        end
+
         context "with newlines and whitespace" do
           before do
             @xml = <<-XML
