@@ -100,9 +100,6 @@ implementations:
 * Ruby 1.8.7
 * Ruby 1.9.2
 * Ruby 1.9.3
-* [JRuby][]
-
-[jruby]: http://www.jruby.org/
 
 If something doesn't work on one of these interpreters, it should be considered
 a bug.
