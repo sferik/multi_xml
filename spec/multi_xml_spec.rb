@@ -12,21 +12,21 @@ describe "MultiXml" do
 
     it "should default to the best available gem" do
       pending
-      MultiXml.parser.name.should be == 'MultiXml::Parsers::Rexml'
+      MultiXml.parser.name.should eq('MultiXml::Parsers::Rexml')
       require 'nokogiri'
-      MultiXml.parser.name.should be == 'MultiXml::Parsers::Nokogiri'
+      MultiXml.parser.name.should eq('MultiXml::Parsers::Nokogiri')
       require 'libxml'
-      MultiXml.parser.name.should == 'MultiXml::Parsers::Libxml'
+      MultiXml.parser.name.should eq('MultiXml::Parsers::Libxml')
     end
 
     it "should be settable via a symbol" do
       MultiXml.parser = :nokogiri
-      MultiXml.parser.name.should == 'MultiXml::Parsers::Nokogiri'
+      MultiXml.parser.name.should eq('MultiXml::Parsers::Nokogiri')
     end
 
     it "should be settable via a class" do
       MultiXml.parser = MockDecoder
-      MultiXml.parser.name.should == 'MockDecoder'
+      MultiXml.parser.name.should eq('MockDecoder')
     end
   end
 

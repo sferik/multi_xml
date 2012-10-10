@@ -15,7 +15,7 @@ shared_examples_for "a parser" do |parser|
       end
 
       it "should return an empty Hash" do
-        MultiXml.parse(@xml).should == {}
+        MultiXml.parse(@xml).should eq({})
       end
     end
 
@@ -25,7 +25,7 @@ shared_examples_for "a parser" do |parser|
       end
 
       it "should return an empty Hash" do
-        MultiXml.parse(@xml).should == {}
+        MultiXml.parse(@xml).should eq({})
       end
     end
 
@@ -47,7 +47,7 @@ shared_examples_for "a parser" do |parser|
       end
 
       it "should parse correctly" do
-        MultiXml.parse(@xml).should == {'user' => nil}
+        MultiXml.parse(@xml).should eq({'user' => nil})
       end
 
       context "with CDATA" do
@@ -56,7 +56,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct CDATA" do
-          MultiXml.parse(@xml)['user'].should == "Erik Michaels-Ober"
+          MultiXml.parse(@xml)['user'].should eq("Erik Michaels-Ober")
         end
       end
 
@@ -66,7 +66,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct content" do
-          MultiXml.parse(@xml)['user'].should == "Erik Michaels-Ober"
+          MultiXml.parse(@xml)['user'].should eq("Erik Michaels-Ober")
         end
       end
 
@@ -76,7 +76,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct attribute" do
-          MultiXml.parse(@xml)['user']['name'].should == "Erik Michaels-Ober"
+          MultiXml.parse(@xml)['user']['name'].should eq("Erik Michaels-Ober")
         end
       end
 
@@ -86,8 +86,8 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct attributes" do
-          MultiXml.parse(@xml)['user']['name'].should be == "Erik Michaels-Ober"
-          MultiXml.parse(@xml)['user']['screen_name'].should be == "sferik"
+          MultiXml.parse(@xml)['user']['name'].should eq("Erik Michaels-Ober")
+          MultiXml.parse(@xml)['user']['screen_name'].should eq("sferik")
         end
       end
 
@@ -97,7 +97,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should symbolize keys" do
-          MultiXml.parse(@xml, :symbolize_keys => true).should == {:user => {:name => "Erik Michaels-Ober"}}
+          MultiXml.parse(@xml, :symbolize_keys => true).should eq({:user => {:name => "Erik Michaels-Ober"}})
         end
       end
 
@@ -134,7 +134,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct number" do
-          MultiXml.parse(@xml)['id'].should == 1
+          MultiXml.parse(@xml)['id'].should eq(1)
         end
       end
 
@@ -149,7 +149,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct number" do
-          MultiXml.parse(@xml)['tag_id'].should == 1
+          MultiXml.parse(@xml)['tag_id'].should eq(1)
         end
       end
 
@@ -199,7 +199,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should return the correct number" do
-            MultiXml.parse(@xml)['tag'].should == 1
+            MultiXml.parse(@xml)['tag'].should eq(1)
           end
         end
 
@@ -217,7 +217,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should return the correct number" do
-            MultiXml.parse(@xml)['tag'].should == -1
+            MultiXml.parse(@xml)['tag'].should eq(-1)
           end
         end
       end
@@ -232,7 +232,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct string" do
-          MultiXml.parse(@xml)['tag'].should == ""
+          MultiXml.parse(@xml)['tag'].should eq("")
         end
       end
 
@@ -246,7 +246,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct date" do
-          MultiXml.parse(@xml)['tag'].should == Date.parse('1970-01-01')
+          MultiXml.parse(@xml)['tag'].should eq(Date.parse('1970-01-01'))
         end
       end
 
@@ -260,7 +260,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct time" do
-          MultiXml.parse(@xml)['tag'].should == Time.parse('1970-01-01 00:00')
+          MultiXml.parse(@xml)['tag'].should eq(Time.parse('1970-01-01 00:00'))
         end
       end
 
@@ -274,7 +274,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct time" do
-          MultiXml.parse(@xml)['tag'].should == Time.parse('1970-01-01 00:00')
+          MultiXml.parse(@xml)['tag'].should eq(Time.parse('1970-01-01 00:00'))
         end
       end
 
@@ -288,7 +288,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct number" do
-          MultiXml.parse(@xml)['tag'].should == 3.14159265358979
+          MultiXml.parse(@xml)['tag'].should eq(3.14159265358979)
         end
       end
 
@@ -302,7 +302,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct number" do
-          MultiXml.parse(@xml)['tag'].should == 3.14159265358979
+          MultiXml.parse(@xml)['tag'].should eq(3.14159265358979)
         end
       end
 
@@ -316,7 +316,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct string" do
-          MultiXml.parse(@xml)['tag'].should == "image.png"
+          MultiXml.parse(@xml)['tag'].should eq("image.png")
         end
       end
 
@@ -330,7 +330,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correctly parsed YAML" do
-          MultiXml.parse(@xml)['tag'].should == {:message => "Have a nice day", 1 => "should return an integer", "array" => [{"should-have-dashes" => true, "should_have_underscores" => true}]}
+          MultiXml.parse(@xml)['tag'].should eq({:message => "Have a nice day", 1 => "should return an integer", "array" => [{"should-have-dashes" => true, "should_have_underscores" => true}]})
         end
       end
 
@@ -344,15 +344,15 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should be decoded correctly" do
-          MultiXml.parse(@xml)['tag'].string.should == 'data'
+          MultiXml.parse(@xml)['tag'].string.should eq('data')
         end
 
         it "should have the correct file name" do
-          MultiXml.parse(@xml)['tag'].original_filename.should == 'data.txt'
+          MultiXml.parse(@xml)['tag'].original_filename.should eq('data.txt')
         end
 
         it "should have the correct content type" do
-          MultiXml.parse(@xml)['tag'].content_type.should == 'text/plain'
+          MultiXml.parse(@xml)['tag'].content_type.should eq('text/plain')
         end
 
         context "with missing name and content type" do
@@ -365,15 +365,15 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should be decoded correctly" do
-            MultiXml.parse(@xml)['tag'].string.should == 'data'
+            MultiXml.parse(@xml)['tag'].string.should eq('data')
           end
 
           it "should have the default file name" do
-            MultiXml.parse(@xml)['tag'].original_filename.should == 'untitled'
+            MultiXml.parse(@xml)['tag'].original_filename.should eq('untitled')
           end
 
           it "should have the default content type" do
-            MultiXml.parse(@xml)['tag'].content_type.should == 'application/octet-stream'
+            MultiXml.parse(@xml)['tag'].content_type.should eq('application/octet-stream')
           end
         end
       end
@@ -388,7 +388,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct array" do
-          MultiXml.parse(@xml)['users'].should == ["Erik Michaels-Ober", "Wynn Netherland"]
+          MultiXml.parse(@xml)['users'].should eq(["Erik Michaels-Ober", "Wynn Netherland"])
         end
       end
 
@@ -402,7 +402,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct array" do
-          MultiXml.parse(@xml)['users'].should == ["Erik Michaels-Ober", "Wynn Netherland"]
+          MultiXml.parse(@xml)['users'].should eq(["Erik Michaels-Ober", "Wynn Netherland"])
         end
       end
 
@@ -416,7 +416,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return the correct array" do
-          MultiXml.parse(@xml)['users'].should == ["Erik Michaels-Ober"]
+          MultiXml.parse(@xml)['users'].should eq(["Erik Michaels-Ober"])
         end
       end
 
@@ -438,7 +438,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should return an empty Array" do
-          MultiXml.parse(@xml)['tag'].should == []
+          MultiXml.parse(@xml)['tag'].should eq([])
         end
 
         context "with whitespace" do
@@ -447,7 +447,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should return an empty Array" do
-            MultiXml.parse(@xml)['tag'].should == []
+            MultiXml.parse(@xml)['tag'].should eq([])
           end
         end
       end
@@ -467,7 +467,7 @@ shared_examples_for "a parser" do |parser|
           it "should return unescaped XML entities" do
             @xml_entities.each do |key, value|
               xml = "<tag>#{value}</tag>"
-              MultiXml.parse(xml)['tag'].should == key
+              MultiXml.parse(xml)['tag'].should eq(key)
             end
           end
         end
@@ -476,7 +476,7 @@ shared_examples_for "a parser" do |parser|
           it "should return unescaped XML entities" do
             @xml_entities.each do |key, value|
               xml = "<tag attribute=\"#{value}\"/>"
-              MultiXml.parse(xml)['tag']['attribute'].should == key
+              MultiXml.parse(xml)['tag']['attribute'].should eq(key)
             end
           end
         end
@@ -510,7 +510,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should return the correct attributes" do
-            MultiXml.parse(@xml)['users']['user']['name'].should == "Erik Michaels-Ober"
+            MultiXml.parse(@xml)['users']['user']['name'].should eq("Erik Michaels-Ober")
           end
         end
 
@@ -520,7 +520,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should return the correct text" do
-            MultiXml.parse(@xml)['user']['name'].should == "Erik Michaels-Ober"
+            MultiXml.parse(@xml)['user']['name'].should eq("Erik Michaels-Ober")
           end
         end
 
@@ -530,7 +530,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should pass through the type" do
-            MultiXml.parse(@xml)['user']['type'].should == 'admin'
+            MultiXml.parse(@xml)['user']['type'].should eq('admin')
           end
         end
 
@@ -547,10 +547,10 @@ shared_examples_for "a parser" do |parser|
             end
 
             it "should add the attributes to the value hash" do
-              @parsed_xml['options']['value'][0]['__content__'].should == '123'
-              @parsed_xml['options']['value'][0]['currency'].should == 'USD'
-              @parsed_xml['options']['value'][1]['__content__'].should == '0.123'
-              @parsed_xml['options']['value'][1]['number'].should == 'percent'
+              @parsed_xml['options']['value'][0]['__content__'].should eq('123')
+              @parsed_xml['options']['value'][0]['currency'].should eq('USD')
+              @parsed_xml['options']['value'][1]['__content__'].should eq('0.123')
+              @parsed_xml['options']['value'][1]['number'].should eq('percent')
             end
           end
 
@@ -567,12 +567,12 @@ shared_examples_for "a parser" do |parser|
             end
 
             it "should add the attributes to the value hash passing through the type" do
-              @parsed_xml['options']['value'][0]['__content__'].should == '123'
-              @parsed_xml['options']['value'][0]['type'].should == 'USD'
-              @parsed_xml['options']['value'][1]['__content__'].should == '0.123'
-              @parsed_xml['options']['value'][1]['type'].should == 'percent'
-              @parsed_xml['options']['value'][2]['__content__'].should == '123'
-              @parsed_xml['options']['value'][2]['currency'].should == 'USD'
+              @parsed_xml['options']['value'][0]['__content__'].should eq('123')
+              @parsed_xml['options']['value'][0]['type'].should eq('USD')
+              @parsed_xml['options']['value'][1]['__content__'].should eq('0.123')
+              @parsed_xml['options']['value'][1]['type'].should eq('percent')
+              @parsed_xml['options']['value'][2]['__content__'].should eq('123')
+              @parsed_xml['options']['value'][2]['currency'].should eq('USD')
             end
           end
 
@@ -589,11 +589,11 @@ shared_examples_for "a parser" do |parser|
             end
 
             it "should add the attributes to the value hash passing through the type" do
-              @parsed_xml['options']['value'][0]['__content__'].should == '123'
-              @parsed_xml['options']['value'][0]['type'].should == 'USD'
-              @parsed_xml['options']['value'][1]['__content__'].should == '0.123'
-              @parsed_xml['options']['value'][1]['type'].should == 'percent'
-              @parsed_xml['options']['value'][2].should == '123'
+              @parsed_xml['options']['value'][0]['__content__'].should eq('123')
+              @parsed_xml['options']['value'][0]['type'].should eq('USD')
+              @parsed_xml['options']['value'][1]['__content__'].should eq('0.123')
+              @parsed_xml['options']['value'][1]['type'].should eq('percent')
+              @parsed_xml['options']['value'][2].should eq('123')
             end
           end
 
@@ -608,8 +608,8 @@ shared_examples_for "a parser" do |parser|
             end
 
             it "should add the the non-type attribute and remove the recognized type attribute and do the typecast" do
-              @parsed_xml['options']['value']['__content__'].should == 123
-              @parsed_xml['options']['value']['number'].should == 'USD'
+              @parsed_xml['options']['value']['__content__'].should eq(123)
+              @parsed_xml['options']['value']['number'].should eq('USD')
             end
           end
 
@@ -624,9 +624,9 @@ shared_examples_for "a parser" do |parser|
             end
 
             it "should add the the non-type attributes and type attribute to the value hash" do
-              @parsed_xml['options']['value']['__content__'].should == '123'
-              @parsed_xml['options']['value']['number'].should == 'USD'
-              @parsed_xml['options']['value']['type'].should == 'currency'
+              @parsed_xml['options']['value']['__content__'].should eq('123')
+              @parsed_xml['options']['value']['number'].should eq('USD')
+              @parsed_xml['options']['value']['type'].should eq('currency')
             end
           end
         end
@@ -641,7 +641,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should parse correctly" do
-            MultiXml.parse(@xml).should == {"user" => {"name" => "Erik Michaels-Ober"}}
+            MultiXml.parse(@xml).should eq({"user" => {"name" => "Erik Michaels-Ober"}})
           end
         end
 
@@ -652,7 +652,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "should parse correctly" do
-            MultiXml.parse(@xml).should == {"users" => {"user" => {"name" => "Erik Michaels-Ober", "status" => {"text" => "Hello"}}}}
+            MultiXml.parse(@xml).should eq({"users" => {"user" => {"name" => "Erik Michaels-Ober", "status" => {"text" => "Hello"}}}})
           end
         end
       end
@@ -667,7 +667,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "should parse correctly" do
-          MultiXml.parse(@xml).should == {"users" => {"user" => ["Erik Michaels-Ober", "Wynn Netherland"]}}
+          MultiXml.parse(@xml).should eq({"users" => {"user" => ["Erik Michaels-Ober", "Wynn Netherland"]}})
         end
       end
 
