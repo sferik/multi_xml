@@ -5,28 +5,28 @@ class MockDecoder; end
 
 describe "MultiXml" do
   context "Parsers" do
-    it "should pick a default parser" do
-      MultiXml.parser.should be_kind_of(Module)
-      MultiXml.parser.should respond_to(:parse)
+    it "picks a default parser" do
+      expect(MultiXml.parser).to be_kind_of(Module)
+      expect(MultiXml.parser).to respond_to(:parse)
     end
 
-    it "should default to the best available gem" do
+    it "defaults to the best available gem" do
       pending
-      MultiXml.parser.name.should eq('MultiXml::Parsers::Rexml')
+      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Rexml')
       require 'nokogiri'
-      MultiXml.parser.name.should eq('MultiXml::Parsers::Nokogiri')
+      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Nokogiri')
       require 'libxml'
-      MultiXml.parser.name.should eq('MultiXml::Parsers::Libxml')
+      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Libxml')
     end
 
-    it "should be settable via a symbol" do
+    it "is settable via a symbol" do
       MultiXml.parser = :nokogiri
-      MultiXml.parser.name.should eq('MultiXml::Parsers::Nokogiri')
+      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Nokogiri')
     end
 
-    it "should be settable via a class" do
+    it "is settable via a class" do
       MultiXml.parser = MockDecoder
-      MultiXml.parser.name.should eq('MockDecoder')
+      expect(MultiXml.parser.name).to eq('MockDecoder')
     end
   end
 
@@ -37,7 +37,7 @@ describe "MultiXml" do
     begin
       require parser.last
       context "#{parser.first} parser" do
-        it_should_behave_like "a parser", parser.first
+        it_behaves_like "a parser", parser.first
       end
     rescue LoadError => e
       puts "Tests not run for #{parser.first} due to a LoadError"
