@@ -1,21 +1,22 @@
 # encoding: utf-8
 require File.expand_path('../lib/multi_xml/version', __FILE__)
 
-Gem::Specification.new do |gem|
-  gem.add_development_dependency 'maruku'
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec'
-  gem.add_development_dependency 'simplecov'
-  gem.add_development_dependency 'yard'
-  gem.author = "Erik Michaels-Ober"
-  gem.description = %q{A gem to provide swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.}
-  gem.email = 'sferik@gmail.com'
-  gem.files = `git ls-files`.split("\n")
-  gem.homepage = 'https://github.com/sferik/multi_xml'
-  gem.name = 'multi_xml'
-  gem.platform = Gem::Platform::RUBY
-  gem.require_paths = ['lib']
-  gem.summary = %q{A generic swappable back-end for XML parsing}
-  gem.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
-  gem.version = MultiXml::VERSION
+Gem::Specification.new do |spec|
+  spec.add_development_dependency 'maruku'
+  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'yard'
+  spec.author = "Erik Michaels-Ober"
+  spec.description = %q{Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.}
+  spec.email = 'sferik@gmail.com'
+  spec.files = `git ls-files`.split("\n")
+  spec.homepage = 'https://github.com/sferik/multi_xml'
+  spec.licenses = ['MIT']
+  spec.name = 'multi_xml'
+  spec.platform = Gem::Platform::RUBY
+  spec.require_paths = ['lib']
+  spec.summary = %q{A generic swappable back-end for XML parsing}
+  spec.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
+  spec.version = MultiXml::VERSION
 end
