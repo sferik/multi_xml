@@ -2,7 +2,7 @@
 require File.expand_path('../lib/multi_xml/version', __FILE__)
 
 Gem::Specification.new do |spec|
-  spec.add_development_dependency 'maruku'
+  spec.add_development_dependency 'kramdown'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'simplecov'
