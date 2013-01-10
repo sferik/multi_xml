@@ -323,8 +323,12 @@ shared_examples_for "a parser" do |parser|
           @xml = "<tag type=\"yaml\">--- \n1: returns an integer\n:message: Have a nice day\narray: \n- has-dashes: true\n  has_underscores: true\n</tag>"
         end
 
-        it "raises MultiXML::DisallowedTypeError" do
+        it "raises MultiXML::DisallowedTypeError by default" do
           expect{ MultiXml.parse(@xml)['tag'] }.to raise_error(MultiXml::DisallowedTypeError)
+        end
+
+        it "returns the correctly parsed YAML when the type is allowed" do
+          expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to eq({:message => "Have a nice day", 1 => "returns an integer", "array" => [{"has-dashes" => true, "has_underscores" => true}]})
         end
       end
 
@@ -335,6 +339,10 @@ shared_examples_for "a parser" do |parser|
 
         it "raises MultiXML::DisallowedTypeError" do
           expect{ MultiXml.parse(@xml)['tag'] }.to raise_error(MultiXml::DisallowedTypeError)
+        end
+
+        it "returns the correctly parsed Symbol when the type is allowed" do
+          expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to eq(:my_symbol)
         end
       end
 
@@ -442,8 +450,12 @@ shared_examples_for "a parser" do |parser|
             @xml = "<tag type=\"#{type}\"/>"
           end
 
-          it "raises MultiXml::DisallowedTypeError" do
+          it "raises MultiXml::DisallowedTypeError by default" do
             expect{ MultiXml.parse(@xml)['tag']}.to raise_error(MultiXml::DisallowedTypeError)
+          end
+
+          it "returns nil when the type is allowed" do
+            expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to be_nil
           end
         end
       end
