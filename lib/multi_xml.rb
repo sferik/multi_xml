@@ -112,6 +112,8 @@ module MultiXml
     # <b>Options</b>
     #
     # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
+    #
+    # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
     def parse(xml, options={})
       xml ||= ''
 
