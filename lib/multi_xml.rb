@@ -7,6 +7,11 @@ require 'yaml'
 
 module MultiXml
   class ParseError < StandardError; end
+  class DisallowedTypeError < StandardError
+    def initialize(type)
+      super "Disallowed type attribute: #{type.inspect}"
+    end
+  end
 
   REQUIREMENT_MAP = [
     ['ox', :ox],
@@ -53,6 +58,8 @@ module MultiXml
     'Array'      => 'array',
     'Hash'       => 'hash'
   } unless defined?(TYPE_NAMES)
+
+  DISALLOWED_XML_TYPES = %w(symbol yaml)
 
   class << self
     # Get the current parser class.
@@ -116,7 +123,9 @@ module MultiXml
         return {} if char.nil?
         xml.ungetc(char)
 
-        hash = typecast_xml_value(undasherize_keys(parser.parse(xml))) || {}
+        hash = typecast_xml_value(undasherize_keys(parser.parse(xml)), options[:disallowed_types]) || {}
+      rescue DisallowedTypeError
+        raise
       rescue parser.parse_error => error
         raise ParseError, error.to_s, error.backtrace
       end
@@ -191,9 +200,15 @@ module MultiXml
       end
     end
 
-    def typecast_xml_value(value)
+    def typecast_xml_value(value, disallowed_types=nil)
+      disallowed_types ||= DISALLOWED_XML_TYPES
+
       case value
       when Hash
+        if value.include?('type') && !value['type'].is_a?(Hash) && disallowed_types.include?(value['type'])
+          raise DisallowedTypeError, value['type']
+        end
+
         if value['type'] == 'array'
 
           # this commented-out suggestion helps to avoid the multiple attribute
@@ -216,9 +231,9 @@ module MultiXml
           else
             case entries
             when Array
-              entries.map {|entry| typecast_xml_value(entry)}
+              entries.map {|entry| typecast_xml_value(entry, disallowed_types)}
             when Hash
-              [typecast_xml_value(entries)]
+              [typecast_xml_value(entries, disallowed_types)]
             else
               raise "can't typecast #{entries.class.name}: #{entries.inspect}"
             end
@@ -252,7 +267,7 @@ module MultiXml
           nil
         else
           xml_value = value.inject({}) do |hash, (k, v)|
-            hash[k] = typecast_xml_value(v)
+            hash[k] = typecast_xml_value(v, disallowed_types)
             hash
           end
 
@@ -261,7 +276,7 @@ module MultiXml
           xml_value['file'].is_a?(StringIO) ? xml_value['file'] : xml_value
         end
       when Array
-        value.map!{|i| typecast_xml_value(i)}
+        value.map!{|i| typecast_xml_value(i, disallowed_types)}
         value.length > 1 ? value : value.first
       when String
         value
