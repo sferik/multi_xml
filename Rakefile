@@ -10,7 +10,7 @@ task :default => :spec
 namespace :doc do
   require 'yard'
   YARD::Rake::YardocTask.new do |task|
-    task.files   = ['LICENSE.md', 'lib/**/*.rb']
+    task.files   = ['lib/**/*.rb', '-', 'LICENSE.md']
     task.options = [
       '--no-private',
       '--protected',
