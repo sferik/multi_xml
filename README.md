@@ -20,16 +20,20 @@ use it like so:
 ```ruby
 require 'multi_xml'
 
-MultiXml.parser = :ox MultiXml.parser = MultiXml::Parsers::Ox # Same as above
+MultiXml.parser = :ox
+MultiXml.parser = MultiXml::Parsers::Ox # Same as above
 MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
 
-MultiXml.parser = :libxml MultiXml.parser = MultiXml::Parsers::Libxml # Same as above
+MultiXml.parser = :libxml
+MultiXml.parser = MultiXml::Parsers::Libxml # Same as above
 MultiXml.parse('<tag>This is the contents</tag>') # Parsed using LibXML
 
-MultiXml.parser = :nokogiri MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above
+MultiXml.parser = :nokogiri
+MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above
 MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
 
-MultiXml.parser = :rexml MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
+MultiXml.parser = :rexml
+MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
 MultiXml.parse('<tag>This is the contents</tag>') # Parsed using REXML
 ```
 The `parser` setter takes either a symbol or a class (to allow for custom XML
