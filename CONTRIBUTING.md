@@ -39,7 +39,7 @@ Ideally, a bug report should include a pull request with failing specs.
 7. Run `open coverage/index.html`. If your changes are not completely covered
    by your tests, return to step 3.
 8. Add documentation for your feature or bug fix.
-9. Run `bundle exec rake yard`. If your changes are not 100% documented, go
+9. Run `bundle exec rake doc:yard`. If your changes are not 100% documented, go
    back to step 8.
 10. Add, commit, and push your changes.
 11. [Submit a pull request.][pr]
