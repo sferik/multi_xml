@@ -1,6 +1,10 @@
-# MultiXML [![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png?branch=master)][travis] [![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
+# MultiXML
+[![Gem Version](https://badge.fury.io/rb/multi_xml.png)][gem]
+[![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png?branch=master)][travis]
+[![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
 A generic swappable back-end for XML parsing
 
+[gem]: https://rubygems.org/gems/multi_xml
 [travis]: http://travis-ci.org/sferik/multi_xml
 [gemnasium]: https://gemnasium.com/sferik/multi_xml
 
