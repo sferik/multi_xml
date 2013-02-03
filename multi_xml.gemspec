@@ -14,8 +14,8 @@ Gem::Specification.new do |spec|
   spec.homepage = 'https://github.com/sferik/multi_xml'
   spec.licenses = ['MIT']
   spec.name = 'multi_xml'
-  spec.platform = Gem::Platform::RUBY
   spec.require_paths = ['lib']
+  spec.required_rubygems_version = '>= 1.3.6'
   spec.summary = %q{A generic swappable back-end for XML parsing}
   spec.test_files = Dir.glob("spec/**/*")
   spec.version = MultiXml::VERSION
