@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.name = 'multi_xml'
   spec.require_paths = ['lib']
   spec.required_rubygems_version = '>= 1.3.6'
-  spec.signing_key = '/Users/sferik/.gem/private_key.pem'
+  spec.signing_key = File.expand_path("~/.gem/private_key.pem") if $0 =~ /gem\z/
   spec.summary = %q{A generic swappable back-end for XML parsing}
   spec.test_files = Dir.glob("spec/**/*")
   spec.version = MultiXml::VERSION
