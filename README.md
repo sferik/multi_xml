@@ -1,16 +1,26 @@
 # MultiXML
-
-A generic swappable back-end for XML parsing
-
 [![Gem Version](https://badge.fury.io/rb/multi_xml.png)][gem]
 [![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png?branch=master)][travis]
 [![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
+
 [gem]: https://rubygems.org/gems/multi_xml
 [travis]: http://travis-ci.org/sferik/multi_xml
 [gemnasium]: https://gemnasium.com/sferik/multi_xml
 
+A generic swappable back-end for XML parsing
+
 ## Installation
     gem install multi_xml
+
+To ensure the code you're installing hasn't been tampered with, it's
+recommended that you verify the signature. To do this, you need to add my
+public key as a trusted certificate (you only need to do this once):
+
+    gem cert --add <(curl -Ls https://gist.github.com/sferik/4701180/raw/public_cert.pem)
+
+Then, install the gem with the high security trust policy:
+
+    gem install multi_xml -P HighSecurity
 
 ## Documentation
 [http://rdoc.info/gems/multi_xml][documentation]
