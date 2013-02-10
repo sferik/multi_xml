@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.cert_chain = ['certs/sferik.pem']
   spec.description = %q{Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.}
   spec.email = 'sferik@gmail.com'
-  spec.files = %w(CONTRIBUTING.md LICENSE.md README.md Rakefile multi_xml.gemspec)
+  spec.files = %w(.yardopts CHANGELOG.md CONTRIBUTING.md LICENSE.md README.md Rakefile multi_xml.gemspec)
   spec.files += Dir.glob("lib/**/*.rb")
   spec.files += Dir.glob("spec/**/*")
   spec.homepage = 'https://github.com/sferik/multi_xml'
