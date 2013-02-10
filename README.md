@@ -2,10 +2,12 @@
 [![Gem Version](https://badge.fury.io/rb/multi_xml.png)][gem]
 [![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png?branch=master)][travis]
 [![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
+[![Code Climate](https://codeclimate.com/github/sferik/multi_xml.png)][codeclimate]
 
 [gem]: https://rubygems.org/gems/multi_xml
 [travis]: http://travis-ci.org/sferik/multi_xml
 [gemnasium]: https://gemnasium.com/sferik/multi_xml
+[codeclimate]: https://codeclimate.com/github/sferik/multi_xml
 
 A generic swappable back-end for XML parsing
 
