@@ -129,7 +129,7 @@ module MultiXml
       rescue DisallowedTypeError
         raise
       rescue parser.parse_error => error
-        raise ParseError, error.to_s, error.backtrace
+        raise ParseError, error.message, error.backtrace
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
