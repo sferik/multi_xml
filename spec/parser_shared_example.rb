@@ -304,6 +304,20 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
+      context "with an attribute type=\"Money\"" do
+        before do
+          @xml = '<tag type="Money">3.14159265358979</tag>'
+        end
+
+        it "returns a BigDecimal" do
+          expect(MultiXml.parse(@xml)['tag']).to be_a(BigDecimal)
+        end
+
+        it "returns the correct number" do
+          expect(MultiXml.parse(@xml)['tag']).to eq(3.14159265358979)
+        end
+      end
+
       context "with an attribute type=\"base64Binary\"" do
         before do
           @xml = '<tag type="base64Binary">aW1hZ2UucG5n</tag>'
