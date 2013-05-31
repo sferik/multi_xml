@@ -89,6 +89,37 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
+      context "typecast management" do
+        before do
+          @xml = %Q{
+            <global-settings>
+              <group>
+                <name>Settings</name>
+                <setting type="string">
+                  <description>Test</description>
+                </setting>
+              </group>
+            </global-settings>
+          }
+        end
+
+        context "with :typecast_xml_value => true" do
+          before do
+            @setting = MultiXml.parse(@xml)["global_settings"]["group"]["setting"]
+          end
+
+          it { expect(@setting).to eq "" }
+        end
+
+        context "with :typecast_xml_value => false" do
+          before do
+            @setting = MultiXml.parse(@xml, :typecast_xml_value => false)["global_settings"]["group"]["setting"]
+          end
+
+          it { expect(@setting).to eq({"type"=>"string", "description"=>{"__content__"=>"Test"}}) }
+        end
+      end
+
       context "with :symbolize_keys => true" do
         before do
           @xml = '<user><name>Erik Michaels-Ober</name></user>'
