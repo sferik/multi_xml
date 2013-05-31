@@ -61,6 +61,12 @@ module MultiXml
 
   DISALLOWED_XML_TYPES = %w(symbol yaml)
 
+  DEFAULT_OPTIONS = {
+    :typecast_xml_value => true,
+    :disallowed_types => DISALLOWED_XML_TYPES,
+    :symbolize_keys => false
+  }
+
   class << self
     # Get the current parser class.
     def parser
@@ -114,8 +120,12 @@ module MultiXml
     # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
     #
     # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
+    #
+    # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
     def parse(xml, options={})
       xml ||= ''
+
+      options = DEFAULT_OPTIONS.merge(options)
 
       xml.strip! if xml.respond_to?(:strip!)
       begin
@@ -125,7 +135,8 @@ module MultiXml
         return {} if char.nil?
         xml.ungetc(char)
 
-        hash = typecast_xml_value(undasherize_keys(parser.parse(xml)), options[:disallowed_types]) || {}
+        hash = undasherize_keys(parser.parse(xml) || {})
+        hash = options[:typecast_xml_value] ? typecast_xml_value(hash, options[:disallowed_types]) : hash
       rescue DisallowedTypeError
         raise
       rescue parser.parse_error => error
