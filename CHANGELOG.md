@@ -1,5 +1,6 @@
-X.Y.Z
+0.5.4
 -----
+* [Add option to not cast parsed values](https://github.com/sferik/multi_xml/commit/44fc05fbcfd60cc8b555b75212471fab29fa8cd0)
 * [Use message instead of to_s](https://github.com/sferik/multi_xml/commit/b06f0114434ffe1957dd7bc2712cb5b76c1b45fe)
 
 0.5.3
