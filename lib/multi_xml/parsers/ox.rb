@@ -10,7 +10,7 @@ require 'ox' unless defined?(Ox)
 #   pairs. Children are added as described by this rule.
 #
 # - Text and CDATE is stored in the parent element Hash with a key of
-#   '__content__' and a value of the text itself.
+#   MultiXml::CONTENT_ROOT and a value of the text itself.
 #
 # - If a key already exists in the Hash then the value associated with the key
 #   is converted to an Array with the old and new value in it.
@@ -52,11 +52,11 @@ module MultiXml
         end
 
         def text(value)
-          append('__content__', value)
+          append(MultiXml::CONTENT_ROOT, value)
         end
 
         def cdata(value)
-          append('__content__', value)
+          append(MultiXml::CONTENT_ROOT, value)
         end
 
         def start_element(name)
