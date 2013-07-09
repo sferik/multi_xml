@@ -58,6 +58,16 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
+      context "element with the same inner element and attribute name" do
+        before do
+          @xml = "<user name='John'><name>Smith</name></user>"
+        end
+
+        it "returns nams as Array" do
+          expect(MultiXml.parse(@xml)['user']['name']).to eq ['John', 'Smith']
+        end
+      end
+
       context "with content" do
         before do
           @xml = '<user>Erik Michaels-Ober</user>'
