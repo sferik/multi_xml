@@ -122,11 +122,11 @@ shared_examples_for "a parser" do |parser|
 
       context "with :symbolize_keys => true" do
         before do
-          @xml = '<user><name>Erik Michaels-Ober</name></user>'
+          @xml = '<users><user name="Erik Michaels-Ober"/><user><name>Wynn Netherland</name></user></users>'
         end
 
         it "symbolizes keys" do
-          expect(MultiXml.parse(@xml, :symbolize_keys => true)).to eq({:user => {:name => "Erik Michaels-Ober"}})
+          expect(MultiXml.parse(@xml, :symbolize_keys => true)).to eq({:users => {:user => [{:name => "Erik Michaels-Ober"}, {:name => "Wynn Netherland"}]}})
         end
       end
 
