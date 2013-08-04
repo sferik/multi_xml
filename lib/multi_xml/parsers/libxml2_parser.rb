@@ -35,7 +35,15 @@ module MultiXml
         end
 
         # Handle attributes
-        each_attr(node) {|a| node_hash[node_name(a)] = a.value }
+        each_attr(node) do |a|
+          key = node_name(a)
+
+          node_hash[key] = if v = node_hash[key]
+                             [a.value, v]
+                           else
+                             a.value
+                           end
+        end
 
         hash
       end
