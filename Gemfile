@@ -4,7 +4,7 @@ gem 'rake'
 gem 'yard'
 
 gem 'libxml-ruby', :require => nil, :platforms => :mri
-gem 'nokogiri', :require => nil
+gem 'nokogiri', '~> 1.5.0', :require => nil
 gem 'ox', :require => nil
 
 group :development do
