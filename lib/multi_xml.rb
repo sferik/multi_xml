@@ -183,8 +183,8 @@ module MultiXml
     def symbolize_keys(params)
       case params
       when Hash
-        params.each_with_object({}) do |(key, value), hash|
-          hash[key.to_sym] = symbolize_keys(value)
+        params.inject({}) do |result, (key, value)|
+          result.merge(key.to_sym => symbolize_keys(value))
         end
       when Array
         params.map{|value| symbolize_keys(value)}
