@@ -196,8 +196,9 @@ module MultiXml
     def undasherize_keys(params)
       case params
       when Hash
-        params.each_with_object({}) do |(key, value), hash|
+        params.inject({}) do |hash, (key, value)|
           hash[key.to_s.tr('-', '_')] = undasherize_keys(value)
+          hash
         end
       when Array
         params.map{|value| undasherize_keys(value)}
@@ -272,8 +273,9 @@ module MultiXml
         elsif value['type'] && value.size == 1 && !value['type'].is_a?(Hash)
           nil
         else
-          xml_value = value.each_with_object({}) do |(k, v), hash|
+          xml_value = value.inject({}) do |hash, (k, v)|
             hash[k] = typecast_xml_value(v, disallowed_types)
+            hash
           end
 
           # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
