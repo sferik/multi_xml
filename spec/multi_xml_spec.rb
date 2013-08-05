@@ -15,17 +15,14 @@ describe "MultiXml" do
     end
 
     it "defaults to the best available gem" do
-      pending
-      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Rexml')
-      require 'nokogiri'
-      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Nokogiri')
-      require 'libxml'
-      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Libxml')
+      # Clear cache variable already set by previous tests
+      MultiXml.send(:remove_instance_variable, :@parser)
+      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Ox')
     end
 
     it "is settable via a symbol" do
-      MultiXml.parser = :nokogiri
-      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Nokogiri')
+      MultiXml.parser = :rexml
+      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Rexml')
     end
 
     it "is settable via a class" do

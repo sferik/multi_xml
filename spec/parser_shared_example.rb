@@ -140,58 +140,6 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
-      context "when value is true" do
-        before do
-          pending
-          @xml = '<tag>true</tag>'
-        end
-
-        it "returns true" do
-          expect(MultiXml.parse(@xml)['tag']).to be_true
-        end
-      end
-
-      context "when value is false" do
-        before do
-          pending
-          @xml = '<tag>false</tag>'
-        end
-
-        it "returns false" do
-          expect(MultiXml.parse(@xml)['tag']).to be_false
-        end
-      end
-
-      context "when key is id" do
-        before do
-          pending
-          @xml = '<id>1</id>'
-        end
-
-        it "returns a Fixnum" do
-          expect(MultiXml.parse(@xml)['id']).to be_a(Fixnum)
-        end
-
-        it "returns the correct number" do
-          expect(MultiXml.parse(@xml)['id']).to eq(1)
-        end
-      end
-
-      context "when key contains _id" do
-        before do
-          pending
-          @xml = '<tag_id>1</tag_id>'
-        end
-
-        it "returns a Fixnum" do
-          expect(MultiXml.parse(@xml)['tag_id']).to be_a(Fixnum)
-        end
-
-        it "returns the correct number" do
-          expect(MultiXml.parse(@xml)['tag_id']).to eq(1)
-        end
-      end
-
       context "with an attribute type=\"boolean\"" do
         %w(true false).each do |boolean|
           context "when #{boolean}" do
