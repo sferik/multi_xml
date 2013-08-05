@@ -5,10 +5,6 @@ class MockDecoder; end
 
 describe "MultiXml" do
   context "Parsers" do
-    before do
-      MultiXml.parser = :nokogiri
-    end
-
     it "picks a default parser" do
       expect(MultiXml.parser).to be_kind_of(Module)
       expect(MultiXml.parser).to respond_to(:parse)
