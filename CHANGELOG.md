@@ -1,3 +1,8 @@
+0.5.5
+-----
+* [Fix symbolize_keys function](https://github.com/sferik/multi_xml/commit/a4cae3aeb690999287cd30206399abaa5ce1ae81)
+* [Fix Nokogiri parser for the same attr and inner element name](https://github.com/sferik/multi_xml/commit/a28ed86e2d7826b2edeed98552736b4c7ca52726)
+
 0.5.4
 -----
 * [Add option to not cast parsed values](https://github.com/sferik/multi_xml/commit/44fc05fbcfd60cc8b555b75212471fab29fa8cd0)
