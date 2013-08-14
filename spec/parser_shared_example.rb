@@ -63,7 +63,7 @@ shared_examples_for "a parser" do |parser|
           @xml = "<user name='John'><name>Smith</name></user>"
         end
 
-        it "returns nams as Array" do
+        it "returns names as Array" do
           expect(MultiXml.parse(@xml)['user']['name']).to eq ['John', 'Smith']
         end
       end
