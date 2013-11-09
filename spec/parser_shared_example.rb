@@ -145,7 +145,7 @@ shared_examples_for "a parser" do |parser|
           context "when #{boolean}" do
             it "returns #{boolean}" do
               xml = "<tag type=\"boolean\">#{boolean}</tag>"
-              expect(MultiXml.parse(xml)['tag']).to instance_eval("be_#{boolean}")
+              expect(MultiXml.parse(xml)['tag']).to be instance_eval(boolean)
             end
           end
         end
@@ -156,7 +156,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "returns true" do
-            expect(MultiXml.parse(@xml)['tag']).to be_true
+            expect(MultiXml.parse(@xml)['tag']).to be true
           end
         end
 
@@ -166,7 +166,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "returns false" do
-            expect(MultiXml.parse(@xml)['tag']).to be_false
+            expect(MultiXml.parse(@xml)['tag']).to be false
           end
         end
       end
@@ -428,7 +428,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "returns nil" do
-            expect(MultiXml.parse(@xml)['tag']).to be_nil
+            expect(MultiXml.parse(@xml)['tag']).to be nil
           end
         end
       end
@@ -444,7 +444,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "returns nil when the type is allowed" do
-            expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to be_nil
+            expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to be nil
           end
         end
       end
