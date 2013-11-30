@@ -1,7 +1,9 @@
 require 'helper'
 require 'parser_shared_example'
 
-class MockDecoder; end
+class MockDecoder;
+  def self.parse; end
+end
 
 describe "MultiXml" do
   context "Parsers" do
@@ -11,9 +13,17 @@ describe "MultiXml" do
     end
 
     it "defaults to the best available gem" do
-      # Clear cache variable already set by previous tests
-      MultiXml.send(:remove_instance_variable, :@parser)
-      expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Ox')
+      # Clear cache variable possibly set by previous tests
+      MultiXml.send(:remove_instance_variable, :@parser) if MultiXml.instance_variable_defined?(:@parser)
+      if jruby?
+        # Ox and Libxml are not not currently available on JRuby, so Nokogiri is the best available gem
+        expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Nokogiri')
+      elsif rubinius?
+        # Ox is not currently available on Rubinius, so Libxml is the best available gem
+        expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Libxml')
+      else
+        expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Ox')
+      end
     end
 
     it "is settable via a symbol" do

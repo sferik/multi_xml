@@ -122,7 +122,7 @@ module MultiXml
     # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
     #
     # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
-    def parse(xml, options={})
+    def parse(xml, options = {})
       xml ||= ''
 
       options = DEFAULT_OPTIONS.merge(options)
@@ -207,7 +207,7 @@ module MultiXml
       end
     end
 
-    def typecast_xml_value(value, disallowed_types=nil)
+    def typecast_xml_value(value, disallowed_types = nil)
       disallowed_types ||= DISALLOWED_XML_TYPES
 
       case value

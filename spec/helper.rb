@@ -15,3 +15,11 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+def jruby?(platform = RUBY_PLATFORM)
+  "java" == platform
+end
+
+def rubinius?(platform = defined?(RUBY_ENGINE) && RUBY_ENGINE)
+  "rbx" == platform
+end

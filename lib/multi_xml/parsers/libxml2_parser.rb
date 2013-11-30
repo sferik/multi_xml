@@ -8,7 +8,7 @@ module MultiXml
       #
       # hash::
       #   Hash to merge the converted element into.
-      def node_to_hash(node, hash={})
+      def node_to_hash(node, hash = {})
         node_hash = {MultiXml::CONTENT_ROOT => ''}
 
         name = node_name(node)
