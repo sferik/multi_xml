@@ -10,7 +10,7 @@ gem 'ox', :require => nil, :platforms => :mri
 group :development do
   gem 'kramdown'
   gem 'pry'
-  gem 'pry-debugger', :platforms => :mri_19
+  gem 'pry-debugger', :platforms => [:mri_19, :mri_20]
 end
 
 group :test do
