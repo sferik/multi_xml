@@ -18,9 +18,6 @@ describe "MultiXml" do
       if jruby?
         # Ox and Libxml are not not currently available on JRuby, so Nokogiri is the best available gem
         expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Nokogiri')
-      elsif rubinius?
-        # Ox is not currently available on Rubinius, so Libxml is the best available gem
-        expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Libxml')
       else
         expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Ox')
       end
