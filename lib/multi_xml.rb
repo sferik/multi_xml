@@ -7,6 +7,7 @@ require 'yaml'
 
 module MultiXml
   class ParseError < StandardError; end
+  class NoParserError < StandardError; end
   class DisallowedTypeError < StandardError
     def initialize(type)
       super "Disallowed type attribute: #{type.inspect}"
@@ -92,6 +93,7 @@ module MultiXml
           next
         end
       end
+      raise NoParserError.new("No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42.")
     end
 
     # Set the XML parser utilizing a symbol, string, or class.
