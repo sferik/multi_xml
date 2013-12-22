@@ -25,9 +25,9 @@ public key as a trusted certificate (you only need to do this once):
 
     gem cert --add <(curl -Ls https://raw.github.com/sferik/multi_xml/master/certs/sferik.pem)
 
-Then, install the gem with the medium security trust policy:
+Then, install the gem with the high security trust policy:
 
-    gem install multi_xml -P MediumSecurity
+    gem install multi_xml -P HighSecurity
 
 ## Documentation
 [http://rdoc.info/gems/multi_xml][documentation]
