@@ -15,7 +15,7 @@ end
 
 group :test do
   gem 'coveralls', :require => false
-  gem 'mime-types', '~> 1.25', :platforms => :ruby_18
+  gem 'mime-types', '~> 1.25', :platforms => [:jruby, :ruby_18]
   gem 'rspec', '>= 2.11'
   gem 'simplecov', :require => false
 end
@@ -23,10 +23,7 @@ end
 platforms :rbx do
   gem 'racc', '~> 1.4' # Required for testing against Nokogiri on Rubinius
   gem 'rubinius-coverage',  '~> 2.0'
-  gem 'rubysl-base64', '~> 2.0'
-  gem 'rubysl-bigdecimal', '~> 2.0'
-  gem 'rubysl-net-http', '~> 2.0'
-  gem 'rubysl-rexml', '~> 2.0'
+  gem 'rubysl', '~> 2.0'
 end
 
 gemspec
