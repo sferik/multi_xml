@@ -6,19 +6,6 @@ RSpec::Core::RakeTask.new(:spec)
 
 task :test => :spec
 
-namespace :doc do
-  require 'yard'
-  YARD::Rake::YardocTask.new do |task|
-    task.files   = ['lib/**/*.rb', '-', 'LICENSE.md']
-    task.options = [
-      '--no-private',
-      '--protected',
-      '--output-dir', 'doc/yard',
-      '--markup', 'markdown',
-    ]
-  end
-end
-
 begin
   require 'rubocop/rake_task'
   Rubocop::RakeTask.new
@@ -28,4 +15,25 @@ rescue LoadError
   end
 end
 
-task :default => [:spec, :rubocop]
+require 'yard'
+YARD::Rake::YardocTask.new do |task|
+  task.files   = ['lib/**/*.rb', '-', 'LICENSE.md']
+  task.options = [
+    '--no-private',
+    '--protected',
+    '--output-dir', 'doc/yard',
+    '--markup', 'markdown',
+  ]
+end
+
+require 'yardstick/rake/measurement'
+Yardstick::Rake::Measurement.new do |measurement|
+  measurement.output = 'measurement/report.txt'
+end
+
+require 'yardstick/rake/verify'
+Yardstick::Rake::Verify.new do |verify|
+  verify.threshold = 47.2
+end
+
+task :default => [:spec, :rubocop, :verify_measurements]
