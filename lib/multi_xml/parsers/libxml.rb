@@ -5,14 +5,17 @@ module MultiXml
   module Parsers
     module Libxml #:nodoc:
       include Libxml2Parser
-
       extend self
 
-      def parse_error() ::LibXML::XML::Error end
+      def parse_error
+        ::LibXML::XML::Error
+      end
 
       def parse(xml)
         node_to_hash(LibXML::XML::Parser.io(xml).parse.root)
       end
+
+    private
 
       def each_child(node, &block)
         node.each_child(&block)

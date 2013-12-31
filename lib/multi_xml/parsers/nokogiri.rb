@@ -5,16 +5,19 @@ module MultiXml
   module Parsers
     module Nokogiri #:nodoc:
       include Libxml2Parser
-
       extend self
 
-      def parse_error() ::Nokogiri::XML::SyntaxError end
+      def parse_error
+        ::Nokogiri::XML::SyntaxError
+      end
 
       def parse(xml)
         doc = ::Nokogiri::XML(xml)
-        raise doc.errors.first if doc.errors.length > 0
+        fail(doc.errors.first) if doc.errors.length > 0
         node_to_hash(doc.root)
       end
+
+    private
 
       def each_child(node, &block)
         node.children.each(&block)

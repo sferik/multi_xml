@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby -wW1
 
-$: << '.'
-$: << '../lib'
+$LOAD_PATH << '.'
+$LOAD_PATH << '../lib'
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
   while (i = ARGV.index('-I'))
-    x,path = ARGV.slice!(i, 2)
-    $: << path
+    _, path = ARGV.slice!(i, 2)
+    $LOAD_PATH << path
   end
 end
 
@@ -14,28 +14,23 @@ require 'optparse'
 require 'stringio'
 require 'multi_xml'
 
-begin
-  require 'libxml'
-rescue Exception => e
-end
-begin
-  require 'nokogiri'
-rescue Exception => e
-end
-begin
-  require 'ox'
-rescue Exception => e
+%w[libxml nokogiri ox].each do |library|
+  begin
+    require library
+  rescue LoadError
+    next
+  end
 end
 
 $verbose = 0
 $parsers = []
-$iter = 10
+$iterations = 10
 
 opts = OptionParser.new
-opts.on("-v", "increase verbosity")                            { $verbose += 1 }
-opts.on("-p", "--parser [String]", String, "parser to test")   { |p| $parsers = [p] }
-opts.on("-i", "--iterations [Int]", Integer, "iterations")     { |i| $iter = i }
-opts.on("-h", "--help", "Show this display")                   { puts opts; Process.exit!(0) }
+opts.on('-v', 'increase verbosity')                            { $verbose += 1 }
+opts.on('-p', '--parser [String]', String, 'parser to test')   { |parsers| $parsers = [pasers] }
+opts.on('-i', '--iterations [Int]', Integer, 'iterations')     { |iterations| $iterations = iterations }
+opts.on('-h', '--help', 'Show this display')                   { puts opts; Process.exit!(0) }
 files = opts.parse(ARGV)
 
 if $parsers.empty?
@@ -45,19 +40,18 @@ if $parsers.empty?
 end
 
 files.each do |filename|
-  times = { }
+  times = {}
   xml = File.read(filename)
   $parsers.each do |p|
     MultiXml.parser = p
     start = Time.now
-    $iter.times do |i|
+    $iterations.times do
       io = StringIO.new(xml)
       MultiXml.parse(io)
     end
-    dt = Time.now - start
     times[p] = Time.now - start
   end
-  times.each do |p,t|
-    puts "%8s took %0.3f seconds to parse %s %d times." % [p, t, filename, $iter]
+  times.each do |p, t|
+    puts format('%8s took %0.3f seconds to parse %s %d times.', p, t, filename, $iterations)
   end
 end

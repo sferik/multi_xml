@@ -4,7 +4,10 @@ module MultiXml
   module Parsers
     module Rexml #:nodoc:
       extend self
-      def parse_error; ::REXML::ParseException; end
+
+      def parse_error
+        ::REXML::ParseException
+      end
 
       # Parse an XML Document IO into a simple hash using REXML
       #
@@ -15,11 +18,11 @@ module MultiXml
         if doc.root
           merge_element!({}, doc.root)
         else
-          raise REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root"
+          fail(REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root")
         end
       end
 
-      private
+    private
 
       # Convert an XML element and merge into the hash
       #
@@ -39,7 +42,7 @@ module MultiXml
         hash = get_attributes(element)
 
         if element.has_elements?
-          element.each_element {|child| merge_element!(hash, child) }
+          element.each_element { |child| merge_element!(hash, child) }
           merge_texts!(hash, element) unless empty_content?(element)
           hash
         else
@@ -54,13 +57,13 @@ module MultiXml
       # element::
       #   XML element whose texts are to me merged into the hash
       def merge_texts!(hash, element)
-        unless element.has_text?
-          hash
-        else
+        if element.has_text?
           # must use value to prevent double-escaping
           texts = ''
           element.texts.each { |t| texts << t.value }
           merge!(hash, MultiXml::CONTENT_ROOT, texts)
+        else
+          hash
         end
       end
 
@@ -76,7 +79,7 @@ module MultiXml
       # value::
       #   Value to be associated with key.
       def merge!(hash, key, value)
-        if hash.has_key?(key)
+        if hash.key?(key)
           if hash[key].instance_of?(Array)
             hash[key] << value
           else
@@ -97,7 +100,7 @@ module MultiXml
       #   XML element to extract attributes from.
       def get_attributes(element)
         attributes = {}
-        element.attributes.each { |n,v| attributes[n] = v }
+        element.attributes.each { |n, v| attributes[n] = v }
         attributes
       end
 

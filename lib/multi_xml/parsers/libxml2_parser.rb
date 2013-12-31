@@ -8,16 +8,19 @@ module MultiXml
       #
       # hash::
       #   Hash to merge the converted element into.
-      def node_to_hash(node, hash = {})
+      def node_to_hash(node, hash = {}) # rubocop:disable CyclomaticComplexity, MethodLength
         node_hash = {MultiXml::CONTENT_ROOT => ''}
 
         name = node_name(node)
 
         # Insert node hash into parent hash correctly.
         case hash[name]
-          when Array then hash[name] << node_hash
-          when Hash  then hash[name] = [hash[name], node_hash]
-          when nil   then hash[name] = node_hash
+        when Array
+          hash[name] << node_hash
+        when Hash
+          hash[name] = [hash[name], node_hash]
+        when NilClass
+          hash[name] = node_hash
         end
 
         # Handle child elements
@@ -37,12 +40,8 @@ module MultiXml
         # Handle attributes
         each_attr(node) do |a|
           key = node_name(a)
-
-          node_hash[key] = if v = node_hash[key]
-                             [a.value, v]
-                           else
-                             a.value
-                           end
+          v = node_hash[key]
+          node_hash[key] = (v ? [a.value, v] : a.value)
         end
 
         hash
@@ -52,22 +51,21 @@ module MultiXml
       # xml::
       #   XML Document IO to parse
       def parse(xml)
-        raise NotImplementedError, "inheritor should define #{__method__}"
+        fail(NotImplementedError, "inheritor should define #{__method__}")
       end
 
-      # :stopdoc:
-      private
+    private
 
       def each_child(*args)
-        raise NotImplementedError, "inheritor should define #{__method__}"
+        fail(NotImplementedError, "inheritor should define #{__method__}")
       end
 
       def each_attr(*args)
-        raise NotImplementedError, "inheritor should define #{__method__}"
+        fail(NotImplementedError, "inheritor should define #{__method__}")
       end
 
       def node_name(*args)
-        raise NotImplementedError, "inheritor should define #{__method__}"
+        fail(NotImplementedError, "inheritor should define #{__method__}")
       end
     end
   end

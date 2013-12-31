@@ -25,18 +25,18 @@ module MultiXml
 
   unless defined?(PARSING)
     PARSING = {
-      'symbol'       => Proc.new{|symbol| symbol.to_sym},
-      'date'         => Proc.new{|date| Date.parse(date)},
-      'datetime'     => Proc.new{|time| Time.parse(time).utc rescue DateTime.parse(time).utc},
-      'integer'      => Proc.new{|integer| integer.to_i},
-      'float'        => Proc.new{|float| float.to_f},
-      'decimal'      => Proc.new{|number| BigDecimal(number)},
-      'boolean'      => Proc.new{|boolean| !%w(0 false).include?(boolean.strip)},
-      'string'       => Proc.new{|string| string.to_s},
-      'yaml'         => Proc.new{|yaml| YAML::load(yaml) rescue yaml},
-      'base64Binary' => Proc.new{|binary| ::Base64.decode64(binary)},
-      'binary'       => Proc.new{|binary, entity| parse_binary(binary, entity)},
-      'file'         => Proc.new{|file, entity| parse_file(file, entity)},
+      'symbol'       => proc { |symbol| symbol.to_sym },
+      'date'         => proc { |date| Date.parse(date) },
+      'datetime'     => proc { |time| Time.parse(time).utc rescue DateTime.parse(time).utc }, # rubocop:disable RescueModifier
+      'integer'      => proc { |integer| integer.to_i },
+      'float'        => proc { |float| float.to_f },
+      'decimal'      => proc { |number| BigDecimal(number) },
+      'boolean'      => proc { |boolean| !%w(0 false).include?(boolean.strip) },
+      'string'       => proc { |string| string.to_s },
+      'yaml'         => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable RescueModifier
+      'base64Binary' => proc { |binary| ::Base64.decode64(binary) },
+      'binary'       => proc { |binary, entity| parse_binary(binary, entity) },
+      'file'         => proc { |file, entity| parse_file(file, entity) },
     }
 
     PARSING.update(
@@ -72,7 +72,7 @@ module MultiXml
     # Get the current parser class.
     def parser
       return @parser if defined?(@parser)
-      self.parser = self.default_parser
+      self.parser = default_parser
       @parser
     end
 
@@ -93,7 +93,7 @@ module MultiXml
           next
         end
       end
-      raise NoParserError.new("No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42.")
+      fail(NoParserError, "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42.")
     end
 
     # Set the XML parser utilizing a symbol, string, or class.
@@ -107,11 +107,11 @@ module MultiXml
       case new_parser
       when String, Symbol
         require "multi_xml/parsers/#{new_parser.to_s.downcase}"
-        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
+        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map { |s| s.capitalize }.join('')}")
       when Class, Module
         @parser = new_parser
       else
-        raise "Did not recognize your parser specification. Please specify either a symbol or a class."
+        fail('Did not recognize your parser specification. Please specify either a symbol or a class.')
       end
     end
 
@@ -124,7 +124,7 @@ module MultiXml
     # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
     #
     # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
-    def parse(xml, options = {})
+    def parse(xml, options = {}) # rubocop:disable CyclomaticComplexity, MethodLength
       xml ||= ''
 
       options = DEFAULT_OPTIONS.merge(options)
@@ -142,7 +142,7 @@ module MultiXml
       rescue DisallowedTypeError
         raise
       rescue parser.parse_error => error
-        raise ParseError, error.message, error.backtrace
+        fail(ParseError, error.message, error.backtrace)
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
@@ -162,7 +162,7 @@ module MultiXml
       end
     end
 
-    private
+  private
 
     # TODO: Add support for other encodings
     def parse_binary(binary, entity) #:nodoc:
@@ -185,11 +185,11 @@ module MultiXml
     def symbolize_keys(params)
       case params
       when Hash
-        params.inject({}) do |result, (key, value)|
+        params.reduce({}) do |result, (key, value)|
           result.merge(key.to_sym => symbolize_keys(value))
         end
       when Array
-        params.map{|value| symbolize_keys(value)}
+        params.map { |value| symbolize_keys(value) }
       else
         params
       end
@@ -198,12 +198,12 @@ module MultiXml
     def undasherize_keys(params)
       case params
       when Hash
-        params.inject({}) do |hash, (key, value)|
+        params.reduce({}) do |hash, (key, value)|
           hash[key.to_s.tr('-', '_')] = undasherize_keys(value)
           hash
         end
       when Array
-        params.map{|value| undasherize_keys(value)}
+        params.map { |value| undasherize_keys(value) }
       else
         params
       end
@@ -215,7 +215,7 @@ module MultiXml
       case value
       when Hash
         if value.include?('type') && !value['type'].is_a?(Hash) && disallowed_types.include?(value['type'])
-          raise DisallowedTypeError, value['type']
+          fail(DisallowedTypeError, value['type'])
         end
 
         if value['type'] == 'array'
@@ -229,28 +229,30 @@ module MultiXml
 
           # This attempt fails to consider the order that the detect method
           # retrieves the entries.
-          #_, entries = value.detect {|key, _| key != 'type'}
+          # _, entries = value.detect {|key, _| key != 'type'}
 
           # This approach ignores attribute entries that are not convertable
           # to an Array which allows attributes to be ignored.
-          _, entries = value.detect {|k, v| k != 'type' && (v.is_a?(Array) || v.is_a?(Hash)) }
+          _, entries = value.detect { |k, v| k != 'type' && (v.is_a?(Array) || v.is_a?(Hash)) }
 
-          if entries.nil? || (entries.is_a?(String) && entries.strip.empty?)
+          case entries
+          when NilClass
             []
+          when String
+            [] if entries.strip.empty? # rubocop:disable BlockNesting
+          when Array
+            entries.map { |entry| typecast_xml_value(entry, disallowed_types) }
+          when Hash
+            [typecast_xml_value(entries, disallowed_types)]
           else
-            case entries
-            when Array
-              entries.map {|entry| typecast_xml_value(entry, disallowed_types)}
-            when Hash
-              [typecast_xml_value(entries, disallowed_types)]
-            else
-              raise "can't typecast #{entries.class.name}: #{entries.inspect}"
-            end
+            fail("can't typecast #{entries.class.name}: #{entries.inspect}")
           end
-        elsif value.has_key?(CONTENT_ROOT)
+
+        elsif value.key?(CONTENT_ROOT)
           content = value[CONTENT_ROOT]
-          if block = PARSING[value['type']]
-            if block.arity == 1
+          block = PARSING[value['type']]
+          if block
+            if block.arity == 1 # rubocop:disable BlockNesting
               value.delete('type') if PARSING[value['type']]
               if value.keys.size > 1
                 value[CONTENT_ROOT] = block.call(content)
@@ -275,7 +277,7 @@ module MultiXml
         elsif value['type'] && value.size == 1 && !value['type'].is_a?(Hash)
           nil
         else
-          xml_value = value.inject({}) do |hash, (k, v)|
+          xml_value = value.reduce({}) do |hash, (k, v)|
             hash[k] = typecast_xml_value(v, disallowed_types)
             hash
           end
@@ -285,14 +287,13 @@ module MultiXml
           xml_value['file'].is_a?(StringIO) ? xml_value['file'] : xml_value
         end
       when Array
-        value.map!{|i| typecast_xml_value(i, disallowed_types)}
+        value.map! { |i| typecast_xml_value(i, disallowed_types) }
         value.length > 1 ? value : value.first
       when String
         value
       else
-        raise "can't typecast #{value.class.name}: #{value.inspect}"
+        fail("can't typecast #{value.class.name}: #{value.inspect}")
       end
     end
   end
-
 end

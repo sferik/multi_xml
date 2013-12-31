@@ -1,18 +1,18 @@
 require 'helper'
 require 'parser_shared_example'
 
-class MockDecoder;
+class MockDecoder
   def self.parse; end
 end
 
-describe "MultiXml" do
-  context "Parsers" do
-    it "picks a default parser" do
+describe 'MultiXml' do
+  context 'Parsers' do
+    it 'picks a default parser' do
       expect(MultiXml.parser).to be_kind_of(Module)
       expect(MultiXml.parser).to respond_to(:parse)
     end
 
-    it "defaults to the best available gem" do
+    it 'defaults to the best available gem' do
       # Clear cache variable possibly set by previous tests
       MultiXml.send(:remove_instance_variable, :@parser) if MultiXml.instance_variable_defined?(:@parser)
       if jruby?
@@ -23,27 +23,27 @@ describe "MultiXml" do
       end
     end
 
-    it "is settable via a symbol" do
+    it 'is settable via a symbol' do
       MultiXml.parser = :rexml
       expect(MultiXml.parser.name).to eq('MultiXml::Parsers::Rexml')
     end
 
-    it "is settable via a class" do
+    it 'is settable via a class' do
       MultiXml.parser = MockDecoder
       expect(MultiXml.parser.name).to eq('MockDecoder')
     end
   end
 
-  [['LibXML', 'libxml'],
-   ['REXML', 'rexml/document'],
-   ['Nokogiri', 'nokogiri'],
-   ['Ox', 'ox']].each do |parser|
+  [%w[LibXML libxml],
+   %w[REXML rexml/document],
+   %w[Nokogiri nokogiri],
+   %w[Ox ox]].each do |parser|
     begin
       require parser.last
       context "#{parser.first} parser" do
-        it_behaves_like "a parser", parser.first
+        it_behaves_like 'a parser', parser.first
       end
-    rescue LoadError => e
+    rescue LoadError
       puts "Tests not run for #{parser.first} due to a LoadError"
     end
   end

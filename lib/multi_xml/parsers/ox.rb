@@ -21,7 +21,6 @@ require 'ox' unless defined?(Ox)
 module MultiXml
   module Parsers
     module Ox #:nodoc:
-
       extend self
 
       def parse_error
@@ -37,7 +36,7 @@ module MultiXml
       class Handler
         attr_accessor :stack
 
-        def initialize()
+        def initialize
           @stack = []
         end
 
@@ -46,9 +45,7 @@ module MultiXml
         end
 
         def attr(name, value)
-          unless @stack.empty?
-            append(name, value)
-          end
+          append(name, value) unless @stack.empty?
         end
 
         def text(value)
@@ -60,26 +57,24 @@ module MultiXml
         end
 
         def start_element(name)
-          if @stack.empty?
-            @stack.push(Hash.new)
-          end
-          h = Hash.new
+          @stack.push({}) if @stack.empty?
+          h = {}
           append(name, h)
           @stack.push(h)
         end
 
         def end_element(name)
-          @stack.pop()
+          @stack.pop
         end
 
         def error(message, line, column)
-          raise Exception.new("#{message} at #{line}:#{column}")
+          fail(Exception, "#{message} at #{line}:#{column}")
         end
 
         def append(key, value)
           key = key.to_s
           h = @stack.last
-          if h.has_key?(key)
+          if h.key?(key)
             v = h[key]
             if v.is_a?(Array)
               v << value
@@ -90,7 +85,6 @@ module MultiXml
             h[key] = value
           end
         end
-
       end # Handler
     end # Ox
   end # Parsers
