@@ -20,7 +20,7 @@ end
 group :test do
   gem 'backports'
   gem 'coveralls', :require => false
-  gem 'json', :platforms => [:ruby_19]
+  gem 'json', :platforms => [:rbx, :ruby_19]
   gem 'mime-types', '~> 1.25', :platforms => [:jruby, :ruby_18]
   gem 'rspec', '>= 2.14'
   gem 'rubocop', '>= 0.16', :platforms => [:ruby_19, :ruby_20, :ruby_21]
@@ -32,7 +32,6 @@ platforms :rbx do
   gem 'racc', '~> 1.4' # Required for testing against Nokogiri on Rubinius
   gem 'rubinius-coverage',  '~> 2.0'
   gem 'rubysl', '~> 2.0'
-  gem 'rubysl-json', '~> 2.0'
 end
 
 gemspec
