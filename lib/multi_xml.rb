@@ -93,7 +93,7 @@ module MultiXml
           next
         end
       end
-      fail(NoParserError, "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42.")
+      fail(NoParserError.new("No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42."))
     end
 
     # Set the XML parser utilizing a symbol, string, or class.
@@ -107,7 +107,7 @@ module MultiXml
       case new_parser
       when String, Symbol
         require "multi_xml/parsers/#{new_parser.to_s.downcase}"
-        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').map { |s| s.capitalize }.join('')}")
+        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').collect { |s| s.capitalize }.join('')}")
       when Class, Module
         @parser = new_parser
       else
@@ -142,7 +142,7 @@ module MultiXml
       rescue DisallowedTypeError
         raise
       rescue parser.parse_error => error
-        fail(ParseError, error.message, error.backtrace)
+        fail(ParseError, error.message, error.backtrace) # rubocop:disable RaiseArgs
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
@@ -185,11 +185,11 @@ module MultiXml
     def symbolize_keys(params)
       case params
       when Hash
-        params.reduce({}) do |result, (key, value)|
+        params.inject({}) do |result, (key, value)|
           result.merge(key.to_sym => symbolize_keys(value))
         end
       when Array
-        params.map { |value| symbolize_keys(value) }
+        params.collect { |value| symbolize_keys(value) }
       else
         params
       end
@@ -198,12 +198,12 @@ module MultiXml
     def undasherize_keys(params)
       case params
       when Hash
-        params.reduce({}) do |hash, (key, value)|
+        params.inject({}) do |hash, (key, value)|
           hash[key.to_s.tr('-', '_')] = undasherize_keys(value)
           hash
         end
       when Array
-        params.map { |value| undasherize_keys(value) }
+        params.collect { |value| undasherize_keys(value) }
       else
         params
       end
@@ -215,7 +215,7 @@ module MultiXml
       case value
       when Hash
         if value.include?('type') && !value['type'].is_a?(Hash) && disallowed_types.include?(value['type'])
-          fail(DisallowedTypeError, value['type'])
+          fail(DisallowedTypeError.new(value['type']))
         end
 
         if value['type'] == 'array'
@@ -241,7 +241,7 @@ module MultiXml
           when String
             [] if entries.strip.empty? # rubocop:disable BlockNesting
           when Array
-            entries.map { |entry| typecast_xml_value(entry, disallowed_types) }
+            entries.collect { |entry| typecast_xml_value(entry, disallowed_types) }
           when Hash
             [typecast_xml_value(entries, disallowed_types)]
           else
@@ -277,7 +277,7 @@ module MultiXml
         elsif value['type'] && value.size == 1 && !value['type'].is_a?(Hash)
           nil
         else
-          xml_value = value.reduce({}) do |hash, (k, v)|
+          xml_value = value.inject({}) do |hash, (k, v)|
             hash[k] = typecast_xml_value(v, disallowed_types)
             hash
           end

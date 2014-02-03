@@ -18,7 +18,7 @@ module MultiXml
         if doc.root
           merge_element!({}, doc.root)
         else
-          fail(REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root")
+          fail(REXML::ParseException.new("The document #{doc.to_s.inspect} does not have a valid root"))
         end
       end
 
