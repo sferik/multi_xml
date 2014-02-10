@@ -28,10 +28,4 @@ group :test do
   gem 'yardstick'
 end
 
-platforms :rbx do
-  gem 'racc', '~> 1.4' # Required for testing against Nokogiri on Rubinius
-  gem 'rubinius-coverage',  '~> 2.0'
-  gem 'rubysl', '~> 2.0'
-end
-
 gemspec
