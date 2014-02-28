@@ -1,11 +1,11 @@
 # MultiXML
 
-[![Gem Version](https://badge.fury.io/rb/multi_xml.png)][gem]
-[![Build Status](https://secure.travis-ci.org/sferik/multi_xml.png?branch=master)][travis]
-[![Dependency Status](https://gemnasium.com/sferik/multi_xml.png?travis)][gemnasium]
-[![Code Climate](https://codeclimate.com/github/sferik/multi_xml.png)][codeclimate]
-[![Coverage Status](https://coveralls.io/repos/sferik/multi_xml/badge.png?branch=master)][coveralls]
-[![Gittip](http://img.shields.io/gittip/gems.png)][gittip]
+[![Gem Version](http://img.shields.io/gem/v/multi_xml.svg)][gem]
+[![Build Status](http://img.shields.io/travis/sferik/multi_xml.svg)][travis]
+[![Dependency Status](http://img.shields.io/gemnasium/sferik/multi_xml.svg)][gemnasium]
+[![Code Climate](http://img.shields.io/codeclimate/github/sferik/multi_xml.svg)][codeclimate]
+[![Coverage Status](http://img.shields.io/coveralls/sferik/multi_xml.svg)][coveralls]
+[![Gittip](http://img.shields.io/gittip/gems.svg)][gittip]
 
 [gem]: https://rubygems.org/gems/multi_xml
 [travis]: http://travis-ci.org/sferik/multi_xml
