@@ -31,7 +31,7 @@ module MultiXml
       'integer'      => proc { |integer| integer.to_i },
       'float'        => proc { |float| float.to_f },
       'decimal'      => proc { |number| BigDecimal(number) },
-      'boolean'      => proc { |boolean| !%w(0 false).include?(boolean.strip) },
+      'boolean'      => proc { |boolean| !%w[0 false].include?(boolean.strip) },
       'string'       => proc { |string| string.to_s },
       'yaml'         => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable RescueModifier
       'base64Binary' => proc { |binary| ::Base64.decode64(binary) },
@@ -60,7 +60,7 @@ module MultiXml
     'Hash'       => 'hash'
   } unless defined?(TYPE_NAMES)
 
-  DISALLOWED_XML_TYPES = %w(symbol yaml)
+  DISALLOWED_XML_TYPES = %w[symbol yaml]
 
   DEFAULT_OPTIONS = {
     :typecast_xml_value => true,
@@ -209,7 +209,7 @@ module MultiXml
       end
     end
 
-    def typecast_xml_value(value, disallowed_types = nil)
+    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable CyclomaticComplexity, MethodLength
       disallowed_types ||= DISALLOWED_XML_TYPES
 
       case value
@@ -264,7 +264,7 @@ module MultiXml
               block.call(content, value)
             end
           else
-            value.keys.size > 1 ? value : content
+            value.keys.size > 1 ? value : content # rubocop:disable BlockNesting
           end
         elsif value['type'] == 'string' && value['nil'] != 'true'
           ''

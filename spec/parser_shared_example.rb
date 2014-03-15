@@ -101,7 +101,7 @@ shared_examples_for 'a parser' do |parser|
 
       context 'typecast management' do
         before do
-          @xml = %Q{
+          @xml = %Q(
             <global-settings>
               <group>
                 <name>Settings</name>
@@ -110,7 +110,7 @@ shared_examples_for 'a parser' do |parser|
                 </setting>
               </group>
             </global-settings>
-          }
+          )
         end
 
         context 'with :typecast_xml_value => true' do
@@ -141,7 +141,7 @@ shared_examples_for 'a parser' do |parser|
       end
 
       context "with an attribute type=\"boolean\"" do
-        %w(true false).each do |boolean|
+        %w[true false].each do |boolean|
           context "when #{boolean}" do
             it "returns #{boolean}" do
               xml = "<tag type=\"boolean\">#{boolean}</tag>"
@@ -421,7 +421,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      %w(integer boolean date datetime file).each do |type|
+      %w[integer boolean date datetime file].each do |type|
         context "with an empty attribute type=\"#{type}\"" do
           before do
             @xml = "<tag type=\"#{type}\"/>"
@@ -433,7 +433,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      %w{yaml symbol}.each do |type|
+      %w[yaml symbol].each do |type|
         context "with an empty attribute type=\"#{type}\"" do
           before do
             @xml = "<tag type=\"#{type}\"/>"
