@@ -63,7 +63,7 @@ module MultiXml
           @stack.push(h)
         end
 
-        def end_element(name)
+        def end_element(_)
           @stack.pop
         end
 

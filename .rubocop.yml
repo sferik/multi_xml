@@ -1,9 +1,9 @@
 AllCops:
-  Includes:
+  Include:
     - 'Gemfile'
     - 'Rakefile'
     - 'multi_xml.gemspec'
-  Excludes:
+  Exclude:
     - 'spec/speed.rb'
 
 # Avoid long parameter lists
@@ -23,7 +23,7 @@ MethodLength:
 
 # Avoid more than `Max` levels of nesting.
 BlockNesting:
-  Max: 3
+  Max: 5
 
 # Align with the style guide.
 CollectionMethods:
@@ -95,3 +95,6 @@ PercentLiteralDelimiters:
     '%w': '[]'
     '%W': '[]'
     '%x': ()
+
+EachWithObject:
+  Enabled: false

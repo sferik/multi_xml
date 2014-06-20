@@ -50,21 +50,21 @@ module MultiXml
       # Parse an XML Document IO into a simple hash.
       # xml::
       #   XML Document IO to parse
-      def parse(xml)
+      def parse(_)
         fail(NotImplementedError.new("inheritor should define #{__method__}"))
       end
 
     private
 
-      def each_child(*args)
+      def each_child(*)
         fail(NotImplementedError.new("inheritor should define #{__method__}"))
       end
 
-      def each_attr(*args)
+      def each_attr(*)
         fail(NotImplementedError.new("inheritor should define #{__method__}"))
       end
 
-      def node_name(*args)
+      def node_name(*)
         fail(NotImplementedError.new("inheritor should define #{__method__}"))
       end
     end
