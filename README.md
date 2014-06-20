@@ -5,14 +5,12 @@
 [![Dependency Status](http://img.shields.io/gemnasium/sferik/multi_xml.svg)][gemnasium]
 [![Code Climate](http://img.shields.io/codeclimate/github/sferik/multi_xml.svg)][codeclimate]
 [![Coverage Status](http://img.shields.io/coveralls/sferik/multi_xml.svg)][coveralls]
-[![Gittip](http://img.shields.io/gittip/gems.svg)][gittip]
 
 [gem]: https://rubygems.org/gems/multi_xml
 [travis]: http://travis-ci.org/sferik/multi_xml
 [gemnasium]: https://gemnasium.com/sferik/multi_xml
 [codeclimate]: https://codeclimate.com/github/sferik/multi_xml
 [coveralls]: https://coveralls.io/r/sferik/multi_xml
-[gittip]: https://www.gittip.com/gems/
 
 A generic swappable back-end for XML parsing
 
