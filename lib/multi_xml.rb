@@ -18,7 +18,7 @@ module MultiXml
     ['ox', :ox],
     ['libxml', :libxml],
     ['nokogiri', :nokogiri],
-    ['rexml/document', :rexml]
+    ['rexml/document', :rexml],
   ] unless defined?(REQUIREMENT_MAP)
 
   CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
@@ -31,7 +31,7 @@ module MultiXml
       'integer'      => proc { |integer| integer.to_i },
       'float'        => proc { |float| float.to_f },
       'decimal'      => proc { |number| BigDecimal(number) },
-      'boolean'      => proc { |boolean| !%w[0 false].include?(boolean.strip) },
+      'boolean'      => proc { |boolean| !%w(0 false).include?(boolean.strip) },
       'string'       => proc { |string| string.to_s },
       'yaml'         => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable RescueModifier
       'base64Binary' => proc { |binary| ::Base64.decode64(binary) },
@@ -39,10 +39,7 @@ module MultiXml
       'file'         => proc { |file, entity| parse_file(file, entity) },
     }
 
-    PARSING.update(
-      'double'   => PARSING['float'],
-      'dateTime' => PARSING['datetime']
-    )
+    PARSING.update('double' => PARSING['float'], 'dateTime' => PARSING['datetime'])
   end
 
   TYPE_NAMES = {
@@ -57,15 +54,15 @@ module MultiXml
     'DateTime'   => 'datetime',
     'Time'       => 'datetime',
     'Array'      => 'array',
-    'Hash'       => 'hash'
+    'Hash'       => 'hash',
   } unless defined?(TYPE_NAMES)
 
-  DISALLOWED_XML_TYPES = %w[symbol yaml]
+  DISALLOWED_XML_TYPES = %w(symbol yaml)
 
   DEFAULT_OPTIONS = {
     :typecast_xml_value => true,
     :disallowed_types => DISALLOWED_XML_TYPES,
-    :symbolize_keys => false
+    :symbolize_keys => false,
   }
 
   class << self
@@ -124,7 +121,7 @@ module MultiXml
     # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
     #
     # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
-    def parse(xml, options = {}) # rubocop:disable CyclomaticComplexity, MethodLength
+    def parse(xml, options = {}) # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
       xml ||= ''
 
       options = DEFAULT_OPTIONS.merge(options)
@@ -209,7 +206,7 @@ module MultiXml
       end
     end
 
-    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable CyclomaticComplexity, MethodLength
+    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
       disallowed_types ||= DISALLOWED_XML_TYPES
 
       case value

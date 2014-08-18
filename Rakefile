@@ -22,7 +22,7 @@ YARD::Rake::YardocTask.new do |task|
     '--no-private',
     '--protected',
     '--output-dir', 'doc/yard',
-    '--markup', 'markdown',
+    '--markup', 'markdown'
   ]
 end
 

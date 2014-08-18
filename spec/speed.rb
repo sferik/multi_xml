@@ -14,7 +14,7 @@ require 'optparse'
 require 'stringio'
 require 'multi_xml'
 
-%w[libxml nokogiri ox].each do |library|
+%w(libxml nokogiri ox).each do |library|
   begin
     require library
   rescue LoadError
@@ -28,7 +28,7 @@ $iterations = 10
 
 opts = OptionParser.new
 opts.on('-v', 'increase verbosity')                            { $verbose += 1 }
-opts.on('-p', '--parser [String]', String, 'parser to test')   { |parsers| $parsers = [pasers] }
+opts.on('-p', '--parser [String]', String, 'parser to test')   { |parsers| $parsers = [parsers] }
 opts.on('-i', '--iterations [Int]', Integer, 'iterations')     { |iterations| $iterations = iterations }
 opts.on('-h', '--help', 'Show this display')                   { puts opts; Process.exit!(0) }
 files = opts.parse(ARGV)

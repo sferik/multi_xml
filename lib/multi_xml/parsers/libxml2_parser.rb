@@ -8,7 +8,7 @@ module MultiXml
       #
       # hash::
       #   Hash to merge the converted element into.
-      def node_to_hash(node, hash = {}) # rubocop:disable CyclomaticComplexity, MethodLength
+      def node_to_hash(node, hash = {}) # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
         node_hash = {MultiXml::CONTENT_ROOT => ''}
 
         name = node_name(node)
