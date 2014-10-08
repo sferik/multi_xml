@@ -8,15 +8,12 @@ Gem::Specification.new do |spec|
   spec.author = 'Erik Michaels-Ober'
   spec.description = 'Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML.'
   spec.email = 'sferik@gmail.com'
-  spec.files = %w(.yardopts CHANGELOG.md CONTRIBUTING.md LICENSE.md README.md Rakefile multi_xml.gemspec)
-  spec.files += Dir.glob('lib/**/*.rb')
-  spec.files += Dir.glob('spec/**/*')
+  spec.files = %w(.yardopts CHANGELOG.md CONTRIBUTING.md LICENSE.md README.md multi_xml.gemspec) + Dir['lib/**/*.rb']
   spec.homepage = 'https://github.com/sferik/multi_xml'
   spec.licenses = ['MIT']
   spec.name = 'multi_xml'
   spec.require_paths = ['lib']
   spec.required_rubygems_version = '>= 1.3.5'
   spec.summary = 'A generic swappable back-end for XML parsing'
-  spec.test_files = Dir.glob('spec/**/*')
   spec.version = MultiXml::VERSION
 end
