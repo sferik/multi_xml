@@ -692,6 +692,30 @@ shared_examples_for 'a parser' do |parser|
       end
 
     end
+
+    context 'a duplexed stream' do
+      before do
+        @xml, wr = IO.pipe
+
+        # Trick Ox to read IO partially.
+        #
+        # https://github.com/ohler55/ox/blob/569e58ecc7b5a3f24ef27369c578fc721b26d775/ext/ox/sax_buf.c#L41
+        if parser == "Ox"
+          class << @xml; undef_method :fileno; end
+        end
+
+        Thread.new {
+          '<user/>'.each_char do |chunk|
+            wr << chunk
+          end
+          wr.close
+        }
+      end
+
+      it 'parses correctly' do
+        expect(MultiXml.parse(@xml)).to eq('user' => nil)
+      end
+    end
   end
 
 end
