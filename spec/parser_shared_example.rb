@@ -3,6 +3,10 @@ shared_examples_for 'a parser' do |parser|
   before do
     begin
       MultiXml.parser = parser
+
+      if parser == 'LibXML'
+        LibXML::XML::Error.set_handler(&LibXML::XML::Error::QUIET_HANDLER)
+      end
     rescue LoadError
       pending "Parser #{parser} couldn't be loaded"
     end
