@@ -6,6 +6,7 @@ gem 'yard'
 gem 'libxml-ruby', :require => nil, :platforms => :ruby
 gem 'nokogiri', '~> 1.5.0', :require => nil
 gem 'ox', :require => nil, :platforms => :ruby
+gem 'oga', '~> 1.0', :require => nil
 
 group :development do
   gem 'kramdown'
