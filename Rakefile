@@ -6,14 +6,8 @@ RSpec::Core::RakeTask.new(:spec)
 
 task :test => :spec
 
-begin
-  require 'rubocop/rake_task'
-  RuboCop::RakeTask.new
-rescue LoadError
-  task :rubocop do
-    $stderr.puts 'RuboCop is disabled'
-  end
-end
+require 'rubocop/rake_task'
+RuboCop::RakeTask.new
 
 require 'yard'
 YARD::Rake::YardocTask.new do |task|

@@ -1,22 +1,16 @@
-def jruby?(platform = RUBY_PLATFORM)
-  'java' == platform
+def jruby?
+  RUBY_PLATFORM == 'java'
 end
 
-def rubinius?(platform = defined?(RUBY_ENGINE) && RUBY_ENGINE)
-  'rbx' == platform
-end
+require 'simplecov'
+require 'coveralls'
 
-if RUBY_VERSION >= '1.9'
-  require 'simplecov'
-  require 'coveralls'
+SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
 
-  SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, Coveralls::SimpleCov::Formatter]
-
-  SimpleCov.start do
-    add_filter '/spec'
-    percent = jruby? ? 91.29 : 91.96
-    minimum_coverage(percent)
-  end
+SimpleCov.start do
+  add_filter '/spec'
+  percent = jruby? ? 91.29 : 92.31
+  minimum_coverage(percent)
 end
 
 require 'multi_xml'

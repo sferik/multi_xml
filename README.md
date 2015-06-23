@@ -58,10 +58,15 @@ then Nokogiri, and finally REXML.
 This library aims to support and is [tested against][travis] the following Ruby
 implementations:
 
-* Ruby 1.8.7
 * Ruby 1.9.3
 * Ruby 2.0.0
-* Ruby 2.1.0
+* Ruby 2.1
+* Ruby 2.2
+* [JRuby 1.7][]
+* [Rubinius 2][]
+
+[jruby]: http://www.jruby.org/
+[rubinius]: http://rubini.us/
 
 If something doesn't work on one of these interpreters, it's a bug.
 
