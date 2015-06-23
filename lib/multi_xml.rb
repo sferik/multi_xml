@@ -104,7 +104,7 @@ module MultiXml
       case new_parser
       when String, Symbol
         require "multi_xml/parsers/#{new_parser.to_s.downcase}"
-        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').collect { |s| s.capitalize }.join('')}")
+        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').collect(&:capitalize).join('')}")
       when Class, Module
         @parser = new_parser
       else
