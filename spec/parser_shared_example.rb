@@ -2,6 +2,10 @@ shared_examples_for 'a parser' do |parser|
   before do
     begin
       MultiXml.parser = parser
+
+      if parser == 'LibXML'
+        LibXML::XML::Error.set_handler(&LibXML::XML::Error::QUIET_HANDLER)
+      end
     rescue LoadError
       pending "Parser #{parser} couldn't be loaded"
     end
@@ -686,6 +690,23 @@ shared_examples_for 'a parser' do |parser|
         it 'parses correctly' do
           expect(MultiXml.parse(@xml)).to eq('users' => {'user' => ['Erik Michaels-Ober', 'Wynn Netherland']})
         end
+      end
+    end
+
+    context 'a duplexed stream' do
+      before do
+        @xml, wr = IO.pipe
+
+        Thread.new {
+          '<user/>'.each_char do |chunk|
+            wr << chunk
+          end
+          wr.close
+        }
+      end
+
+      it 'parses correctly' do
+        expect(MultiXml.parse(@xml)).to eq('user' => nil)
       end
     end
   end
