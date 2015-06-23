@@ -66,10 +66,10 @@ implementations:
 * Ruby 2.0.0
 * Ruby 2.1
 * Ruby 2.2
-* [JRuby 1.7][]
-* [Rubinius 2][]
+* [JRuby 1.7][jruby]
+* [Rubinius 2][rubinius]
 
-[jruby]: http://www.jruby.org/
+[jruby]: http://jruby.org/
 [rubinius]: http://rubini.us/
 
 If something doesn't work on one of these interpreters, it's a bug.
