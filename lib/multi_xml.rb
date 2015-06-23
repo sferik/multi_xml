@@ -5,7 +5,7 @@ require 'stringio'
 require 'time'
 require 'yaml'
 
-module MultiXml
+module MultiXml # rubocop:disable ModuleLength
   class ParseError < StandardError; end
   class NoParserError < StandardError; end
   class DisallowedTypeError < StandardError
@@ -121,7 +121,7 @@ module MultiXml
     # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
     #
     # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
-    def parse(xml, options = {}) # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
+    def parse(xml, options = {}) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
       xml ||= ''
 
       options = DEFAULT_OPTIONS.merge(options)
@@ -206,7 +206,7 @@ module MultiXml
       end
     end
 
-    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
+    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
       disallowed_types ||= DISALLOWED_XML_TYPES
 
       case value
@@ -236,7 +236,7 @@ module MultiXml
           when NilClass
             []
           when String
-            [] if entries.strip.empty? # rubocop:disable BlockNesting
+            [] if entries.strip.empty?
           when Array
             entries.collect { |entry| typecast_xml_value(entry, disallowed_types) }
           when Hash
@@ -249,7 +249,7 @@ module MultiXml
           content = value[CONTENT_ROOT]
           block = PARSING[value['type']]
           if block
-            if block.arity == 1 # rubocop:disable BlockNesting
+            if block.arity == 1
               value.delete('type') if PARSING[value['type']]
               if value.keys.size > 1
                 value[CONTENT_ROOT] = block.call(content)
@@ -261,7 +261,7 @@ module MultiXml
               block.call(content, value)
             end
           else
-            value.keys.size > 1 ? value : content # rubocop:disable BlockNesting
+            value.keys.size > 1 ? value : content
           end
         elsif value['type'] == 'string' && value['nil'] != 'true'
           ''
