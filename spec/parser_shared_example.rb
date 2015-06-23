@@ -1,5 +1,4 @@
 shared_examples_for 'a parser' do |parser|
-
   before do
     begin
       MultiXml.parser = parser
@@ -686,8 +685,6 @@ shared_examples_for 'a parser' do |parser|
           expect(MultiXml.parse(@xml)).to eq('users' => {'user' => ['Erik Michaels-Ober', 'Wynn Netherland']})
         end
       end
-
     end
   end
-
 end
