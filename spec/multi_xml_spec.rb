@@ -37,7 +37,8 @@ describe 'MultiXml' do
   [%w(LibXML libxml),
    %w(REXML rexml/document),
    %w(Nokogiri nokogiri),
-   %w(Ox ox)].each do |parser|
+   %w(Ox ox),
+   %w(Oga oga)].each do |parser|
     begin
       require parser.last
       context "#{parser.first} parser" do

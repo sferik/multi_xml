@@ -19,6 +19,7 @@ module MultiXml # rubocop:disable ModuleLength
     ['libxml', :libxml],
     ['nokogiri', :nokogiri],
     ['rexml/document', :rexml],
+    ['oga', :oga]
   ] unless defined?(REQUIREMENT_MAP)
 
   CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
@@ -81,6 +82,7 @@ module MultiXml # rubocop:disable ModuleLength
       return :ox if defined?(::Ox)
       return :libxml if defined?(::LibXML)
       return :nokogiri if defined?(::Nokogiri)
+      return :oga if defined?(::Oga)
 
       REQUIREMENT_MAP.each do |library, parser|
         begin
@@ -100,6 +102,7 @@ module MultiXml # rubocop:disable ModuleLength
     # * <tt>:nokogiri</tt>
     # * <tt>:ox</tt>
     # * <tt>:rexml</tt>
+    # * <tt>:oga</tt>
     def parser=(new_parser)
       case new_parser
       when String, Symbol

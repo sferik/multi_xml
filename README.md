@@ -45,6 +45,10 @@ MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
 MultiXml.parser = :rexml
 MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
 MultiXml.parse('<tag>This is the contents</tag>') # Parsed using REXML
+
+MultiXml.parser = :oga
+MultiXml.parser = MultiXml::Parsers::Oga # Same as above
+MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Oga
 ```
 The `parser` setter takes either a symbol or a class (to allow for custom XML
 parsers) that responds to `.parse` at the class level.
