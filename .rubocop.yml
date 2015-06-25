@@ -14,7 +14,7 @@ Metrics/LineLength:
 
 Metrics/MethodLength:
   CountComments: false
-  Max: 12
+  Max: 13
 
 Metrics/ParameterLists:
   Max: 3

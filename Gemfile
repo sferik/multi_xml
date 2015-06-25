@@ -19,8 +19,7 @@ group :test do
   gem 'mime-types'
   gem 'rest-client'
   gem 'rspec', '>= 2.14'
-  # Go back to using the RuboCop gem after https://github.com/bbatsov/rubocop/pull/1956 is released
-  gem 'rubocop', :git => 'https://github.com/bbatsov/rubocop.git', :ref => 'f8fbd50e02a19669727bd3a811419b7df6337b4b'
+  gem 'rubocop', '>= 0.32.1'
   gem 'simplecov', '>= 0.9'
   gem 'yardstick'
 end

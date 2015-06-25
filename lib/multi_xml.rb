@@ -19,7 +19,7 @@ module MultiXml # rubocop:disable ModuleLength
     ['libxml', :libxml],
     ['nokogiri', :nokogiri],
     ['rexml/document', :rexml],
-    ['oga', :oga]
+    ['oga', :oga],
   ] unless defined?(REQUIREMENT_MAP)
 
   CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)

@@ -16,7 +16,7 @@ module MultiXml
         node_to_hash(document.children[0])
       end
 
-      def node_to_hash(node, hash = {}) # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
+      def node_to_hash(node, hash = {}) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
         node_hash = {MultiXml::CONTENT_ROOT => ''}
 
         name = node_name(node)
