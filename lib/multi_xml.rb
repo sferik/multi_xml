@@ -199,7 +199,7 @@ module MultiXml # rubocop:disable ModuleLength
       case params
       when Hash
         params.inject({}) do |hash, (key, value)|
-          hash[key.to_s.tr('-', '_')] = undasherize_keys(value)
+          hash[key.to_s.tr('-'.freeze, '_'.freeze)] = undasherize_keys(value)
           hash
         end
       when Array
