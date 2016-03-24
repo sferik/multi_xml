@@ -47,5 +47,20 @@ describe 'MultiXml' do
     rescue LoadError
       puts "Tests not run for #{parser.first} due to a LoadError"
     end
+
+    context 'when a different parser is passed in via the options' do
+      before do
+        @orig_parser = MultiXml.parser
+        MultiXml.parser = parser.first.downcase
+      end
+
+      after { MultiXml.parser = @orig_parser }
+
+      it 'uses the specified parser' do
+        expect(MockDecoder).to receive(:parse).with(an_instance_of(StringIO))
+          .and_return('foo' => 'bar')
+        MultiXml.parse('<foo>bar</foo>', parser: MockDecoder)
+      end
+    end
   end
 end

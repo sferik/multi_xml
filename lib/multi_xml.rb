@@ -104,15 +104,7 @@ module MultiXml # rubocop:disable ModuleLength
     # * <tt>:rexml</tt>
     # * <tt>:oga</tt>
     def parser=(new_parser)
-      case new_parser
-      when String, Symbol
-        require "multi_xml/parsers/#{new_parser.to_s.downcase}"
-        @parser = MultiXml::Parsers.const_get("#{new_parser.to_s.split('_').collect(&:capitalize).join('')}")
-      when Class, Module
-        @parser = new_parser
-      else
-        fail('Did not recognize your parser specification. Please specify either a symbol or a class.')
-      end
+      @parser = resolve_parser(new_parser)
     end
 
     # Parse an XML string or IO into Ruby.
@@ -124,6 +116,8 @@ module MultiXml # rubocop:disable ModuleLength
     # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
     #
     # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
+    #
+    # <tt>:parser</tt> :: A symbol or module that corresponds to one of the valid parsers
     def parse(xml, options = {}) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
       xml ||= ''
 
@@ -137,6 +131,7 @@ module MultiXml # rubocop:disable ModuleLength
         return {} if char.nil?
         xml.ungetc(char)
 
+        parser = options.key?(:parser) ? resolve_parser(options[:parser]) : self.parser
         hash = undasherize_keys(parser.parse(xml) || {})
         hash = options[:typecast_xml_value] ? typecast_xml_value(hash, options[:disallowed_types]) : hash
       rescue DisallowedTypeError
@@ -163,6 +158,18 @@ module MultiXml # rubocop:disable ModuleLength
     end
 
   private
+
+    def resolve_parser(parser)
+      case parser
+      when String, Symbol
+        require "multi_xml/parsers/#{parser.to_s.downcase}"
+        @parser = MultiXml::Parsers.const_get("#{parser.to_s.split('_').collect(&:capitalize).join('')}")
+      when Class, Module
+        @parser = parser
+      else
+        fail('Did not recognize your parser specification. Please specify either a symbol or a class.')
+      end
+    end
 
     # TODO: Add support for other encodings
     def parse_binary(binary, entity) #:nodoc:
