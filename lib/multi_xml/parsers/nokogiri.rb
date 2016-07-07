@@ -13,7 +13,7 @@ module MultiXml
 
       def parse(xml)
         doc = ::Nokogiri::XML(xml)
-        fail(doc.errors.first) if !doc.errors.empty?
+        fail(doc.errors.first) unless doc.errors.empty?
         node_to_hash(doc.root)
       end
 
