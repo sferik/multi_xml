@@ -19,7 +19,7 @@ group :test do
   gem 'mime-types'
   gem 'rest-client'
   gem 'rspec', '>= 2.14'
-  gem 'rubocop', '>= 0.32.1'
+  gem 'rubocop', '~> 0.41.1'
   gem 'simplecov', '>= 0.9'
   gem 'yardstick'
 end
