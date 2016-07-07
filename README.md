@@ -66,7 +66,8 @@ implementations:
 * Ruby 2.0.0
 * Ruby 2.1
 * Ruby 2.2
-* [JRuby 1.7][jruby]
+* Ruby 2.3
+* [JRuby 9000][jruby]
 * [Rubinius 2][rubinius]
 
 [jruby]: http://jruby.org/
