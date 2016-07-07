@@ -8,6 +8,10 @@ gem 'nokogiri', :require => nil
 gem 'ox', :require => nil, :platforms => :ruby
 gem 'oga', '~> 1.0', :require => nil
 
+platforms :ruby_19 do
+  gem 'json', '~> 1.8'
+end
+
 group :development do
   gem 'kramdown'
   gem 'pry'
