@@ -697,12 +697,12 @@ shared_examples_for 'a parser' do |parser|
       before do
         @xml, wr = IO.pipe
 
-        Thread.new {
+        Thread.new do
           '<user/>'.each_char do |chunk|
             wr << chunk
           end
           wr.close
-        }
+        end
       end
 
       it 'parses correctly' do
