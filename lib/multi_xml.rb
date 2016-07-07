@@ -20,17 +20,22 @@ module MultiXml # rubocop:disable ModuleLength
     ['nokogiri', :nokogiri],
     ['rexml/document', :rexml],
     ['oga', :oga],
-  ] unless defined?(REQUIREMENT_MAP)
+  ].freeze unless defined?(REQUIREMENT_MAP)
 
   CONTENT_ROOT = '__content__'.freeze unless defined?(CONTENT_ROOT)
 
   unless defined?(PARSING)
+    float_proc = proc { |float| float.to_f }
+    datetime_proc = proc { |time| Time.parse(time).utc rescue DateTime.parse(time).utc } # rubocop:disable RescueModifier
+
     PARSING = {
       'symbol'       => proc { |symbol| symbol.to_sym },
       'date'         => proc { |date| Date.parse(date) },
-      'datetime'     => proc { |time| Time.parse(time).utc rescue DateTime.parse(time).utc }, # rubocop:disable RescueModifier
+      'datetime'     => datetime_proc,
+      'dateTime'     => datetime_proc,
       'integer'      => proc { |integer| integer.to_i },
-      'float'        => proc { |float| float.to_f },
+      'float'        => float_proc,
+      'double'       => float_proc,
       'decimal'      => proc { |number| BigDecimal(number) },
       'boolean'      => proc { |boolean| !%w(0 false).include?(boolean.strip) },
       'string'       => proc { |string| string.to_s },
@@ -38,9 +43,7 @@ module MultiXml # rubocop:disable ModuleLength
       'base64Binary' => proc { |binary| ::Base64.decode64(binary) },
       'binary'       => proc { |binary, entity| parse_binary(binary, entity) },
       'file'         => proc { |file, entity| parse_file(file, entity) },
-    }
-
-    PARSING.update('double' => PARSING['float'], 'dateTime' => PARSING['datetime'])
+    }.freeze
   end
 
   TYPE_NAMES = {
@@ -56,15 +59,15 @@ module MultiXml # rubocop:disable ModuleLength
     'Time'       => 'datetime',
     'Array'      => 'array',
     'Hash'       => 'hash',
-  } unless defined?(TYPE_NAMES)
+  }.freeze unless defined?(TYPE_NAMES)
 
-  DISALLOWED_XML_TYPES = %w(symbol yaml)
+  DISALLOWED_XML_TYPES = %w(symbol yaml).freeze
 
   DEFAULT_OPTIONS = {
     :typecast_xml_value => true,
     :disallowed_types => DISALLOWED_XML_TYPES,
     :symbolize_keys => false,
-  }
+  }.freeze
 
   class << self
     # Get the current parser class.

@@ -1,3 +1,3 @@
 module MultiXml
-  VERSION = '0.5.5' unless defined?(MultiXML::VERSION)
+  VERSION = '0.5.5'.freeze unless defined?(MultiXML::VERSION)
 end
