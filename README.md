@@ -68,10 +68,8 @@ implementations:
 * Ruby 2.2
 * Ruby 2.3
 * [JRuby 9000][jruby]
-* [Rubinius 2][rubinius]
 
 [jruby]: http://jruby.org/
-[rubinius]: http://rubini.us/
 
 If something doesn't work on one of these interpreters, it's a bug.
 
