@@ -51,21 +51,21 @@ module MultiXml
       # xml::
       #   XML Document IO to parse
       def parse(_)
-        fail(NotImplementedError.new("inheritor should define #{__method__}"))
+        raise(NotImplementedError.new("inheritor should define #{__method__}"))
       end
 
     private
 
       def each_child(*)
-        fail(NotImplementedError.new("inheritor should define #{__method__}"))
+        raise(NotImplementedError.new("inheritor should define #{__method__}"))
       end
 
       def each_attr(*)
-        fail(NotImplementedError.new("inheritor should define #{__method__}"))
+        raise(NotImplementedError.new("inheritor should define #{__method__}"))
       end
 
       def node_name(*)
-        fail(NotImplementedError.new("inheritor should define #{__method__}"))
+        raise(NotImplementedError.new("inheritor should define #{__method__}"))
       end
     end
   end

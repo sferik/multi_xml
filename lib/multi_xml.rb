@@ -95,7 +95,7 @@ module MultiXml # rubocop:disable ModuleLength
           next
         end
       end
-      fail(NoParserError.new("No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42."))
+      raise(NoParserError.new("No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42."))
     end
 
     # Set the XML parser utilizing a symbol, string, or class.
@@ -114,7 +114,7 @@ module MultiXml # rubocop:disable ModuleLength
       when Class, Module
         @parser = new_parser
       else
-        fail('Did not recognize your parser specification. Please specify either a symbol or a class.')
+        raise('Did not recognize your parser specification. Please specify either a symbol or a class.')
       end
     end
 
@@ -218,7 +218,7 @@ module MultiXml # rubocop:disable ModuleLength
       case value
       when Hash
         if value.include?('type') && !value['type'].is_a?(Hash) && disallowed_types.include?(value['type'])
-          fail(DisallowedTypeError.new(value['type']))
+          raise(DisallowedTypeError.new(value['type']))
         end
 
         if value['type'] == 'array'
@@ -248,7 +248,7 @@ module MultiXml # rubocop:disable ModuleLength
           when Hash
             [typecast_xml_value(entries, disallowed_types)]
           else
-            fail("can't typecast #{entries.class.name}: #{entries.inspect}")
+            raise("can't typecast #{entries.class.name}: #{entries.inspect}")
           end
 
         elsif value.key?(CONTENT_ROOT)
@@ -295,7 +295,7 @@ module MultiXml # rubocop:disable ModuleLength
       when String
         value
       else
-        fail("can't typecast #{value.class.name}: #{value.inspect}")
+        raise("can't typecast #{value.class.name}: #{value.inspect}")
       end
     end
   end
