@@ -10,6 +10,7 @@ gem 'oga', '~> 1.0', :require => nil
 
 platforms :ruby_19 do
   gem 'json', '~> 1.8'
+  gem 'mime-types', '~> 2.99'
 end
 
 group :development do
@@ -20,7 +21,6 @@ end
 group :test do
   gem 'backports'
   gem 'coveralls'
-  gem 'mime-types'
   gem 'rest-client'
   gem 'rspec', '>= 2.14'
   gem 'rubocop', '~> 0.41.1'
