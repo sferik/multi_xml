@@ -145,7 +145,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"boolean\"" do
+      context 'with an attribute type="boolean"' do
         %w(true false).each do |boolean|
           context "when #{boolean}" do
             it "returns #{boolean}" do
@@ -176,7 +176,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"integer\"" do
+      context 'with an attribute type="integer"' do
         context 'with a positive integer' do
           before do
             @xml = '<tag type="integer">1</tag>'
@@ -214,7 +214,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"string\"" do
+      context 'with an attribute type="string"' do
         before do
           @xml = '<tag type="string"></tag>'
         end
@@ -228,7 +228,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"date\"" do
+      context 'with an attribute type="date"' do
         before do
           @xml = '<tag type="date">1970-01-01</tag>'
         end
@@ -242,7 +242,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"datetime\"" do
+      context 'with an attribute type="datetime"' do
         before do
           @xml = '<tag type="datetime">1970-01-01 00:00</tag>'
         end
@@ -256,7 +256,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"dateTime\"" do
+      context 'with an attribute type="dateTime"' do
         before do
           @xml = '<tag type="datetime">1970-01-01 00:00</tag>'
         end
@@ -270,7 +270,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"double\"" do
+      context 'with an attribute type="double"' do
         before do
           @xml = '<tag type="double">3.14159265358979</tag>'
         end
@@ -284,7 +284,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"decimal\"" do
+      context 'with an attribute type="decimal"' do
         before do
           @xml = '<tag type="decimal">3.14159265358979</tag>'
         end
@@ -298,7 +298,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"base64Binary\"" do
+      context 'with an attribute type="base64Binary"' do
         before do
           @xml = '<tag type="base64Binary">aW1hZ2UucG5n</tag>'
         end
@@ -312,7 +312,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"yaml\"" do
+      context 'with an attribute type="yaml"' do
         before do
           @xml = "<tag type=\"yaml\">--- \n1: returns an integer\n:message: Have a nice day\narray: \n- has-dashes: true\n  has_underscores: true\n</tag>"
         end
@@ -326,9 +326,9 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"symbol\"" do
+      context 'with an attribute type="symbol"' do
         before do
-          @xml = "<tag type=\"symbol\">my_symbol</tag>"
+          @xml = '<tag type="symbol">my_symbol</tag>'
         end
 
         it 'raises MultiXML::DisallowedTypeError' do
@@ -340,7 +340,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"file\"" do
+      context 'with an attribute type="file"' do
         before do
           @xml = '<tag type="file" name="data.txt" content_type="text/plain">ZGF0YQ==</tag>'
         end
@@ -384,7 +384,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"array\"" do
+      context 'with an attribute type="array"' do
         before do
           @xml = '<users type="array"><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
         end
@@ -398,7 +398,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"array\" in addition to other attributes" do
+      context 'with an attribute type="array" in addition to other attributes' do
         before do
           @xml = '<users type="array" foo="bar"><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
         end
@@ -412,7 +412,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an attribute type=\"array\" containing only one item" do
+      context 'with an attribute type="array" containing only one item' do
         before do
           @xml = '<users type="array"><user>Erik Michaels-Ober</user></users>'
         end
@@ -454,7 +454,7 @@ shared_examples_for 'a parser' do |parser|
         end
       end
 
-      context "with an empty attribute type=\"array\"" do
+      context 'with an empty attribute type="array"' do
         before do
           @xml = '<tag type="array"/>'
         end
