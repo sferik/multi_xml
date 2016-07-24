@@ -32,6 +32,16 @@ shared_examples_for 'a parser' do |parser|
       end
     end
 
+    context 'a frozen string' do
+      before do
+        @xml = ' '.freeze
+      end
+
+      it 'returns an empty Hash' do
+        expect(MultiXml.parse(@xml)).to eq({})
+      end
+    end
+
     unless parser == 'Oga'
       context 'an invalid XML document' do
         before do

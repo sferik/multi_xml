@@ -132,7 +132,7 @@ module MultiXml # rubocop:disable ModuleLength
 
       options = DEFAULT_OPTIONS.merge(options)
 
-      xml.strip! if xml.respond_to?(:strip!)
+      xml = xml.strip if xml.respond_to?(:strip)
       begin
         xml = StringIO.new(xml) unless xml.respond_to?(:read)
 
