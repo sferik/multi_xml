@@ -182,8 +182,8 @@ shared_examples_for 'a parser' do |parser|
             @xml = '<tag type="integer">1</tag>'
           end
 
-          it 'returns a Fixnum' do
-            expect(MultiXml.parse(@xml)['tag']).to be_a(Fixnum)
+          it 'returns a Integer' do
+            expect(MultiXml.parse(@xml)['tag']).to be_a(Integer)
           end
 
           it 'returns a positive number' do
@@ -200,8 +200,8 @@ shared_examples_for 'a parser' do |parser|
             @xml = '<tag type="integer">-1</tag>'
           end
 
-          it 'returns a Fixnum' do
-            expect(MultiXml.parse(@xml)['tag']).to be_a(Fixnum)
+          it 'returns a Integer' do
+            expect(MultiXml.parse(@xml)['tag']).to be_a(Integer)
           end
 
           it 'returns a negative number' do
