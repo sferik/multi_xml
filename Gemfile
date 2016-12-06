@@ -25,6 +25,7 @@ group :test do
   gem 'rspec', '>= 2.14'
   gem 'rubocop', '~> 0.41.1'
   gem 'simplecov', '>= 0.9'
+  gem 'tins', '~> 1.6.0'
   gem 'yardstick'
 end
 
