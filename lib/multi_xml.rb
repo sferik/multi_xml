@@ -204,7 +204,7 @@ module MultiXml # rubocop:disable ModuleLength
     def undasherize_keys(params)
       case params
       when Hash
-        params.inject({}) do |hash, (key, value)|
+        params.each_with_object({}) do |(key, value), hash|
           hash[key.to_s.tr('-'.freeze, '_'.freeze)] = undasherize_keys(value)
           hash
         end
@@ -283,7 +283,7 @@ module MultiXml # rubocop:disable ModuleLength
         elsif value['type'] && value.size == 1 && !value['type'].is_a?(Hash)
           nil
         else
-          xml_value = value.inject({}) do |hash, (k, v)|
+          xml_value = value.each_with_object({}) do |(k, v), hash|
             hash[k] = typecast_xml_value(v, disallowed_types)
             hash
           end

@@ -33,21 +33,6 @@ Style/CollectionMethods:
 Style/Documentation:
   Enabled: false
 
-Style/DotPosition:
-  EnforcedStyle: trailing
-
-Style/DoubleNegation:
-  Enabled: false
-
-Style/EachWithObject:
-  Enabled: false
-
-Style/Encoding:
-  Enabled: false
-
-Style/Lambda:
-  Enabled: false
-
 Style/ModuleFunction:
   Enabled: false
 
