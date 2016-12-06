@@ -48,8 +48,7 @@ module MultiXml # rubocop:disable ModuleLength
 
   TYPE_NAMES = {
     'Symbol'     => 'symbol',
-    'Fixnum'     => 'integer',
-    'Bignum'     => 'integer',
+    'Integer'    => 'integer',
     'BigDecimal' => 'decimal',
     'Float'      => 'float',
     'TrueClass'  => 'boolean',
