@@ -36,9 +36,6 @@ Style/Documentation:
 Style/ModuleFunction:
   Enabled: false
 
-Style/RaiseArgs:
-  EnforcedStyle: compact
-
 Style/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 

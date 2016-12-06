@@ -15,7 +15,7 @@ module MultiXml
       #   XML Document IO to parse
       def parse(xml)
         doc = REXML::Document.new(xml)
-        raise(REXML::ParseException.new("The document #{doc.to_s.inspect} does not have a valid root")) unless doc.root
+        raise(REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root") unless doc.root
         merge_element!({}, doc.root)
       end
 

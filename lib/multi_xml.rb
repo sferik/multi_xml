@@ -98,7 +98,7 @@ module MultiXml # rubocop:disable ModuleLength
           next
         end
       end
-      raise(NoParserError.new("No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42."))
+      raise(NoParserError, "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42.")
     end
 
     # Set the XML parser utilizing a symbol, string, or class.
@@ -148,7 +148,7 @@ module MultiXml # rubocop:disable ModuleLength
       rescue DisallowedTypeError
         raise
       rescue parser.parse_error => error
-        raise(ParseError, error.message, error.backtrace) # rubocop:disable RaiseArgs
+        raise(ParseError, error.message, error.backtrace)
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
@@ -221,7 +221,7 @@ module MultiXml # rubocop:disable ModuleLength
       case value
       when Hash
         if value.include?('type') && !value['type'].is_a?(Hash) && disallowed_types.include?(value['type'])
-          raise(DisallowedTypeError.new(value['type']))
+          raise(DisallowedTypeError, value['type'])
         end
 
         if value['type'] == 'array'

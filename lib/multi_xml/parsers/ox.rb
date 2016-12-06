@@ -68,7 +68,7 @@ module MultiXml
         end
 
         def error(message, line, column)
-          raise(Exception.new("#{message} at #{line}:#{column}"))
+          raise(Exception, "#{message} at #{line}:#{column}")
         end
 
         def append(key, value)
