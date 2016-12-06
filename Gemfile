@@ -5,8 +5,8 @@ gem 'yard'
 
 gem 'libxml-ruby', :require => nil, :platforms => :ruby
 gem 'nokogiri', :require => nil
-gem 'ox', :require => nil, :platforms => :ruby
 gem 'oga', '>= 2.3', :require => nil
+gem 'ox', :require => nil, :platforms => :ruby
 
 platforms :ruby_19 do
   gem 'json', '~> 1.8'
