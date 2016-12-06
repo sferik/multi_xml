@@ -13,7 +13,8 @@ Gem::Specification.new do |spec|
   spec.licenses = ['MIT']
   spec.name = 'multi_xml'
   spec.require_paths = ['lib']
-  spec.required_rubygems_version = '>= 1.3.5'
+  spec.required_ruby_version     = '>= 2.2.2'
+  spec.required_rubygems_version = '>= 1.8.11'
   spec.summary = 'A generic swappable back-end for XML parsing'
   spec.version = MultiXml::Version
 end

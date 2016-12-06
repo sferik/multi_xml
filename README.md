@@ -62,15 +62,11 @@ then Nokogiri, and finally REXML.
 This library aims to support and is [tested against][travis] the following Ruby
 implementations:
 
-* Ruby 2.0.0
-* Ruby 2.1
-* Ruby 2.2
-* Ruby 2.3
-* [JRuby 9000][jruby]
+* Ruby 2.2.2
+* Ruby 2.3.3
+* JRuby 9.1.6.0
 
-[jruby]: http://jruby.org/
-
-If something doesn't work on one of these interpreters, it's a bug.
+If something doesn't work on one of these versions, it's a bug.
 
 This library may inadvertently work (or seem to work) on other Ruby
 implementations, however support will only be provided for the versions listed
