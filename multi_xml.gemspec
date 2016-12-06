@@ -15,5 +15,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.required_rubygems_version = '>= 1.3.5'
   spec.summary = 'A generic swappable back-end for XML parsing'
-  spec.version = MultiXml::VERSION
+  spec.version = MultiXml::Version
 end
