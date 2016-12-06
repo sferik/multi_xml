@@ -67,9 +67,9 @@ module MultiXml # rubocop:disable ModuleLength
   DISALLOWED_XML_TYPES = %w(symbol yaml).freeze
 
   DEFAULT_OPTIONS = {
-    :typecast_xml_value => true,
-    :disallowed_types => DISALLOWED_XML_TYPES,
-    :symbolize_keys => false,
+    typecast_xml_value: true,
+    disallowed_types: DISALLOWED_XML_TYPES,
+    symbolize_keys: false,
   }.freeze
 
   class << self

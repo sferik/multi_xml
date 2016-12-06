@@ -138,7 +138,7 @@ shared_examples_for 'a parser' do |parser|
 
         context 'with :typecast_xml_value => false' do
           before do
-            @setting = MultiXml.parse(@xml, :typecast_xml_value => false)['global_settings']['group']['setting']
+            @setting = MultiXml.parse(@xml, typecast_xml_value: false)['global_settings']['group']['setting']
           end
 
           it { expect(@setting).to eq('type' => 'string', 'description' => {'__content__' => 'Test'}) }
@@ -151,7 +151,7 @@ shared_examples_for 'a parser' do |parser|
         end
 
         it 'symbolizes keys' do
-          expect(MultiXml.parse(@xml, :symbolize_keys => true)).to eq(:users => {:user => [{:name => 'Erik Michaels-Ober'}, {:name => 'Wynn Netherland'}]})
+          expect(MultiXml.parse(@xml, symbolize_keys: true)).to eq(users: {user: [{name: 'Erik Michaels-Ober'}, {name: 'Wynn Netherland'}]})
         end
       end
 
@@ -332,7 +332,7 @@ shared_examples_for 'a parser' do |parser|
         end
 
         it 'returns the correctly parsed YAML when the type is allowed' do
-          expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to eq(:message => 'Have a nice day', 1 => 'returns an integer', 'array' => [{'has-dashes' => true, 'has_underscores' => true}])
+          expect(MultiXml.parse(@xml, disallowed_types: [])['tag']).to eq(:message => 'Have a nice day', 1 => 'returns an integer', 'array' => [{'has-dashes' => true, 'has_underscores' => true}])
         end
       end
 
@@ -346,7 +346,7 @@ shared_examples_for 'a parser' do |parser|
         end
 
         it 'returns the correctly parsed Symbol when the type is allowed' do
-          expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to eq(:my_symbol)
+          expect(MultiXml.parse(@xml, disallowed_types: [])['tag']).to eq(:my_symbol)
         end
       end
 
@@ -459,7 +459,7 @@ shared_examples_for 'a parser' do |parser|
           end
 
           it 'returns nil when the type is allowed' do
-            expect(MultiXml.parse(@xml, :disallowed_types => [])['tag']).to be nil
+            expect(MultiXml.parse(@xml, disallowed_types: [])['tag']).to be nil
           end
         end
       end
