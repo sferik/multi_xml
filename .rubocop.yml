@@ -1,4 +1,6 @@
 AllCops:
+  TargetRubyVersion: '2.2.2'
+  DisplayCopNames: true
   Exclude:
     - 'spec/speed.rb'
 
