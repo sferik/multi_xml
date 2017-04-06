@@ -39,7 +39,7 @@ module MultiXml # rubocop:disable ModuleLength
       'float'        => float_proc,
       'double'       => float_proc,
       'decimal'      => proc { |number| BigDecimal(number) },
-      'boolean'      => proc { |boolean| !%w(0 false).include?(boolean.strip) },
+      'boolean'      => proc { |boolean| !%w[0 false].include?(boolean.strip) },
       'string'       => proc { |string| string.to_s },
       'yaml'         => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable RescueModifier, YAMLLoad
       'base64Binary' => proc { |binary| ::Base64.decode64(binary) },
@@ -64,7 +64,7 @@ module MultiXml # rubocop:disable ModuleLength
     }.freeze
   end
 
-  DISALLOWED_XML_TYPES = %w(symbol yaml).freeze
+  DISALLOWED_XML_TYPES = %w[symbol yaml].freeze
 
   DEFAULT_OPTIONS = {
     typecast_xml_value: true,
