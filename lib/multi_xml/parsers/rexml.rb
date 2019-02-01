@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rexml/document' unless defined?(REXML::Document)
 
 module MultiXml
@@ -56,8 +58,7 @@ module MultiXml
       def merge_texts!(hash, element)
         if element.has_text?
           # must use value to prevent double-escaping
-          texts = ''
-          element.texts.each { |t| texts << t.value }
+          texts = element.texts.reduce('') { |acc, t| acc + t.value }
           merge!(hash, MultiXml::CONTENT_ROOT, texts)
         else
           hash

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'libxml' unless defined?(LibXML)
 require 'multi_xml/parsers/libxml2_parser'
 
