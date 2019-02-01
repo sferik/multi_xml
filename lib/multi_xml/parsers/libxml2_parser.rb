@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MultiXml
   module Parsers
     module Libxml2Parser #:nodoc:
@@ -28,7 +30,7 @@ module MultiXml
           if c.element?
             node_to_hash(c, node_hash)
           elsif c.text? || c.cdata?
-            node_hash[MultiXml::CONTENT_ROOT] << c.content
+            node_hash[MultiXml::CONTENT_ROOT] += c.content
           end
         end
 

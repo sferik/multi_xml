@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'nokogiri' unless defined?(Nokogiri)
 require 'multi_xml/parsers/libxml2_parser'
 

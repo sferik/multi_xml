@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'oga' unless defined?(Oga)
 require 'multi_xml/parsers/libxml2_parser'
 
@@ -36,7 +38,7 @@ module MultiXml
           if c.is_a?(::Oga::XML::Element)
             node_to_hash(c, node_hash)
           elsif c.is_a?(::Oga::XML::Text) || c.is_a?(::Oga::XML::Cdata)
-            node_hash[MultiXml::CONTENT_ROOT] << c.text
+            node_hash[MultiXml::CONTENT_ROOT] += c.text
           end
         end
 
