@@ -7,6 +7,7 @@ gem 'libxml-ruby', require: nil, platforms: :ruby
 gem 'nokogiri', require: nil
 gem 'oga', '>= 2.3', require: nil
 gem 'ox', require: nil, platforms: :ruby
+gem 'rexml', require: nil
 
 group :development do
   gem 'kramdown'
