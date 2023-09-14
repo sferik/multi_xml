@@ -8,18 +8,10 @@ gem 'nokogiri', require: nil
 gem 'oga', '>= 2.3', require: nil
 gem 'ox', require: nil, platforms: :ruby
 
-group :development do
-  gem 'kramdown'
-  gem 'pry'
-end
-
-group :test do
-  gem 'backports'
-  gem 'coveralls'
-  gem 'rspec', '>= 3'
-  gem 'rubocop', '>= 0.47'
-  gem 'simplecov', '>= 0.9'
-  gem 'yardstick'
-end
+gem 'backports', ">= 3.24.1"
+gem 'rspec', '>= 3.12'
+gem 'rubocop', '>= 1.56.3'
+gem 'simplecov', '>= 0.22'
+gem 'yardstick', '>= 0.9.9'
 
 gemspec
