@@ -1,3 +1,9 @@
+0.6.0
+-----
+* [Duplexed Streams](https://github.com/sferik/multi_xml/pull/45)
+* [Support for Oga](https://github.com/sferik/multi_xml/pull/47)
+* [Integer unification for Ruby 2.4](https://github.com/sferik/multi_xml/pull/54)
+
 0.5.5
 -----
 * [Fix symbolize_keys function](https://github.com/sferik/multi_xml/commit/a4cae3aeb690999287cd30206399abaa5ce1ae81)
