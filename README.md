@@ -11,10 +11,6 @@ A generic swappable back-end for XML parsing
 [documentation]: http://rdoc.info/gems/multi_xml
 
 ## Usage Examples
-Lots of Ruby libraries utilize XML parsing in some form, and everyone has their
-favorite XML library. In order to best support multiple XML parsers and
-libraries, `multi_xml` is a general-purpose swappable XML backend library. You
-use it like so:
 ```ruby
 require 'multi_xml'
 
@@ -42,8 +38,8 @@ The `parser` setter takes either a symbol or a class (to allow for custom XML
 parsers) that responds to `.parse` at the class level.
 
 MultiXML tries to have intelligent defaulting. That is, if you have any of the
-supported parsers already loaded, it will utilize them before attempting to
-load any. When loading, libraries are ordered by speed: first Ox, then LibXML,
+supported parsers already loaded, it will use them before attempting to load
+a new one. When loading, libraries are ordered by speed: first Ox, then LibXML,
 then Nokogiri, and finally REXML.
 
 ## Supported Ruby Versions
