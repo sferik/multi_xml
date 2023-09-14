@@ -47,12 +47,12 @@ load any. When loading, libraries are ordered by speed: first Ox, then LibXML,
 then Nokogiri, and finally REXML.
 
 ## Supported Ruby Versions
-This library aims to support and is [tested against][travis] the following Ruby
+This library aims to support and is tested against the following Ruby
 implementations:
 
-* Ruby 2.2.2
-* Ruby 2.3.3
-* JRuby 9.1.6.0
+* 3.0
+* 3.1
+* 3.2
 
 If something doesn't work on one of these versions, it's a bug.
 
