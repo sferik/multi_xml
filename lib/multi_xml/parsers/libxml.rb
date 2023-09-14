@@ -1,9 +1,9 @@
-require 'libxml' unless defined?(LibXML)
-require 'multi_xml/parsers/libxml2_parser'
+require "libxml" unless defined?(LibXML)
+require "multi_xml/parsers/libxml2_parser"
 
 module MultiXml
   module Parsers
-    module Libxml #:nodoc:
+    module Libxml # :nodoc:
       include Libxml2Parser
       extend self
 
@@ -15,7 +15,7 @@ module MultiXml
         node_to_hash(LibXML::XML::Parser.io(xml).parse.root)
       end
 
-    private
+      private
 
       def each_child(node, &block)
         node.each_child(&block)

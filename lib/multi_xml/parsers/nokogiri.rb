@@ -1,9 +1,9 @@
-require 'nokogiri' unless defined?(Nokogiri)
-require 'multi_xml/parsers/libxml2_parser'
+require "nokogiri" unless defined?(Nokogiri)
+require "multi_xml/parsers/libxml2_parser"
 
 module MultiXml
   module Parsers
-    module Nokogiri #:nodoc:
+    module Nokogiri # :nodoc:
       include Libxml2Parser
       extend self
 
@@ -14,10 +14,11 @@ module MultiXml
       def parse(xml)
         doc = ::Nokogiri::XML(xml)
         raise(doc.errors.first) unless doc.errors.empty?
+
         node_to_hash(doc.root)
       end
 
-    private
+      private
 
       def each_child(node, &block)
         node.children.each(&block)

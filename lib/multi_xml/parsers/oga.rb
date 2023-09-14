@@ -1,9 +1,9 @@
-require 'oga' unless defined?(Oga)
-require 'multi_xml/parsers/libxml2_parser'
+require "oga" unless defined?(Oga)
+require "multi_xml/parsers/libxml2_parser"
 
 module MultiXml
   module Parsers
-    module Oga #:nodoc:
+    module Oga # :nodoc:
       include Libxml2Parser
       extend self
 
@@ -16,8 +16,8 @@ module MultiXml
         node_to_hash(document.children[0])
       end
 
-      def node_to_hash(node, hash = {}) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
-        node_hash = {MultiXml::CONTENT_ROOT => ''}
+      def node_to_hash(node, hash = {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
+        node_hash = { MultiXml::CONTENT_ROOT => "" }
 
         name = node_name(node)
 
@@ -41,9 +41,7 @@ module MultiXml
         end
 
         # Remove content node if it is empty
-        if node_hash[MultiXml::CONTENT_ROOT].strip.empty?
-          node_hash.delete(MultiXml::CONTENT_ROOT)
-        end
+        node_hash.delete(MultiXml::CONTENT_ROOT) if node_hash[MultiXml::CONTENT_ROOT].strip.empty?
 
         # Handle attributes
         each_attr(node) do |a|
@@ -55,7 +53,7 @@ module MultiXml
         hash
       end
 
-    private
+      private
 
       def each_child(node, &block)
         node.children.each(&block)
@@ -68,6 +66,6 @@ module MultiXml
       def node_name(node)
         node.name
       end
-    end # Oga
-  end # Parsers
-end # MultiXml
+    end
+  end
+end

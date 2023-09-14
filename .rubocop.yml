@@ -1,49 +1,54 @@
+require:
+ - rubocop-performance
+ - rubocop-rake
+ - rubocop-rspec
+ - standard
+ - standard-performance
+
 AllCops:
-  Exclude:
-    - 'spec/speed.rb'
+  NewCops: enable
+  TargetRubyVersion: 3.0
 
-Metrics/BlockLength:
+Layout/ArgumentAlignment:
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+
+Layout/ArrayAlignment:
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+
+Layout/EndAlignment:
+  Enabled: true
+  EnforcedStyleAlignWith: variable
+
+Layout/HashAlignment:
+  Enabled: true
+  EnforcedHashRocketStyle: key
+  EnforcedColonStyle: key
+  EnforcedLastArgumentHashStyle: always_inspect
+
+Layout/ParameterAlignment:
+  Enabled: true
+  EnforcedStyle: with_fixed_indentation
+  IndentationWidth: ~
+
+Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
-
-Metrics/BlockNesting:
-  Max: 5
-
-Metrics/ClassLength:
-  Max: 50
-
-Metrics/LineLength:
-  AllowURI: true
-  Enabled: false
-
-Metrics/MethodLength:
-  CountComments: false
-  Max: 13
 
 Metrics/ParameterLists:
-  Max: 3
-  CountKeywordArgs: true
+  CountKeywordArgs: false
 
-Style/AccessModifierIndentation:
-  EnforcedStyle: outdent
+Style/Alias:
+  Enabled: true
+  EnforcedStyle: prefer_alias_method
 
-Style/CollectionMethods:
-  PreferredMethods:
-    map:      'collect'
-    reduce:   'inject'
-    find:     'detect'
-    find_all: 'select'
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
 
-Style/Documentation:
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/FrozenStringLiteralComment:
   Enabled: false
-
-Style/ModuleFunction:
-  Enabled: false
-
-Style/SpaceInsideHashLiteralBraces:
-  EnforcedStyle: no_space
-
-Style/TrailingCommaInArguments:
-  EnforcedStyleForMultiline: 'comma'
-
-Style/TrailingCommaInLiteral:
-  EnforcedStyleForMultiline: 'comma'

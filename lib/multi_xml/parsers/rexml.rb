@@ -1,8 +1,8 @@
-require 'rexml/document' unless defined?(REXML::Document)
+require "rexml/document" unless defined?(REXML::Document)
 
 module MultiXml
   module Parsers
-    module Rexml #:nodoc:
+    module Rexml # :nodoc:
       extend self
 
       def parse_error
@@ -16,10 +16,11 @@ module MultiXml
       def parse(xml)
         doc = REXML::Document.new(xml)
         raise(REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root") unless doc.root
+
         merge_element!({}, doc.root)
       end
 
-    private
+      private
 
       # Convert an XML element and merge into the hash
       #
@@ -56,7 +57,7 @@ module MultiXml
       def merge_texts!(hash, element)
         if element.has_text?
           # must use value to prevent double-escaping
-          texts = ''
+          texts = ""
           element.texts.each { |t| texts << t.value }
           merge!(hash, MultiXml::CONTENT_ROOT, texts)
         else
