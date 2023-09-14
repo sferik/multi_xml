@@ -4,6 +4,7 @@ gem "libxml-ruby", require: nil, platforms: :ruby
 gem "nokogiri", require: nil
 gem "oga", ">= 2.3", require: nil
 gem "ox", require: nil, platforms: :ruby
+gem "rexml", require: nil
 
 gem "backports", ">= 3.24.1"
 gem "rake", ">= 13.0.6"
