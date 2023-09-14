@@ -329,7 +329,7 @@ shared_examples_for "a parser" do |parser|
           expect { MultiXml.parse(@xml)["tag"] }.to raise_error(MultiXml::DisallowedTypeError)
         end
 
-        xit "returns the correctly parsed YAML when the type is allowed" do
+        it "returns the correctly parsed YAML when the type is allowed" do
           expect(MultiXml.parse(@xml,
             disallowed_types: [])["tag"]).to eq(:message => "Have a nice day", 1 => "returns an integer",
               "array" => [{ "has-dashes" => true, "has_underscores" => true }])
