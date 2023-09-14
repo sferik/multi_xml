@@ -1,4 +1,4 @@
-require 'ox' unless defined?(Ox)
+require "ox" unless defined?(Ox)
 
 # Each MultiXml parser is expected to parse an XML document into a Hash. The
 # conversion rules are:
@@ -20,8 +20,8 @@ require 'ox' unless defined?(Ox)
 
 module MultiXml
   module Parsers
-    module Ox #:nodoc:
-      extend self
+    module Ox # :nodoc:
+      module_function
 
       def parse_error
         Exception
@@ -68,7 +68,7 @@ module MultiXml
         end
 
         def error(message, line, column)
-          raise(Exception, "#{message} at #{line}:#{column}")
+          raise(StandardError, "#{message} at #{line}:#{column}")
         end
 
         def append(key, value)
@@ -85,7 +85,7 @@ module MultiXml
             h[key] = value
           end
         end
-      end # Handler
-    end # Ox
-  end # Parsers
-end # MultiXml
+      end
+    end
+  end
+end

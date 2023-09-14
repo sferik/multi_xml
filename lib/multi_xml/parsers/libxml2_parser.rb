@@ -1,6 +1,6 @@
 module MultiXml
   module Parsers
-    module Libxml2Parser #:nodoc:
+    module Libxml2Parser # :nodoc:
       # Convert XML document to hash
       #
       # node::
@@ -8,8 +8,8 @@ module MultiXml
       #
       # hash::
       #   Hash to merge the converted element into.
-      def node_to_hash(node, hash = {}) # rubocop:disable AbcSize, CyclomaticComplexity, MethodLength, PerceivedComplexity
-        node_hash = {MultiXml::CONTENT_ROOT => ''}
+      def node_to_hash(node, hash = {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
+        node_hash = { MultiXml::CONTENT_ROOT => "" }
 
         name = node_name(node)
 
@@ -33,9 +33,7 @@ module MultiXml
         end
 
         # Remove content node if it is empty
-        if node_hash[MultiXml::CONTENT_ROOT].strip.empty?
-          node_hash.delete(MultiXml::CONTENT_ROOT)
-        end
+        node_hash.delete(MultiXml::CONTENT_ROOT) if node_hash[MultiXml::CONTENT_ROOT].strip.empty?
 
         # Handle attributes
         each_attr(node) do |a|
@@ -54,7 +52,7 @@ module MultiXml
         raise(NotImplementedError, "inheritor should define #{__method__}")
       end
 
-    private
+      private
 
       def each_child(*)
         raise(NotImplementedError, "inheritor should define #{__method__}")

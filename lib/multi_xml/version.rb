@@ -1,6 +1,6 @@
 module MultiXml
   module Version
-  module_function
+    module_function
 
     # @return [Integer]
     def major
@@ -28,7 +28,7 @@ module MultiXml
         major: major,
         minor: minor,
         patch: patch,
-        pre: pre,
+        pre: pre
       }
     end
 
@@ -39,7 +39,7 @@ module MultiXml
 
     # @return [String]
     def to_s
-      to_a.join('.')
+      to_a.join(".")
     end
   end
 end
