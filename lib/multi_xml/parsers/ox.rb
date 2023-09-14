@@ -29,7 +29,7 @@ module MultiXml
 
       def parse(io)
         handler = Handler.new
-        ::Ox.sax_parse(handler, io, convert_special: true)
+        ::Ox.sax_parse(handler, io, convert_special: true, skip: :skip_return)
         handler.doc
       end
 
