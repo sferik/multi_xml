@@ -1,4 +1,3 @@
-require "base64"
 require "bigdecimal"
 require "date"
 require "stringio"
@@ -43,7 +42,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       "boolean" => proc { |boolean| !%w[0 false].include?(boolean.strip) },
       "string" => proc { |string| string.to_s },
       "yaml" => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable Style/RescueModifier, Security/YAMLLoad
-      "base64Binary" => proc { |binary| ::Base64.decode64(binary) },
+      "base64Binary" => proc { |binary| base64_decode(binary) },
       "binary" => proc { |binary, entity| parse_binary(binary, entity) },
       "file" => proc { |file, entity| parse_file(file, entity) }
     }.freeze
@@ -176,18 +175,22 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     def parse_binary(binary, entity) # :nodoc:
       case entity["encoding"]
       when "base64"
-        Base64.decode64(binary)
+        base64_decode(binary)
       else
         binary
       end
     end
 
     def parse_file(file, entity)
-      f = StringIO.new(Base64.decode64(file))
+      f = StringIO.new(base64_decode(file))
       f.extend(FileLike)
       f.original_filename = entity["name"]
       f.content_type = entity["content_type"]
       f
+    end
+
+    def base64_decode(input)
+      input.unpack1("m")
     end
 
     def symbolize_keys(params)
