@@ -17,12 +17,12 @@ module MultiXml
 
       private
 
-      def each_child(node, &block)
-        node.each_child(&block)
+      def each_child(node, &)
+        node.each_child(&)
       end
 
-      def each_attr(node, &block)
-        node.each_attr(&block)
+      def each_attr(node, &)
+        node.each_attr(&)
       end
 
       def node_name(node)

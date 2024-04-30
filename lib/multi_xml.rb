@@ -6,6 +6,7 @@ require "yaml"
 
 module MultiXml # rubocop:disable Metrics/ModuleLength
   class ParseError < StandardError; end
+
   class NoParserError < StandardError; end
 
   class DisallowedTypeError < StandardError

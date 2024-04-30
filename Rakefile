@@ -11,7 +11,7 @@ RuboCop::RakeTask.new
 
 require "yard"
 YARD::Rake::YardocTask.new do |task|
-  task.files   = ["lib/**/*.rb", "-", "LICENSE.md"]
+  task.files = ["lib/**/*.rb", "-", "LICENSE.md"]
   task.options = [
     "--no-private",
     "--protected",
