@@ -39,7 +39,7 @@ module MultiXml
         each_attr(node) do |a|
           key = node_name(a)
           v = node_hash[key]
-          node_hash[key] = (v ? [a.value, v] : a.value)
+          node_hash[key] = ((v) ? [a.value, v] : a.value)
         end
 
         hash
