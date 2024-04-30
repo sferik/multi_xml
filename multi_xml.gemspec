@@ -32,5 +32,5 @@ Gem::Specification.new do |spec|
   # guide at: https://bundler.io/guides/creating_gem.html
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  spec.add_runtime_dependency("bigdecimal")
+  spec.add_runtime_dependency("bigdecimal", "~> 3.1")
 end
