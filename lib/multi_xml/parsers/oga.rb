@@ -17,7 +17,7 @@ module MultiXml
       end
 
       def node_to_hash(node, hash = {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
-        node_hash = { MultiXml::CONTENT_ROOT => "" }
+        node_hash = {MultiXml::CONTENT_ROOT => ""}
 
         name = node_name(node)
 
@@ -55,12 +55,12 @@ module MultiXml
 
       private
 
-      def each_child(node, &block)
-        node.children.each(&block)
+      def each_child(node, &)
+        node.children.each(&)
       end
 
-      def each_attr(node, &block)
-        node.attributes.each(&block)
+      def each_attr(node, &)
+        node.attributes.each(&)
       end
 
       def node_name(node)

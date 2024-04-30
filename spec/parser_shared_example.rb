@@ -137,7 +137,7 @@ shared_examples_for "a parser" do |parser|
             @setting = MultiXml.parse(@xml, typecast_xml_value: false)["global_settings"]["group"]["setting"]
           end
 
-          it { expect(@setting).to eq("type" => "string", "description" => { "__content__" => "Test" }) }
+          it { expect(@setting).to eq("type" => "string", "description" => {"__content__" => "Test"}) }
         end
       end
 
@@ -148,8 +148,8 @@ shared_examples_for "a parser" do |parser|
 
         it "symbolizes keys" do
           expect(MultiXml.parse(@xml,
-            symbolize_keys: true)).to eq(users: { user: [{ name: "Erik Michaels-Ober" },
-              { name: "Wynn Netherland" }] })
+            symbolize_keys: true)).to eq(users: {user: [{name: "Erik Michaels-Ober"},
+              {name: "Wynn Netherland"}]})
         end
       end
 
@@ -332,7 +332,7 @@ shared_examples_for "a parser" do |parser|
         it "returns the correctly parsed YAML when the type is allowed" do
           expect(MultiXml.parse(@xml,
             disallowed_types: [])["tag"]).to eq(:message => "Have a nice day", 1 => "returns an integer",
-              "array" => [{ "has-dashes" => true, "has_underscores" => true }])
+              "array" => [{"has-dashes" => true, "has_underscores" => true}])
         end
       end
 
@@ -672,7 +672,7 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "parses correctly" do
-            expect(MultiXml.parse(@xml)).to eq("user" => { "name" => "Erik Michaels-Ober" })
+            expect(MultiXml.parse(@xml)).to eq("user" => {"name" => "Erik Michaels-Ober"})
           end
         end
 
@@ -683,8 +683,8 @@ shared_examples_for "a parser" do |parser|
           end
 
           it "parses correctly" do
-            expect(MultiXml.parse(@xml)).to eq("users" => { "user" => { "name" => "Erik Michaels-Ober",
-                                                                        "status" => { "text" => "Hello" } } })
+            expect(MultiXml.parse(@xml)).to eq("users" => {"user" => {"name" => "Erik Michaels-Ober",
+                                                                      "status" => {"text" => "Hello"}}})
           end
         end
       end
@@ -699,7 +699,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "parses correctly" do
-          expect(MultiXml.parse(@xml)).to eq("users" => { "user" => ["Erik Michaels-Ober", "Wynn Netherland"] })
+          expect(MultiXml.parse(@xml)).to eq("users" => {"user" => ["Erik Michaels-Ober", "Wynn Netherland"]})
         end
       end
     end

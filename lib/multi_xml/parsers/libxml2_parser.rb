@@ -9,7 +9,7 @@ module MultiXml
       # hash::
       #   Hash to merge the converted element into.
       def node_to_hash(node, hash = {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
-        node_hash = { MultiXml::CONTENT_ROOT => "" }
+        node_hash = {MultiXml::CONTENT_ROOT => ""}
 
         name = node_name(node)
 
