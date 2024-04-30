@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.summary = "Provides swappable XML backends utilizing LibXML, Nokogiri, Ox, or REXML."
   spec.homepage = "https://github.com/sferik/multi_xml"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0"
+  spec.required_ruby_version = ">= 3.1.4"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 

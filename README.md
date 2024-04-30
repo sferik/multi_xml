@@ -46,9 +46,9 @@ then Nokogiri, and finally REXML.
 This library aims to support and is tested against the following Ruby
 implementations:
 
-* 3.0
 * 3.1
 * 3.2
+* 3.3
 
 If something doesn't work on one of these versions, it's a bug.
 
