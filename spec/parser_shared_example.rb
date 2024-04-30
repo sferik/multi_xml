@@ -61,11 +61,11 @@ shared_examples_for "a parser" do |parser|
 
       context "with CDATA" do
         before do
-          @xml = "<user><![CDATA[Erik Michaels-Ober]]></user>"
+          @xml = "<user><![CDATA[Erik Berlin]]></user>"
         end
 
         it "returns the correct CDATA" do
-          expect(MultiXml.parse(@xml)["user"]).to eq("Erik Michaels-Ober")
+          expect(MultiXml.parse(@xml)["user"]).to eq("Erik Berlin")
         end
       end
 
@@ -81,31 +81,31 @@ shared_examples_for "a parser" do |parser|
 
       context "with content" do
         before do
-          @xml = "<user>Erik Michaels-Ober</user>"
+          @xml = "<user>Erik Berlin</user>"
         end
 
         it "returns the correct content" do
-          expect(MultiXml.parse(@xml)["user"]).to eq("Erik Michaels-Ober")
+          expect(MultiXml.parse(@xml)["user"]).to eq("Erik Berlin")
         end
       end
 
       context "with an attribute" do
         before do
-          @xml = '<user name="Erik Michaels-Ober"/>'
+          @xml = '<user name="Erik Berlin"/>'
         end
 
         it "returns the correct attribute" do
-          expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Michaels-Ober")
+          expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Berlin")
         end
       end
 
       context "with multiple attributes" do
         before do
-          @xml = '<user name="Erik Michaels-Ober" screen_name="sferik"/>'
+          @xml = '<user name="Erik Berlin" screen_name="sferik"/>'
         end
 
         it "returns the correct attributes" do
-          expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Michaels-Ober")
+          expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Berlin")
           expect(MultiXml.parse(@xml)["user"]["screen_name"]).to eq("sferik")
         end
       end
@@ -143,12 +143,12 @@ shared_examples_for "a parser" do |parser|
 
       context "with :symbolize_keys => true" do
         before do
-          @xml = '<users><user name="Erik Michaels-Ober"/><user><name>Wynn Netherland</name></user></users>'
+          @xml = '<users><user name="Erik Berlin"/><user><name>Wynn Netherland</name></user></users>'
         end
 
         it "symbolizes keys" do
           expect(MultiXml.parse(@xml,
-            symbolize_keys: true)).to eq(users: {user: [{name: "Erik Michaels-Ober"},
+            symbolize_keys: true)).to eq(users: {user: [{name: "Erik Berlin"},
               {name: "Wynn Netherland"}]})
         end
       end
@@ -396,7 +396,7 @@ shared_examples_for "a parser" do |parser|
 
       context 'with an attribute type="array"' do
         before do
-          @xml = '<users type="array"><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
+          @xml = '<users type="array"><user>Erik Berlin</user><user>Wynn Netherland</user></users>'
         end
 
         it "returns an Array" do
@@ -404,13 +404,13 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "returns the correct array" do
-          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Michaels-Ober", "Wynn Netherland"])
+          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Berlin", "Wynn Netherland"])
         end
       end
 
       context 'with an attribute type="array" in addition to other attributes' do
         before do
-          @xml = '<users type="array" foo="bar"><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>'
+          @xml = '<users type="array" foo="bar"><user>Erik Berlin</user><user>Wynn Netherland</user></users>'
         end
 
         it "returns an Array" do
@@ -418,13 +418,13 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "returns the correct array" do
-          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Michaels-Ober", "Wynn Netherland"])
+          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Berlin", "Wynn Netherland"])
         end
       end
 
       context 'with an attribute type="array" containing only one item' do
         before do
-          @xml = '<users type="array"><user>Erik Michaels-Ober</user></users>'
+          @xml = '<users type="array"><user>Erik Berlin</user></users>'
         end
 
         it "returns an Array" do
@@ -432,7 +432,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "returns the correct array" do
-          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Michaels-Ober"])
+          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Berlin"])
         end
       end
 
@@ -537,27 +537,27 @@ shared_examples_for "a parser" do |parser|
       context "with children" do
         context "with attributes" do
           before do
-            @xml = '<users><user name="Erik Michaels-Ober"/></users>'
+            @xml = '<users><user name="Erik Berlin"/></users>'
           end
 
           it "returns the correct attributes" do
-            expect(MultiXml.parse(@xml)["users"]["user"]["name"]).to eq("Erik Michaels-Ober")
+            expect(MultiXml.parse(@xml)["users"]["user"]["name"]).to eq("Erik Berlin")
           end
         end
 
         context "with text" do
           before do
-            @xml = "<user><name>Erik Michaels-Ober</name></user>"
+            @xml = "<user><name>Erik Berlin</name></user>"
           end
 
           it "returns the correct text" do
-            expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Michaels-Ober")
+            expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Berlin")
           end
         end
 
         context "with an unrecognized attribute type" do
           before do
-            @xml = '<user type="admin"><name>Erik Michaels-Ober</name></user>'
+            @xml = '<user type="admin"><name>Erik Berlin</name></user>'
           end
 
           it "passes through the type" do
@@ -666,24 +666,24 @@ shared_examples_for "a parser" do |parser|
           before do
             @xml = <<-XML
               <user>
-                <name>Erik Michaels-Ober</name>
+                <name>Erik Berlin</name>
               </user>
             XML
           end
 
           it "parses correctly" do
-            expect(MultiXml.parse(@xml)).to eq("user" => {"name" => "Erik Michaels-Ober"})
+            expect(MultiXml.parse(@xml)).to eq("user" => {"name" => "Erik Berlin"})
           end
         end
 
         # Babies having babies
         context "with children" do
           before do
-            @xml = '<users><user name="Erik Michaels-Ober"><status text="Hello"/></user></users>'
+            @xml = '<users><user name="Erik Berlin"><status text="Hello"/></user></users>'
           end
 
           it "parses correctly" do
-            expect(MultiXml.parse(@xml)).to eq("users" => {"user" => {"name" => "Erik Michaels-Ober",
+            expect(MultiXml.parse(@xml)).to eq("users" => {"user" => {"name" => "Erik Berlin",
                                                                       "status" => {"text" => "Hello"}}})
           end
         end
@@ -691,7 +691,7 @@ shared_examples_for "a parser" do |parser|
 
       context "with sibling children" do
         before do
-          @xml = "<users><user>Erik Michaels-Ober</user><user>Wynn Netherland</user></users>"
+          @xml = "<users><user>Erik Berlin</user><user>Wynn Netherland</user></users>"
         end
 
         it "returns an Array" do
@@ -699,7 +699,7 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "parses correctly" do
-          expect(MultiXml.parse(@xml)).to eq("users" => {"user" => ["Erik Michaels-Ober", "Wynn Netherland"]})
+          expect(MultiXml.parse(@xml)).to eq("users" => {"user" => ["Erik Berlin", "Wynn Netherland"]})
         end
       end
     end
