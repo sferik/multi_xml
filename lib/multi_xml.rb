@@ -42,7 +42,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       "decimal" => proc { |number| BigDecimal(number) },
       "boolean" => proc { |boolean| !%w[0 false].include?(boolean.strip) },
       "string" => proc { |string| string.to_s },
-      "yaml" => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable Style/RescueModifier, Security/YAMLLoad
+      "yaml" => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable Style/RescueModifier
       "base64Binary" => proc { |binary| base64_decode(binary) },
       "binary" => proc { |binary, entity| parse_binary(binary, entity) },
       "file" => proc { |file, entity| parse_file(file, entity) }
