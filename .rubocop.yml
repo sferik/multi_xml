@@ -1,54 +1,54 @@
 require:
- - rubocop-performance
- - rubocop-rake
- - rubocop-rspec
- - standard
- - standard-performance
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+  - standard
+  - standard-performance
 
 AllCops:
   NewCops: enable
   TargetRubyVersion: 3.0
 
 Layout/ArgumentAlignment:
-  Enabled: true
   EnforcedStyle: with_fixed_indentation
+  IndentationWidth: 2
 
-Layout/ArrayAlignment:
-  Enabled: true
-  EnforcedStyle: with_fixed_indentation
+Layout/CaseIndentation:
+  EnforcedStyle: end
 
 Layout/EndAlignment:
-  Enabled: true
-  EnforcedStyleAlignWith: variable
+  EnforcedStyleAlignWith: start_of_line
 
-Layout/HashAlignment:
-  Enabled: true
-  EnforcedHashRocketStyle: key
-  EnforcedColonStyle: key
-  EnforcedLastArgumentHashStyle: always_inspect
+Layout/LineLength:
+  Max: 140
 
 Layout/ParameterAlignment:
-  Enabled: true
   EnforcedStyle: with_fixed_indentation
-  IndentationWidth: ~
+  IndentationWidth: 2
 
 Layout/SpaceInsideHashLiteralBraces:
-  Enabled: false
+  EnforcedStyle: no_space
 
 Metrics/ParameterLists:
   CountKeywordArgs: false
 
 Style/Alias:
-  Enabled: true
   EnforcedStyle: prefer_alias_method
 
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: never
+
+Style/OpenStructUse:
+  Enabled: false
+
 Style/StringLiterals:
-  Enabled: true
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
-  Enabled: true
   EnforcedStyle: double_quotes
 
-Style/FrozenStringLiteralComment:
-  Enabled: false
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses

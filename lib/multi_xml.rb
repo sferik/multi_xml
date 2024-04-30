@@ -276,7 +276,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
               block.call(content, value)
             end
           else
-            value.keys.size > 1 ? value : content
+            (value.keys.size > 1) ? value : content
           end
         elsif value["type"] == "string" && value["nil"] != "true"
           ""
@@ -296,11 +296,11 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
 
           # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
           # how multipart uploaded files from HTML appear
-          xml_value["file"].is_a?(StringIO) ? xml_value["file"] : xml_value
+          (xml_value["file"].is_a?(StringIO)) ? xml_value["file"] : xml_value
         end
       when Array
         value.map! { |i| typecast_xml_value(i, disallowed_types) }
-        value.length > 1 ? value : value.first
+        (value.length > 1) ? value : value.first
       when String
         value
       else

@@ -149,7 +149,7 @@ shared_examples_for "a parser" do |parser|
         it "symbolizes keys" do
           expect(MultiXml.parse(@xml,
             symbolize_keys: true)).to eq(users: {user: [{name: "Erik Berlin"},
-              {name: "Wynn Netherland"}]})
+                                                        {name: "Wynn Netherland"}]})
         end
       end
 
