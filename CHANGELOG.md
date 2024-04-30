@@ -1,3 +1,9 @@
+0.7.0
+-----
+* [Add support for Ruby 3.3](https://github.com/sferik/multi_xml/pull/67)
+* [Drop support for Ruby 3.0](https://github.com/sferik/multi_xml/commit/eec72c56307fede3a93f1a61553587cb278b0c8a) [and](https://github.com/sferik/multi_xml/commit/6a6dec80a36c30774a5525b45f71d346fb561e69) [earlier](https://github.com/sferik/multi_xml/commit/e7dad37a0a0be8383a26ffe515c575b5b4d04588)
+* [Don't mutate strings](https://github.com/sferik/multi_xml/commit/71be3fff4afb0277a7e1c47c5f1f4b6106a8eb45)
+
 0.6.0
 -----
 * [Duplexed Streams](https://github.com/sferik/multi_xml/pull/45)
