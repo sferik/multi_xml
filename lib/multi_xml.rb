@@ -10,7 +10,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
 
   class DisallowedTypeError < StandardError
     def initialize(type)
-      super "Disallowed type attribute: #{type.inspect}"
+      super("Disallowed type attribute: #{type.inspect}")
     end
   end
 
