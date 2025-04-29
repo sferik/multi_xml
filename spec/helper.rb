@@ -6,7 +6,7 @@ require "simplecov"
 
 SimpleCov.start do
   add_filter "/spec"
-  percent = (jruby?) ? 91.29 : 92.31
+  percent = (jruby?) ? 91.38 : 93.16
   minimum_coverage(percent)
 end
 
