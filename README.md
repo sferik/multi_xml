@@ -46,9 +46,10 @@ then Nokogiri, and finally REXML.
 This library aims to support and is tested against the following Ruby
 implementations:
 
-* 3.1
 * 3.2
 * 3.3
+* 3.4
+* JRuby 10
 
 If something doesn't work on one of these versions, it's a bug.
 
@@ -69,6 +70,6 @@ MultiXML was inspired by [MultiJSON][].
 [multijson]: https://github.com/intridea/multi_json/
 
 ## Copyright
-Copyright (c) 2010-2024 Erik Berlin. See [LICENSE][] for details.
+Copyright (c) 2010-2025 Erik Berlin. See [LICENSE][] for details.
 
 [license]: LICENSE.md
