@@ -13,9 +13,16 @@ Gem::Specification.new do |spec|
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
-  spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/sferik/multi_xml"
-  spec.metadata["changelog_uri"] = "https://github.com/sferik/multi_xml/blob/master/CHANGELOG.md"
+  spec.metadata = {
+    "allowed_push_host" => "https://rubygems.org",
+    "bug_tracker_uri" => "https://github.com/sferik/multi_xml/issues",
+    "changelog_uri" => "https://github.com/sferik/multi_xml/blob/master/CHANGELOG.md",
+    "documentation_uri" => "https://rubydoc.info/gems/multi_xml/",
+    "funding_uri" => "https://github.com/sponsors/sferik",
+    "homepage_uri" => spec.homepage,
+    "rubygems_mfa_required" => "true",
+    "source_code_uri" => "https://github.com/sferik/multi_xml"
+  }
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
