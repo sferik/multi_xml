@@ -1,8 +1,10 @@
 require:
+  - standard
+
+plugins:
   - rubocop-performance
   - rubocop-rake
   - rubocop-rspec
-  - standard
   - standard-performance
 
 AllCops:
