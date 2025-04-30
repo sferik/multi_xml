@@ -1,3 +1,11 @@
+0.7.2
+-----
+* [Drop support for Ruby 3.1](https://github.com/sferik/multi_xml/commit/fab6288edd36c58a2b13e0206d8bed305fcb4a4b)
+
+0.7.1
+-----
+* [Relax required Ruby version constraint to allow installation on Debian stable](https://github.com/sferik/multi_xml/commit/7d18711466a15e158dc71344ca6f6e18838ecc8d)
+
 0.7.0
 -----
 * [Add support for Ruby 3.3](https://github.com/sferik/multi_xml/pull/67)
