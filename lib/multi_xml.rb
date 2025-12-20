@@ -111,12 +111,18 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     # * <tt>:rexml</tt>
     # * <tt>:oga</tt>
     def parser=(new_parser)
-      case new_parser
+      @parser = resolve_parser(new_parser)
+    end
+
+    # Resolve a parser from a symbol, string, or class/module.
+    # Returns the parser module/class.
+    def resolve_parser(parser_spec)
+      case parser_spec
       when String, Symbol
-        require "multi_xml/parsers/#{new_parser.to_s.downcase}"
-        @parser = MultiXml::Parsers.const_get(new_parser.to_s.split("_").collect(&:capitalize).join.to_s)
+        require "multi_xml/parsers/#{parser_spec.to_s.downcase}"
+        MultiXml::Parsers.const_get(parser_spec.to_s.split("_").collect(&:capitalize).join.to_s)
       when Class, Module
-        @parser = new_parser
+        parser_spec
       else
         raise("Did not recognize your parser specification. Please specify either a symbol or a class.")
       end
@@ -125,6 +131,8 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     # Parse an XML string or IO into Ruby.
     #
     # <b>Options</b>
+    #
+    # <tt>:parser</tt> :: The parser to use for this parse operation. Can be a symbol (e.g. +:nokogiri+), string, or class/module. Defaults to the class-level parser.
     #
     # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
     #
@@ -135,6 +143,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       xml ||= ""
 
       options = DEFAULT_OPTIONS.merge(options)
+      current_parser = options[:parser] ? resolve_parser(options[:parser]) : parser
 
       xml = xml.strip if xml.respond_to?(:strip)
       begin
@@ -145,11 +154,11 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
 
         xml.ungetc(char)
 
-        hash = undasherize_keys(parser.parse(xml) || {})
+        hash = undasherize_keys(current_parser.parse(xml) || {})
         hash = typecast_xml_value(hash, options[:disallowed_types]) if options[:typecast_xml_value]
       rescue DisallowedTypeError
         raise
-      rescue parser.parse_error => e
+      rescue current_parser.parse_error => e
         raise(ParseError, e.message, e.backtrace)
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]

@@ -32,6 +32,43 @@ describe "MultiXml" do
       MultiXml.parser = MockDecoder
       expect(MultiXml.parser.name).to eq("MockDecoder")
     end
+
+    it "allows per-parse parser via symbol" do
+      MultiXml.parser = :rexml
+      result = MultiXml.parse("<user>Erik</user>", parser: :nokogiri)
+      expect(result).to eq({"user" => "Erik"})
+      # Class-level parser should remain unchanged
+      expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Rexml")
+    end
+
+    it "allows per-parse parser via string" do
+      MultiXml.parser = :rexml
+      result = MultiXml.parse("<user>Erik</user>", parser: "nokogiri")
+      expect(result).to eq({"user" => "Erik"})
+      expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Rexml")
+    end
+
+    it "allows per-parse parser via class" do
+      MultiXml.parser = :rexml
+      require "multi_xml/parsers/nokogiri"
+      result = MultiXml.parse("<user>Erik</user>", parser: MultiXml::Parsers::Nokogiri)
+      expect(result).to eq({"user" => "Erik"})
+      expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Rexml")
+    end
+
+    it "uses class-level parser when :parser option is not provided" do
+      MultiXml.parser = :nokogiri
+      result = MultiXml.parse("<user>Erik</user>")
+      expect(result).to eq({"user" => "Erik"})
+    end
+
+    it "raises error for invalid per-parse parser" do
+      expect { MultiXml.parse("<user/>", parser: 123) }.to raise_error(RuntimeError, /Did not recognize your parser specification/)
+    end
+
+    it "wraps parser errors correctly with per-parse parser" do
+      expect { MultiXml.parse("<open></close>", parser: :nokogiri) }.to raise_error(MultiXml::ParseError)
+    end
   end
 
   [%w[LibXML libxml],
