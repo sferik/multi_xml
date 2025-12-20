@@ -28,20 +28,20 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
   CONTENT_ROOT = "__content__".freeze unless defined?(CONTENT_ROOT)
 
   unless defined?(PARSING)
-    float_proc = proc(&:to_f)
+    float_proc = proc { |float| float.to_f }
     datetime_proc = proc { |time| Time.parse(time).utc rescue DateTime.parse(time).utc } # rubocop:disable Style/RescueModifier
 
     PARSING = {
-      "symbol" => proc(&:to_sym),
+      "symbol" => proc { |symbol| symbol.to_sym },
       "date" => proc { |date| Date.parse(date) },
       "datetime" => datetime_proc,
       "dateTime" => datetime_proc,
-      "integer" => proc(&:to_i),
+      "integer" => proc { |integer| integer.to_i },
       "float" => float_proc,
       "double" => float_proc,
       "decimal" => proc { |number| BigDecimal(number) },
       "boolean" => proc { |boolean| !%w[0 false].include?(boolean.strip) },
-      "string" => proc(&:to_s),
+      "string" => proc { |string| string.to_s },
       "yaml" => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable Style/RescueModifier
       "base64Binary" => proc { |binary| base64_decode(binary) },
       "binary" => proc { |binary, entity| parse_binary(binary, entity) },
