@@ -1,4 +1,4 @@
-require "oga" unless defined?(Oga)
+require "oga" unless defined?(::Oga)
 require "multi_xml/parsers/libxml2_parser"
 
 module MultiXml
