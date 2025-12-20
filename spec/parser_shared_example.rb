@@ -69,6 +69,32 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
+      context "with whitespace-only content" do
+        it "preserves whitespace when no children or attributes" do
+          expect(MultiXml.parse("<tag> </tag>")["tag"]).to eq(" ")
+        end
+
+        it "preserves multiple spaces when no children or attributes" do
+          expect(MultiXml.parse("<tag>   </tag>")["tag"]).to eq("   ")
+        end
+
+        it "preserves newlines and tabs when no children or attributes" do
+          expect(MultiXml.parse("<tag>\n\t\n</tag>")["tag"]).to eq("\n\t\n")
+        end
+
+        it "strips whitespace when there are child elements" do
+          expect(MultiXml.parse("<tag> <child/> </tag>")["tag"]).to eq("child" => nil)
+        end
+
+        it "strips whitespace when there are attributes" do
+          expect(MultiXml.parse('<tag attr="val"> </tag>')["tag"]).to eq("attr" => "val")
+        end
+
+        it "preserves content with surrounding whitespace" do
+          expect(MultiXml.parse("<tag>  hello  </tag>")["tag"]).to eq("  hello  ")
+        end
+      end
+
       context "element with the same inner element and attribute name" do
         before do
           @xml = "<user name='John'><name>Smith</name></user>"

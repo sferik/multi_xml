@@ -65,9 +65,6 @@ module MultiXml
         end
 
         def on_end_element(_name)
-          # Remove content if it's empty or whitespace-only
-          current_hash.delete(CONTENT_KEY) if current_hash[CONTENT_KEY].strip.empty?
-
           # Handle attributes after child elements (like the DOM parser)
           # This ensures proper merging when attribute name matches child element name
           @attrs_stack.pop.each do |key, value|
@@ -77,6 +74,13 @@ module MultiXml
             existing = current_hash[key]
             current_hash[key] = (existing) ? [value, existing] : value
           end
+
+          # Remove content if:
+          # 1. It is completely empty (no text at all), OR
+          # 2. It is whitespace-only AND there are child elements/attributes
+          # (consistent with ActiveSupport::XmlMini behavior)
+          content = current_hash[CONTENT_KEY]
+          current_hash.delete(CONTENT_KEY) if content.empty? || (current_hash.length > 1 && content.strip.empty?)
 
           @hash_stack.pop
         end

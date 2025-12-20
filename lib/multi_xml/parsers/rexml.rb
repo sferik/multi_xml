@@ -42,10 +42,14 @@ module MultiXml
         if element.has_elements?
           element.each_element { |child| merge_element!(hash, child) }
           merge_texts!(hash, element) unless empty_content?(element)
-          hash
-        else
+        elsif hash.empty? || !empty_content?(element)
+          # Only add text content if:
+          # 1. No attributes (hash.empty?), OR
+          # 2. Content is not whitespace-only
+          # (consistent with ActiveSupport::XmlMini behavior)
           merge_texts!(hash, element)
         end
+        hash
       end
 
       # Merge all the texts of an element into the hash
@@ -59,9 +63,8 @@ module MultiXml
           # must use value to prevent double-escaping
           texts = element.texts.map(&:value).join
           merge!(hash, MultiXml::CONTENT_ROOT, texts)
-        else
-          hash
         end
+        hash
       end
 
       # Adds a new key/value pair to an existing Hash. If the key to be added
