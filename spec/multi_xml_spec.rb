@@ -72,8 +72,10 @@ describe "MultiXml" do
   end
 
   [%w[LibXML libxml],
+   %w[libxml_sax libxml],
    %w[REXML rexml/document],
    %w[Nokogiri nokogiri],
+   %w[nokogiri_sax nokogiri],
    %w[Ox ox],
    %w[Oga oga]].each do |parser|
     require parser.last

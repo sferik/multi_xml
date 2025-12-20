@@ -143,7 +143,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       xml ||= ""
 
       options = DEFAULT_OPTIONS.merge(options)
-      current_parser = options[:parser] ? resolve_parser(options[:parser]) : parser
+      current_parser = (options[:parser]) ? resolve_parser(options[:parser]) : parser
 
       xml = xml.strip if xml.respond_to?(:strip)
       begin
