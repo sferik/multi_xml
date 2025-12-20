@@ -1,4 +1,4 @@
-require "rexml/document" unless defined?(REXML::Document)
+require "rexml/document" unless defined?(::REXML::Document)
 
 module MultiXml
   module Parsers

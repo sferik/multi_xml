@@ -1,5 +1,5 @@
 require "cgi"
-require "nokogiri" unless defined?(Nokogiri)
+require "nokogiri" unless defined?(::Nokogiri)
 require "stringio"
 
 module MultiXml

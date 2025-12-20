@@ -1,4 +1,4 @@
-require "nokogiri" unless defined?(Nokogiri)
+require "nokogiri" unless defined?(::Nokogiri)
 require "multi_xml/parsers/libxml2_parser"
 
 module MultiXml

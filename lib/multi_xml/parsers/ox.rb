@@ -1,4 +1,4 @@
-require "ox" unless defined?(Ox)
+require "ox" unless defined?(::Ox)
 
 # Each MultiXml parser is expected to parse an XML document into a Hash. The
 # conversion rules are:

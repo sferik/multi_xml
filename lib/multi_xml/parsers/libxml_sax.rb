@@ -1,5 +1,5 @@
 require "cgi"
-require "libxml" unless defined?(LibXML)
+require "libxml" unless defined?(::LibXML)
 require "stringio"
 
 module MultiXml

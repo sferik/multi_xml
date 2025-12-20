@@ -1,4 +1,4 @@
-require "libxml" unless defined?(LibXML)
+require "libxml" unless defined?(::LibXML)
 require "multi_xml/parsers/libxml2_parser"
 
 module MultiXml
