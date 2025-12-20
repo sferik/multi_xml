@@ -64,6 +64,15 @@ module MultiXml
         end
 
         def end_element(_)
+          h = @stack.last
+          # Remove content if:
+          # 1. It is completely empty (no text at all), OR
+          # 2. It is whitespace-only AND there are child elements/attributes
+          # (consistent with ActiveSupport::XmlMini behavior)
+          if h.key?(MultiXml::CONTENT_ROOT)
+            content = h[MultiXml::CONTENT_ROOT]
+            h.delete(MultiXml::CONTENT_ROOT) if content.empty? || (h.length > 1 && content.strip.empty?)
+          end
           @stack.pop
         end
 

@@ -32,15 +32,19 @@ module MultiXml
           end
         end
 
-        # Remove content node if it is empty
-        node_hash.delete(MultiXml::CONTENT_ROOT) if node_hash[MultiXml::CONTENT_ROOT].strip.empty?
-
         # Handle attributes
         each_attr(node) do |a|
           key = node_name(a)
           v = node_hash[key]
           node_hash[key] = ((v) ? [a.value, v] : a.value)
         end
+
+        # Remove content node if:
+        # 1. It is completely empty (no text at all), OR
+        # 2. It is whitespace-only AND there are child elements/attributes
+        # (consistent with ActiveSupport::XmlMini behavior)
+        content = node_hash[MultiXml::CONTENT_ROOT]
+        node_hash.delete(MultiXml::CONTENT_ROOT) if content.empty? || (node_hash.length > 1 && content.strip.empty?)
 
         hash
       end
