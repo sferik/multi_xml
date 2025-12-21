@@ -7,21 +7,15 @@ class MockDecoder
 end
 
 describe "MultiXml" do
-  context "Parsers" do
+  context "with parsers" do
     it "picks a default parser" do
-      expect(MultiXml.parser).to be_a(Module)
-      expect(MultiXml.parser).to respond_to(:parse)
+      expect(MultiXml.parser).to be_a(Module).and respond_to(:parse)
     end
 
     it "defaults to the best available gem" do
-      # Clear cache variable possibly set by previous tests
       MultiXml.send(:remove_instance_variable, :@parser) if MultiXml.instance_variable_defined?(:@parser)
-      if jruby?
-        # Ox and Libxml are not not currently available on JRuby, so Nokogiri is the best available gem
-        expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Nokogiri")
-      else
-        expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Ox")
-      end
+      expected = jruby? ? "MultiXml::Parsers::Nokogiri" : "MultiXml::Parsers::Ox"
+      expect(MultiXml.parser.name).to eq(expected)
     end
 
     it "is settable via a symbol" do
@@ -36,24 +30,23 @@ describe "MultiXml" do
 
     it "allows per-parse parser via symbol" do
       MultiXml.parser = :rexml
-      result = MultiXml.parse("<user>Erik</user>", parser: :nokogiri)
-      expect(result).to eq({"user" => "Erik"})
-      # Class-level parser should remain unchanged
-      expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Rexml")
+      expect(MultiXml.parse("<user>Erik</user>", parser: :nokogiri)).to eq({"user" => "Erik"})
     end
 
     it "allows per-parse parser via string" do
       MultiXml.parser = :rexml
-      result = MultiXml.parse("<user>Erik</user>", parser: "nokogiri")
-      expect(result).to eq({"user" => "Erik"})
-      expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Rexml")
+      expect(MultiXml.parse("<user>Erik</user>", parser: "nokogiri")).to eq({"user" => "Erik"})
     end
 
     it "allows per-parse parser via class" do
       MultiXml.parser = :rexml
       require "multi_xml/parsers/nokogiri"
-      result = MultiXml.parse("<user>Erik</user>", parser: MultiXml::Parsers::Nokogiri)
-      expect(result).to eq({"user" => "Erik"})
+      expect(MultiXml.parse("<user>Erik</user>", parser: MultiXml::Parsers::Nokogiri)).to eq({"user" => "Erik"})
+    end
+
+    it "does not change class-level parser when using per-parse parser" do
+      MultiXml.parser = :rexml
+      MultiXml.parse("<user>Erik</user>", parser: :nokogiri)
       expect(MultiXml.parser.name).to eq("MultiXml::Parsers::Rexml")
     end
 
@@ -80,7 +73,7 @@ describe "MultiXml" do
     %w[Ox ox],
     %w[Oga oga]].each do |parser|
     require parser.last
-    context "#{parser.first} parser" do
+    context "with #{parser.first} parser" do
       it_behaves_like "a parser", parser.first
     end
   rescue LoadError

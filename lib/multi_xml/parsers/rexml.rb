@@ -79,16 +79,10 @@ module MultiXml
       # value::
       #   Value to be associated with key.
       def merge!(hash, key, value)
-        if hash.key?(key)
-          if hash[key].instance_of?(Array)
-            hash[key] << value
-          else
-            hash[key] = [hash[key], value]
-          end
-        elsif value.instance_of?(Array)
-          hash[key] = [value]
+        hash[key] = if hash.key?(key)
+          hash[key].instance_of?(Array) ? hash[key] << value : [hash[key], value]
         else
-          hash[key] = value
+          value.instance_of?(Array) ? [value] : value
         end
         hash
       end
