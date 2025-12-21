@@ -1,15 +1,12 @@
-name: ci
+name: linter
 on: [push, pull_request]
 jobs:
   build:
-    strategy:
-      matrix:
-        ruby: ["3.2", "3.3", "3.4", "jruby-10"]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby }}
+        ruby-version: "3.2"
         bundler-cache: true
-    - run: bundle exec rake test
+    - run: bundle exec rake lint

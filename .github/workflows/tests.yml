@@ -1,0 +1,33 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        ruby-version: ["3.2", "3.3", "3.4", "jruby-10.0"]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+        bundler-cache: false # Do not bundle install yet, need recent versions for Windows
+    - name: Run tests
+      run: |
+        gem install bundler
+        bundle install
+        bundle exec rake
