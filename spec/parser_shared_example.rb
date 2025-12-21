@@ -47,6 +47,18 @@ shared_examples_for "a parser" do |parser|
         it "raises MultiXml::ParseError" do
           expect { MultiXml.parse(@xml) }.to raise_error(MultiXml::ParseError)
         end
+
+        it "includes the original XML in the exception" do
+          MultiXml.parse(@xml)
+        rescue MultiXml::ParseError => e
+          expect(e.xml).to eq(@xml)
+        end
+
+        it "includes the underlying cause in the exception" do
+          MultiXml.parse(@xml)
+        rescue MultiXml::ParseError => e
+          expect(e.cause).not_to be_nil
+        end
       end
     end
 
