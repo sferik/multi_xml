@@ -34,6 +34,189 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
 
   CONTENT_ROOT = "__content__".freeze unless defined?(CONTENT_ROOT)
 
+  unless defined?(TYPE_NAMES)
+    TYPE_NAMES = {
+      "Symbol" => "symbol",
+      "Integer" => "integer",
+      "BigDecimal" => "decimal",
+      "Float" => "float",
+      "TrueClass" => "boolean",
+      "FalseClass" => "boolean",
+      "Date" => "date",
+      "DateTime" => "datetime",
+      "Time" => "datetime",
+      "Array" => "array",
+      "Hash" => "hash"
+    }.freeze
+  end
+
+  DISALLOWED_XML_TYPES = %w[symbol yaml].freeze
+
+  # This module decorates files with the <tt>original_filename</tt>
+  # and <tt>content_type</tt> methods.
+  module FileLike # :nodoc:
+    attr_writer :original_filename, :content_type
+
+    def original_filename
+      @original_filename || "untitled"
+    end
+
+    def content_type
+      @content_type || "application/octet-stream"
+    end
+  end
+
+  # Internal helper methods for XML parsing and typecasting
+  module Helpers # :nodoc:
+    module_function
+
+    def symbolize_keys(params)
+      case params
+      when Hash
+        params.inject({}) do |result, (key, value)|
+          result.merge(key.to_sym => symbolize_keys(value))
+        end
+      when Array
+        params.collect { |value| symbolize_keys(value) }
+      else
+        params
+      end
+    end
+
+    def undasherize_keys(params)
+      case params
+      when Hash
+        params.each_with_object({}) do |(key, value), hash|
+          hash[key.to_s.tr("-", "_")] = undasherize_keys(value)
+          hash
+        end
+      when Array
+        params.collect { |value| undasherize_keys(value) }
+      else
+        params
+      end
+    end
+
+    # TODO: Add support for other encodings
+    def parse_binary(binary, entity) # :nodoc:
+      case entity["encoding"]
+      when "base64"
+        base64_decode(binary)
+      else
+        binary
+      end
+    end
+
+    def parse_file(file, entity)
+      f = StringIO.new(base64_decode(file))
+      f.extend(FileLike)
+      f.original_filename = entity["name"]
+      f.content_type = entity["content_type"]
+      f
+    end
+
+    def base64_decode(input)
+      input.unpack1("m")
+    end
+
+    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+      disallowed_types ||= DISALLOWED_XML_TYPES
+
+      case value
+      when Hash
+        typecast_hash_value(value, disallowed_types)
+      when Array
+        value.map! { |i| typecast_xml_value(i, disallowed_types) }
+        (value.length > 1) ? value : value.first
+      when String
+        value
+      else
+        raise("can't typecast #{value.class.name}: #{value.inspect}")
+      end
+    end
+
+    def typecast_hash_value(value, disallowed_types) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+      if value.include?("type") && !value["type"].is_a?(Hash) && disallowed_types.include?(value["type"])
+        raise(DisallowedTypeError, value["type"])
+      end
+
+      if value["type"] == "array"
+        typecast_array_value(value, disallowed_types)
+      elsif value.key?(CONTENT_ROOT)
+        typecast_content_value(value)
+      elsif value["type"] == "string" && value["nil"] != "true"
+        ""
+      # blank or nil parsed values are represented by nil
+      elsif value.empty? || value["nil"] == "true"
+        nil
+      # If the type is the only element which makes it then
+      # this still makes the value nil, except if type is
+      # a XML node(where type['value'] is a Hash)
+      elsif value["type"] && value.size == 1 && !value["type"].is_a?(Hash)
+        nil
+      else
+        xml_value = value.each_with_object({}) do |(k, v), hash|
+          hash[k] = typecast_xml_value(v, disallowed_types)
+          hash
+        end
+
+        # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
+        # how multipart uploaded files from HTML appear
+        xml_value["file"].is_a?(StringIO) ? xml_value["file"] : xml_value
+      end
+    end
+
+    def typecast_array_value(value, disallowed_types)
+      # this commented-out suggestion helps to avoid the multiple attribute
+      # problem, but it breaks when there is only one item in the array.
+      #
+      # from: https://github.com/jnunemaker/httparty/issues/102
+      #
+      # _, entries = value.detect { |k, v| k != 'type' && v.is_a?(Array) }
+
+      # This attempt fails to consider the order that the detect method
+      # retrieves the entries.
+      # _, entries = value.detect {|key, _| key != 'type'}
+
+      # This approach ignores attribute entries that are not convertable
+      # to an Array which allows attributes to be ignored.
+      _, entries = value.detect { |k, v| k != "type" && (v.is_a?(Array) || v.is_a?(Hash)) }
+
+      case entries
+      when NilClass
+        []
+      when String
+        [] if entries.strip.empty?
+      when Array
+        entries.collect { |entry| typecast_xml_value(entry, disallowed_types) }
+      when Hash
+        [typecast_xml_value(entries, disallowed_types)]
+      else
+        raise("can't typecast #{entries.class.name}: #{entries.inspect}")
+      end
+    end
+
+    def typecast_content_value(value)
+      content = value[CONTENT_ROOT]
+      block = PARSING[value["type"]]
+      if block
+        if block.arity == 1
+          value.delete("type") if PARSING[value["type"]]
+          if value.keys.size > 1
+            value[CONTENT_ROOT] = block.call(content)
+            value
+          else
+            block.call(content)
+          end
+        else
+          block.call(content, value)
+        end
+      else
+        (value.keys.size > 1) ? value : content
+      end
+    end
+  end
+
   unless defined?(PARSING)
     float_proc = proc { |float| float.to_f }
     datetime_proc = proc { |time| Time.parse(time).utc rescue DateTime.parse(time).utc } # rubocop:disable Style/RescueModifier
@@ -56,24 +239,6 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     }.freeze
   end
 
-  unless defined?(TYPE_NAMES)
-    TYPE_NAMES = {
-      "Symbol" => "symbol",
-      "Integer" => "integer",
-      "BigDecimal" => "decimal",
-      "Float" => "float",
-      "TrueClass" => "boolean",
-      "FalseClass" => "boolean",
-      "Date" => "date",
-      "DateTime" => "datetime",
-      "Time" => "datetime",
-      "Array" => "array",
-      "Hash" => "hash"
-    }.freeze
-  end
-
-  DISALLOWED_XML_TYPES = %w[symbol yaml].freeze
-
   DEFAULT_OPTIONS = {
     typecast_xml_value: true,
     disallowed_types: DISALLOWED_XML_TYPES,
@@ -81,6 +246,8 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
   }.freeze
 
   class << self
+    include Helpers
+
     # Get the current parser class.
     def parser
       return @parser if defined?(@parser)
@@ -176,158 +343,6 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
-    end
-
-    # This module decorates files with the <tt>original_filename</tt>
-    # and <tt>content_type</tt> methods.
-    module FileLike # :nodoc:
-      attr_writer :original_filename, :content_type
-
-      def original_filename
-        @original_filename || "untitled"
-      end
-
-      def content_type
-        @content_type || "application/octet-stream"
-      end
-    end
-
-    private
-
-    # TODO: Add support for other encodings
-    def parse_binary(binary, entity) # :nodoc:
-      case entity["encoding"]
-      when "base64"
-        base64_decode(binary)
-      else
-        binary
-      end
-    end
-
-    def parse_file(file, entity)
-      f = StringIO.new(base64_decode(file))
-      f.extend(FileLike)
-      f.original_filename = entity["name"]
-      f.content_type = entity["content_type"]
-      f
-    end
-
-    def base64_decode(input)
-      input.unpack1("m")
-    end
-
-    def symbolize_keys(params)
-      case params
-      when Hash
-        params.inject({}) do |result, (key, value)|
-          result.merge(key.to_sym => symbolize_keys(value))
-        end
-      when Array
-        params.collect { |value| symbolize_keys(value) }
-      else
-        params
-      end
-    end
-
-    def undasherize_keys(params)
-      case params
-      when Hash
-        params.each_with_object({}) do |(key, value), hash|
-          hash[key.to_s.tr("-", "_")] = undasherize_keys(value)
-          hash
-        end
-      when Array
-        params.collect { |value| undasherize_keys(value) }
-      else
-        params
-      end
-    end
-
-    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
-      disallowed_types ||= DISALLOWED_XML_TYPES
-
-      case value
-      when Hash
-        if value.include?("type") && !value["type"].is_a?(Hash) && disallowed_types.include?(value["type"])
-          raise(DisallowedTypeError, value["type"])
-        end
-
-        if value["type"] == "array"
-
-          # this commented-out suggestion helps to avoid the multiple attribute
-          # problem, but it breaks when there is only one item in the array.
-          #
-          # from: https://github.com/jnunemaker/httparty/issues/102
-          #
-          # _, entries = value.detect { |k, v| k != 'type' && v.is_a?(Array) }
-
-          # This attempt fails to consider the order that the detect method
-          # retrieves the entries.
-          # _, entries = value.detect {|key, _| key != 'type'}
-
-          # This approach ignores attribute entries that are not convertable
-          # to an Array which allows attributes to be ignored.
-          _, entries = value.detect { |k, v| k != "type" && (v.is_a?(Array) || v.is_a?(Hash)) }
-
-          case entries
-          when NilClass
-            []
-          when String
-            [] if entries.strip.empty?
-          when Array
-            entries.collect { |entry| typecast_xml_value(entry, disallowed_types) }
-          when Hash
-            [typecast_xml_value(entries, disallowed_types)]
-          else
-            raise("can't typecast #{entries.class.name}: #{entries.inspect}")
-          end
-
-        elsif value.key?(CONTENT_ROOT)
-          content = value[CONTENT_ROOT]
-          block = PARSING[value["type"]]
-          if block
-            if block.arity == 1
-              value.delete("type") if PARSING[value["type"]]
-              if value.keys.size > 1
-                value[CONTENT_ROOT] = block.call(content)
-                value
-              else
-                block.call(content)
-              end
-            else
-              block.call(content, value)
-            end
-          else
-            (value.keys.size > 1) ? value : content
-          end
-        elsif value["type"] == "string" && value["nil"] != "true"
-          ""
-        # blank or nil parsed values are represented by nil
-        elsif value.empty? || value["nil"] == "true"
-          nil
-        # If the type is the only element which makes it then
-        # this still makes the value nil, except if type is
-        # a XML node(where type['value'] is a Hash)
-        elsif value["type"] && value.size == 1 && !value["type"].is_a?(Hash)
-          nil
-        else
-          xml_value = value.each_with_object({}) do |(k, v), hash|
-            hash[k] = typecast_xml_value(v, disallowed_types)
-            hash
-          end
-
-          # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
-          # how multipart uploaded files from HTML appear
-          xml_value["file"].is_a?(StringIO) ? xml_value["file"] : xml_value
-        end
-      when Array
-        value.map! { |i| typecast_xml_value(i, disallowed_types) }
-        (value.length > 1) ? value : value.first
-      when String
-        value
-      else
-        raise("can't typecast #{value.class.name}: #{value.inspect}")
-      end
     end
   end
 end
