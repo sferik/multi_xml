@@ -2,7 +2,8 @@ require "helper"
 require "parser_shared_example"
 
 class MockDecoder
-  def self.parse; end
+  def self.parse
+  end
 end
 
 describe "MultiXml" do
@@ -72,12 +73,12 @@ describe "MultiXml" do
   end
 
   [%w[LibXML libxml],
-   %w[libxml_sax libxml],
-   %w[REXML rexml/document],
-   %w[Nokogiri nokogiri],
-   %w[nokogiri_sax nokogiri],
-   %w[Ox ox],
-   %w[Oga oga]].each do |parser|
+    %w[libxml_sax libxml],
+    %w[REXML rexml/document],
+    %w[Nokogiri nokogiri],
+    %w[nokogiri_sax nokogiri],
+    %w[Ox ox],
+    %w[Oga oga]].each do |parser|
     require parser.last
     context "#{parser.first} parser" do
       it_behaves_like "a parser", parser.first

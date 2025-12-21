@@ -187,7 +187,7 @@ shared_examples_for "a parser" do |parser|
         it "symbolizes keys" do
           expect(MultiXml.parse(@xml,
             symbolize_keys: true)).to eq(users: {user: [{name: "Erik Berlin"},
-                                                        {name: "Wynn Netherland"}]})
+              {name: "Wynn Netherland"}]})
         end
       end
 
@@ -360,7 +360,8 @@ shared_examples_for "a parser" do |parser|
 
       context 'with an attribute type="yaml"' do
         before do
-          @xml = "<tag type=\"yaml\">--- \n1: returns an integer\n:message: Have a nice day\narray: \n- has-dashes: true\n  has_underscores: true\n</tag>"
+          @xml = "<tag type=\"yaml\">--- \n1: returns an integer\n:message: Have a nice day\n" \
+                 "array: \n- has-dashes: true\n  has_underscores: true\n</tag>"
         end
 
         it "raises MultiXML::DisallowedTypeError by default" do

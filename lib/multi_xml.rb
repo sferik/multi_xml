@@ -106,7 +106,9 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
         next
       end
       raise(NoParserError,
-        "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see https://github.com/sferik/multi_xml/issues/42.")
+        "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your " \
+        "Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see " \
+        "https://github.com/sferik/multi_xml/issues/42.")
     end
 
     # Set the XML parser utilizing a symbol, string, or class.
@@ -139,7 +141,8 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     #
     # <b>Options</b>
     #
-    # <tt>:parser</tt> :: The parser to use for this parse operation. Can be a symbol (e.g. +:nokogiri+), string, or class/module. Defaults to the class-level parser.
+    # <tt>:parser</tt> :: The parser to use for this parse operation. Can be a symbol
+    #                     (e.g. +:nokogiri+), string, or class/module. Defaults to the class-level parser.
     #
     # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
     #
@@ -315,7 +318,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
 
           # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
           # how multipart uploaded files from HTML appear
-          (xml_value["file"].is_a?(StringIO)) ? xml_value["file"] : xml_value
+          xml_value["file"].is_a?(StringIO) ? xml_value["file"] : xml_value
         end
       when Array
         value.map! { |i| typecast_xml_value(i, disallowed_types) }

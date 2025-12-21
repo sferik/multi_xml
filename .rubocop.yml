@@ -15,6 +15,9 @@ Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
   IndentationWidth: 2
 
+Layout/ArrayAlignment:
+  EnforcedStyle: with_fixed_indentation
+
 Layout/CaseIndentation:
   EnforcedStyle: end
 
@@ -40,10 +43,16 @@ Style/Alias:
 Style/Documentation:
   Enabled: false
 
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
 Style/FrozenStringLiteralComment:
   EnforcedStyle: never
 
 Style/OpenStructUse:
+  Enabled: false
+
+Style/RedundantConstantBase:
   Enabled: false
 
 Style/StringLiterals:
@@ -52,5 +61,8 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
+Style/SymbolProc:
+  Enabled: false
+
 Style/TernaryParentheses:
-  EnforcedStyle: require_parentheses
+  EnforcedStyle: require_parentheses_when_complex

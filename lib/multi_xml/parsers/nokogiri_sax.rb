@@ -68,7 +68,7 @@ module MultiXml
             # SAX parsers encode entities differently than DOM parsers
             value = CGI.unescapeHTML(attr[1])
             existing = current_hash[key]
-            current_hash[key] = (existing) ? [value, existing] : value
+            current_hash[key] = existing ? [value, existing] : value
           end
 
           # Remove content if:

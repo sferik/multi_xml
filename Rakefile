@@ -4,8 +4,10 @@ Bundler::GemHelper.install_tasks
 require "rspec/core/rake_task"
 RSpec::Core::RakeTask.new(:spec)
 
+desc "Alias for spec task"
 task test: :spec
 
+require "standard/rake"
 require "rubocop/rake_task"
 RuboCop::RakeTask.new
 
