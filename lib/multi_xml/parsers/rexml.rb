@@ -2,107 +2,58 @@ require "rexml/document" unless defined?(::REXML::Document)
 
 module MultiXml
   module Parsers
-    module Rexml # :nodoc:
+    # XML parser using Ruby's built-in REXML library
+    module Rexml
       extend self
 
-      def parse_error
-        ::REXML::ParseException
-      end
+      def parse_error = ::REXML::ParseException
 
-      # Parse an XML Document IO into a simple hash using REXML
-      #
-      # xml::
-      #   XML Document IO to parse
-      def parse(xml)
-        doc = REXML::Document.new(xml)
-        raise(REXML::ParseException, "The document #{doc.to_s.inspect} does not have a valid root") unless doc.root
+      def parse(io)
+        doc = REXML::Document.new(io)
+        raise REXML::ParseException, "Document has no valid root element" unless doc.root
 
-        merge_element!({}, doc.root)
+        element_to_hash({}, doc.root)
       end
 
       private
 
-      # Convert an XML element and merge into the hash
-      #
-      # hash::
-      #   Hash to merge the converted element into.
-      # element::
-      #   XML element to merge into hash
-      def merge_element!(hash, element)
-        merge!(hash, element.name, collapse(element))
+      def element_to_hash(hash, element)
+        add_to_hash(hash, element.name, collapse_element(element))
       end
 
-      # Actually converts an XML document element into a data structure.
-      #
-      # element::
-      #   The document element to be collapsed.
-      def collapse(element)
-        hash = get_attributes(element)
+      def collapse_element(element)
+        node_hash = element.attributes.each_with_object({}) { |(k, v), h| h[k] = v }
 
         if element.has_elements?
-          element.each_element { |child| merge_element!(hash, child) }
-          merge_texts!(hash, element) unless empty_content?(element)
-        elsif hash.empty? || !empty_content?(element)
-          # Only add text content if:
-          # 1. No attributes (hash.empty?), OR
-          # 2. Content is not whitespace-only
-          # (consistent with ActiveSupport::XmlMini behavior)
-          merge_texts!(hash, element)
+          element.each_element { |child| element_to_hash(node_hash, child) }
+          add_text_content(node_hash, element) unless whitespace_only?(element)
+        elsif node_hash.empty? || !whitespace_only?(element)
+          add_text_content(node_hash, element)
         end
-        hash
+
+        node_hash
       end
 
-      # Merge all the texts of an element into the hash
-      #
-      # hash::
-      #   Hash to add the converted element to.
-      # element::
-      #   XML element whose texts are to me merged into the hash
-      def merge_texts!(hash, element)
-        if element.has_text?
-          # must use value to prevent double-escaping
-          texts = element.texts.map(&:value).join
-          merge!(hash, MultiXml::CONTENT_ROOT, texts)
-        end
-        hash
+      def add_text_content(hash, element)
+        return hash unless element.has_text?
+
+        text = element.texts.map(&:value).join
+        add_to_hash(hash, TEXT_CONTENT_KEY, text)
       end
 
-      # Adds a new key/value pair to an existing Hash. If the key to be added
-      # already exists and the existing value associated with key is not
-      # an Array, it will be wrapped in an Array. Then the new value is
-      # appended to that Array.
-      #
-      # hash::
-      #   Hash to add key/value pair to.
-      # key::
-      #   Key to be added.
-      # value::
-      #   Value to be associated with key.
-      def merge!(hash, key, value)
-        hash[key] = if hash.key?(key)
-          hash[key].instance_of?(Array) ? hash[key] << value : [hash[key], value]
+      def add_to_hash(hash, key, value)
+        existing = hash[key]
+        hash[key] = if existing
+          existing.is_a?(Array) ? existing << value : [existing, value]
+        elsif value.is_a?(Array)
+          [value]
         else
-          value.instance_of?(Array) ? [value] : value
+          value
         end
         hash
       end
 
-      # Converts the attributes array of an XML element into a hash.
-      # Returns an empty Hash if node has no attributes.
-      #
-      # element::
-      #   XML element to extract attributes from.
-      def get_attributes(element)
-        attributes = {}
-        element.attributes.each { |n, v| attributes[n] = v }
-        attributes
-      end
-
-      # Determines if a document element has text content
-      #
-      # element::
-      #   XML element to be checked.
-      def empty_content?(element)
+      def whitespace_only?(element)
         element.texts.join.strip.empty?
       end
     end
