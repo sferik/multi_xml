@@ -9,12 +9,10 @@ shared_examples_for "a parser" do |parser|
 
   describe ".parse" do
     context "with a blank string" do
-      before do
-        @xml = ""
-      end
+      let(:xml) { "" }
 
       it "returns an empty Hash" do
-        expect(MultiXml.parse(@xml)).to eq({})
+        expect(MultiXml.parse(xml)).to eq({})
       end
     end
 
@@ -28,22 +26,20 @@ shared_examples_for "a parser" do |parser|
 
     unless parser == "Oga"
       context "with an invalid XML document" do
-        before do
-          @xml = "<open></close>"
-        end
+        let(:xml) { "<open></close>" }
 
         it "raises MultiXml::ParseError" do
-          expect { MultiXml.parse(@xml) }.to raise_error(MultiXml::ParseError)
+          expect { MultiXml.parse(xml) }.to raise_error(MultiXml::ParseError)
         end
 
         it "includes the original XML in the exception" do
-          MultiXml.parse(@xml)
+          MultiXml.parse(xml)
         rescue MultiXml::ParseError => e
-          expect(e.xml).to eq(@xml)
+          expect(e.xml).to eq(xml)
         end
 
         it "includes the underlying cause in the exception" do
-          MultiXml.parse(@xml)
+          MultiXml.parse(xml)
         rescue MultiXml::ParseError => e
           expect(e.cause).not_to be_nil
         end
@@ -51,21 +47,17 @@ shared_examples_for "a parser" do |parser|
     end
 
     context "with a valid XML document" do
-      before do
-        @xml = "<user/>"
-      end
+      let(:xml) { "<user/>" }
 
       it "parses correctly" do
-        expect(MultiXml.parse(@xml)).to eq("user" => nil)
+        expect(MultiXml.parse(xml)).to eq("user" => nil)
       end
 
       context "with CDATA" do
-        before do
-          @xml = "<user><![CDATA[Erik Berlin]]></user>"
-        end
+        let(:xml) { "<user><![CDATA[Erik Berlin]]></user>" }
 
         it "returns the correct CDATA" do
-          expect(MultiXml.parse(@xml)["user"]).to eq("Erik Berlin")
+          expect(MultiXml.parse(xml)["user"]).to eq("Erik Berlin")
         end
       end
 
@@ -96,42 +88,34 @@ shared_examples_for "a parser" do |parser|
       end
 
       context "with element having the same inner element and attribute name" do
-        before do
-          @xml = "<user name='John'><name>Smith</name></user>"
-        end
+        let(:xml) { "<user name='John'><name>Smith</name></user>" }
 
         it "returns names as Array" do
-          expect(MultiXml.parse(@xml)["user"]["name"]).to eq %w[John Smith]
+          expect(MultiXml.parse(xml)["user"]["name"]).to eq %w[John Smith]
         end
       end
 
       context "with content" do
-        before do
-          @xml = "<user>Erik Berlin</user>"
-        end
+        let(:xml) { "<user>Erik Berlin</user>" }
 
         it "returns the correct content" do
-          expect(MultiXml.parse(@xml)["user"]).to eq("Erik Berlin")
+          expect(MultiXml.parse(xml)["user"]).to eq("Erik Berlin")
         end
       end
 
       context "with an attribute" do
-        before do
-          @xml = '<user name="Erik Berlin"/>'
-        end
+        let(:xml) { '<user name="Erik Berlin"/>' }
 
         it "returns the correct attribute" do
-          expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Berlin")
+          expect(MultiXml.parse(xml)["user"]["name"]).to eq("Erik Berlin")
         end
       end
 
       context "with multiple attributes" do
-        before do
-          @xml = '<user name="Erik Berlin" screen_name="sferik"/>'
-        end
+        let(:xml) { '<user name="Erik Berlin" screen_name="sferik"/>' }
 
         it "returns the correct attributes" do
-          expect(MultiXml.parse(@xml)["user"]).to include("name" => "Erik Berlin", "screen_name" => "sferik")
+          expect(MultiXml.parse(xml)["user"]).to include("name" => "Erik Berlin", "screen_name" => "sferik")
         end
       end
 
@@ -154,12 +138,10 @@ shared_examples_for "a parser" do |parser|
       end
 
       context "with :symbolize_keys => true" do
-        before do
-          @xml = '<users><user name="Erik Berlin"/><user><name>Wynn Netherland</name></user></users>'
-        end
+        let(:xml) { '<users><user name="Erik Berlin"/><user><name>Wynn Netherland</name></user></users>' }
 
         it "symbolizes keys" do
-          expect(MultiXml.parse(@xml,
+          expect(MultiXml.parse(xml,
             symbolize_keys: true)).to eq(users: {user: [{name: "Erik Berlin"},
               {name: "Wynn Netherland"}]})
         end
@@ -196,232 +178,204 @@ shared_examples_for "a parser" do |parser|
       end
 
       context 'with an attribute type="string"' do
-        before do
-          @xml = '<tag type="string"></tag>'
-        end
+        let(:xml) { '<tag type="string"></tag>' }
 
         it "returns a String" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(String)
+          expect(MultiXml.parse(xml)["tag"]).to be_a(String)
         end
 
         it "returns the correct string" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq("")
+          expect(MultiXml.parse(xml)["tag"]).to eq("")
         end
       end
 
       context 'with an attribute type="date"' do
-        before do
-          @xml = '<tag type="date">1970-01-01</tag>'
-        end
+        let(:xml) { '<tag type="date">1970-01-01</tag>' }
 
         it "returns a Date" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(Date)
+          expect(MultiXml.parse(xml)["tag"]).to be_a(Date)
         end
 
         it "returns the correct date" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq(Date.parse("1970-01-01"))
+          expect(MultiXml.parse(xml)["tag"]).to eq(Date.parse("1970-01-01"))
         end
       end
 
       %w[datetime dateTime].each do |type|
         context %(with an attribute type="#{type}") do
-          before do
-            @xml = %(<tag type="#{type}">1970-01-01 00:00</tag>)
-          end
+          let(:xml) { %(<tag type="#{type}">1970-01-01 00:00</tag>) }
 
           it "returns a Time" do
-            expect(MultiXml.parse(@xml)["tag"]).to be_a(Time)
+            expect(MultiXml.parse(xml)["tag"]).to be_a(Time)
           end
 
           it "returns the correct time" do
-            expect(MultiXml.parse(@xml)["tag"]).to eq(Time.parse("1970-01-01 00:00"))
+            expect(MultiXml.parse(xml)["tag"]).to eq(Time.parse("1970-01-01 00:00"))
           end
         end
       end
 
       context 'with an attribute type="double"' do
-        before do
-          @xml = '<tag type="double">3.14159265358979</tag>'
-        end
+        let(:xml) { '<tag type="double">3.14159265358979</tag>' }
 
         it "returns a Float" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(Float)
+          expect(MultiXml.parse(xml)["tag"]).to be_a(Float)
         end
 
         it "returns the correct number" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq(3.14159265358979)
+          expect(MultiXml.parse(xml)["tag"]).to eq(3.14159265358979)
         end
       end
 
       context 'with an attribute type="decimal"' do
-        before do
-          @xml = '<tag type="decimal">3.14159265358979</tag>'
-        end
+        let(:xml) { '<tag type="decimal">3.14159265358979</tag>' }
 
         it "returns a BigDecimal" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(BigDecimal)
+          expect(MultiXml.parse(xml)["tag"]).to be_a(BigDecimal)
         end
 
         it "returns the correct number" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq(3.14159265358979)
+          expect(MultiXml.parse(xml)["tag"]).to eq(3.14159265358979)
         end
       end
 
       context 'with an attribute type="base64Binary"' do
-        before do
-          @xml = '<tag type="base64Binary">aW1hZ2UucG5n</tag>'
-        end
+        let(:xml) { '<tag type="base64Binary">aW1hZ2UucG5n</tag>' }
 
         it "returns a String" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(String)
+          expect(MultiXml.parse(xml)["tag"]).to be_a(String)
         end
 
         it "returns the correct string" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq("image.png")
+          expect(MultiXml.parse(xml)["tag"]).to eq("image.png")
         end
       end
 
       context 'with an attribute type="yaml"' do
-        before do
-          @xml = "<tag type=\"yaml\">--- \n1: returns an integer\n:message: Have a nice day\n" \
-                 "array: \n- has-dashes: true\n  has_underscores: true\n</tag>"
+        let(:xml) do
+          "<tag type=\"yaml\">--- \n1: returns an integer\n:message: Have a nice day\n" \
+            "array: \n- has-dashes: true\n  has_underscores: true\n</tag>"
         end
 
         it "raises MultiXML::DisallowedTypeError by default" do
-          expect { MultiXml.parse(@xml)["tag"] }.to raise_error(MultiXml::DisallowedTypeError)
+          expect { MultiXml.parse(xml)["tag"] }.to raise_error(MultiXml::DisallowedTypeError)
         end
 
         it "returns the correctly parsed YAML when the type is allowed" do
-          expect(MultiXml.parse(@xml,
+          expect(MultiXml.parse(xml,
             disallowed_types: [])["tag"]).to eq(:message => "Have a nice day", 1 => "returns an integer",
               "array" => [{"has-dashes" => true, "has_underscores" => true}])
         end
       end
 
       context 'with an attribute type="symbol"' do
-        before do
-          @xml = '<tag type="symbol">my_symbol</tag>'
-        end
+        let(:xml) { '<tag type="symbol">my_symbol</tag>' }
 
         it "raises MultiXML::DisallowedTypeError" do
-          expect { MultiXml.parse(@xml)["tag"] }.to raise_error(MultiXml::DisallowedTypeError)
+          expect { MultiXml.parse(xml)["tag"] }.to raise_error(MultiXml::DisallowedTypeError)
         end
 
         it "returns the correctly parsed Symbol when the type is allowed" do
-          expect(MultiXml.parse(@xml, disallowed_types: [])["tag"]).to eq(:my_symbol)
+          expect(MultiXml.parse(xml, disallowed_types: [])["tag"]).to eq(:my_symbol)
         end
       end
 
       context 'with an attribute type="file"' do
-        before do
-          @xml = '<tag type="file" name="data.txt" content_type="text/plain">ZGF0YQ==</tag>'
-        end
+        let(:xml) { '<tag type="file" name="data.txt" content_type="text/plain">ZGF0YQ==</tag>' }
 
         it "returns a StringIO" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(StringIO)
+          expect(MultiXml.parse(xml)["tag"]).to be_a(StringIO)
         end
 
         it "is decoded correctly" do
-          expect(MultiXml.parse(@xml)["tag"].string).to eq("data")
+          expect(MultiXml.parse(xml)["tag"].string).to eq("data")
         end
 
         it "has the correct file name" do
-          expect(MultiXml.parse(@xml)["tag"].original_filename).to eq("data.txt")
+          expect(MultiXml.parse(xml)["tag"].original_filename).to eq("data.txt")
         end
 
         it "has the correct content type" do
-          expect(MultiXml.parse(@xml)["tag"].content_type).to eq("text/plain")
+          expect(MultiXml.parse(xml)["tag"].content_type).to eq("text/plain")
         end
       end
 
       context 'with an attribute type="file" with missing name and content type' do
-        before do
-          @xml = '<tag type="file">ZGF0YQ==</tag>'
-        end
+        let(:xml) { '<tag type="file">ZGF0YQ==</tag>' }
 
         it "returns a StringIO" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(StringIO)
+          expect(MultiXml.parse(xml)["tag"]).to be_a(StringIO)
         end
 
         it "is decoded correctly" do
-          expect(MultiXml.parse(@xml)["tag"].string).to eq("data")
+          expect(MultiXml.parse(xml)["tag"].string).to eq("data")
         end
 
         it "has the default file name" do
-          expect(MultiXml.parse(@xml)["tag"].original_filename).to eq("untitled")
+          expect(MultiXml.parse(xml)["tag"].original_filename).to eq("untitled")
         end
 
         it "has the default content type" do
-          expect(MultiXml.parse(@xml)["tag"].content_type).to eq("application/octet-stream")
+          expect(MultiXml.parse(xml)["tag"].content_type).to eq("application/octet-stream")
         end
       end
 
       context 'with an attribute type="array"' do
-        before do
-          @xml = '<users type="array"><user>Erik Berlin</user><user>Wynn Netherland</user></users>'
-        end
+        let(:xml) { '<users type="array"><user>Erik Berlin</user><user>Wynn Netherland</user></users>' }
 
         it "returns an Array" do
-          expect(MultiXml.parse(@xml)["users"]).to be_a(Array)
+          expect(MultiXml.parse(xml)["users"]).to be_a(Array)
         end
 
         it "returns the correct array" do
-          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Berlin", "Wynn Netherland"])
+          expect(MultiXml.parse(xml)["users"]).to eq(["Erik Berlin", "Wynn Netherland"])
         end
       end
 
       context 'with an attribute type="array" in addition to other attributes' do
-        before do
-          @xml = '<users type="array" foo="bar"><user>Erik Berlin</user><user>Wynn Netherland</user></users>'
-        end
+        let(:xml) { '<users type="array" foo="bar"><user>Erik Berlin</user><user>Wynn Netherland</user></users>' }
 
         it "returns an Array" do
-          expect(MultiXml.parse(@xml)["users"]).to be_a(Array)
+          expect(MultiXml.parse(xml)["users"]).to be_a(Array)
         end
 
         it "returns the correct array" do
-          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Berlin", "Wynn Netherland"])
+          expect(MultiXml.parse(xml)["users"]).to eq(["Erik Berlin", "Wynn Netherland"])
         end
       end
 
       context 'with an attribute type="array" containing only one item' do
-        before do
-          @xml = '<users type="array"><user>Erik Berlin</user></users>'
-        end
+        let(:xml) { '<users type="array"><user>Erik Berlin</user></users>' }
 
         it "returns an Array" do
-          expect(MultiXml.parse(@xml)["users"]).to be_a(Array)
+          expect(MultiXml.parse(xml)["users"]).to be_a(Array)
         end
 
         it "returns the correct array" do
-          expect(MultiXml.parse(@xml)["users"]).to eq(["Erik Berlin"])
+          expect(MultiXml.parse(xml)["users"]).to eq(["Erik Berlin"])
         end
       end
 
       %w[integer boolean date datetime file].each do |type|
         context "with an empty attribute type=\"#{type}\"" do
-          before do
-            @xml = "<tag type=\"#{type}\"/>"
-          end
+          let(:xml) { "<tag type=\"#{type}\"/>" }
 
           it "returns nil" do
-            expect(MultiXml.parse(@xml)["tag"]).to be_nil
+            expect(MultiXml.parse(xml)["tag"]).to be_nil
           end
         end
       end
 
       %w[yaml symbol].each do |type|
         context "with an empty attribute type=\"#{type}\"" do
-          before do
-            @xml = "<tag type=\"#{type}\"/>"
-          end
+          let(:xml) { "<tag type=\"#{type}\"/>" }
 
           it "raises MultiXml::DisallowedTypeError by default" do
-            expect { MultiXml.parse(@xml)["tag"] }.to raise_error(MultiXml::DisallowedTypeError)
+            expect { MultiXml.parse(xml)["tag"] }.to raise_error(MultiXml::DisallowedTypeError)
           end
 
           it "returns nil when the type is allowed" do
-            expect(MultiXml.parse(@xml, disallowed_types: [])["tag"]).to be_nil
+            expect(MultiXml.parse(xml, disallowed_types: [])["tag"]).to be_nil
           end
         end
       end
@@ -453,22 +407,18 @@ shared_examples_for "a parser" do |parser|
       end
 
       context "with dasherized tag" do
-        before do
-          @xml = "<tag-1/>"
-        end
+        let(:xml) { "<tag-1/>" }
 
         it "returns undasherize tag" do
-          expect(MultiXml.parse(@xml).keys).to include("tag_1")
+          expect(MultiXml.parse(xml).keys).to include("tag_1")
         end
       end
 
       context "with dasherized attribute" do
-        before do
-          @xml = '<tag attribute-1="1"></tag>'
-        end
+        let(:xml) { '<tag attribute-1="1"></tag>' }
 
         it "returns undasherize attribute" do
-          expect(MultiXml.parse(@xml)["tag"].keys).to include("attribute_1")
+          expect(MultiXml.parse(xml)["tag"].keys).to include("attribute_1")
         end
       end
 
@@ -551,34 +501,32 @@ shared_examples_for "a parser" do |parser|
       end
 
       context "with sibling children" do
-        before do
-          @xml = "<users><user>Erik Berlin</user><user>Wynn Netherland</user></users>"
-        end
+        let(:xml) { "<users><user>Erik Berlin</user><user>Wynn Netherland</user></users>" }
 
         it "returns an Array" do
-          expect(MultiXml.parse(@xml)["users"]["user"]).to be_a(Array)
+          expect(MultiXml.parse(xml)["users"]["user"]).to be_a(Array)
         end
 
         it "parses correctly" do
-          expect(MultiXml.parse(@xml)).to eq("users" => {"user" => ["Erik Berlin", "Wynn Netherland"]})
+          expect(MultiXml.parse(xml)).to eq("users" => {"user" => ["Erik Berlin", "Wynn Netherland"]})
         end
       end
     end
 
     context "with a duplexed stream" do
-      before do
-        @xml, wr = IO.pipe
-
+      let(:xml) do
+        rd, wr = IO.pipe
         Thread.new do
           "<user/>".each_char do |chunk|
             wr << chunk
           end
           wr.close
         end
+        rd
       end
 
       it "parses correctly" do
-        expect(MultiXml.parse(@xml)).to eq("user" => nil)
+        expect(MultiXml.parse(xml)).to eq("user" => nil)
       end
     end
   end
