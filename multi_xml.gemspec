@@ -11,8 +11,6 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2"
 
-  spec.metadata["allowed_push_host"] = "https://rubygems.org"
-
   spec.metadata = {
     "allowed_push_host" => "https://rubygems.org",
     "bug_tracker_uri" => "https://github.com/sferik/multi_xml/issues",
@@ -34,10 +32,6 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-
-  # For more information and examples about making a new gem, check out our
-  # guide at: https://bundler.io/guides/creating_gem.html
-  spec.metadata["rubygems_mfa_required"] = "true"
 
   spec.add_dependency("bigdecimal", ">= 3.1", "< 5")
 end

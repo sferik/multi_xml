@@ -73,11 +73,9 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     def symbolize_keys(params)
       case params
       when Hash
-        params.inject({}) do |result, (key, value)|
-          result.merge(key.to_sym => symbolize_keys(value))
-        end
+        params.transform_keys(&:to_sym).transform_values { |v| symbolize_keys(v) }
       when Array
-        params.collect { |value| symbolize_keys(value) }
+        params.map { |value| symbolize_keys(value) }
       else
         params
       end
@@ -86,12 +84,9 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     def undasherize_keys(params)
       case params
       when Hash
-        params.each_with_object({}) do |(key, value), hash|
-          hash[key.to_s.tr("-", "_")] = undasherize_keys(value)
-          hash
-        end
+        params.transform_keys { |key| key.to_s.tr("-", "_") }.transform_values { |v| undasherize_keys(v) }
       when Array
-        params.collect { |value| undasherize_keys(value) }
+        params.map { |value| undasherize_keys(value) }
       else
         params
       end
@@ -119,7 +114,7 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       input.unpack1("m")
     end
 
-    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable Metrics/MethodLength
       disallowed_types ||= DISALLOWED_XML_TYPES
 
       case value
@@ -146,19 +141,10 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
         typecast_content_value(value)
       elsif value["type"] == "string" && value["nil"] != "true"
         ""
-      # blank or nil parsed values are represented by nil
-      elsif value.empty? || value["nil"] == "true"
-        nil
-      # If the type is the only element which makes it then
-      # this still makes the value nil, except if type is
-      # a XML node(where type['value'] is a Hash)
-      elsif value["type"] && value.size == 1 && !value["type"].is_a?(Hash)
+      elsif null_value?(value)
         nil
       else
-        xml_value = value.each_with_object({}) do |(k, v), hash|
-          hash[k] = typecast_xml_value(v, disallowed_types)
-          hash
-        end
+        xml_value = value.transform_values { |v| typecast_xml_value(v, disallowed_types) }
 
         # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
         # how multipart uploaded files from HTML appear
@@ -166,54 +152,40 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       end
     end
 
+    # Finds array entries, ignoring non-convertible attribute entries.
+    # See: https://github.com/jnunemaker/httparty/issues/102
     def typecast_array_value(value, disallowed_types)
-      # this commented-out suggestion helps to avoid the multiple attribute
-      # problem, but it breaks when there is only one item in the array.
-      #
-      # from: https://github.com/jnunemaker/httparty/issues/102
-      #
-      # _, entries = value.detect { |k, v| k != 'type' && v.is_a?(Array) }
-
-      # This attempt fails to consider the order that the detect method
-      # retrieves the entries.
-      # _, entries = value.detect {|key, _| key != 'type'}
-
-      # This approach ignores attribute entries that are not convertable
-      # to an Array which allows attributes to be ignored.
       _, entries = value.detect { |k, v| k != "type" && (v.is_a?(Array) || v.is_a?(Hash)) }
+      typecast_array_entries(entries, disallowed_types)
+    end
 
+    def typecast_array_entries(entries, disallowed_types)
       case entries
-      when NilClass
-        []
-      when String
-        [] if entries.strip.empty?
-      when Array
-        entries.collect { |entry| typecast_xml_value(entry, disallowed_types) }
-      when Hash
-        [typecast_xml_value(entries, disallowed_types)]
-      else
-        raise("can't typecast #{entries.class.name}: #{entries.inspect}")
+      when NilClass, String then []
+      when Array then entries.map { |entry| typecast_xml_value(entry, disallowed_types) }
+      when Hash then [typecast_xml_value(entries, disallowed_types)]
+      else raise("can't typecast #{entries.class.name}: #{entries.inspect}")
       end
     end
 
     def typecast_content_value(value)
       content = value[CONTENT_ROOT]
       block = PARSING[value["type"]]
-      if block
-        if block.arity == 1
-          value.delete("type") if PARSING[value["type"]]
-          if value.keys.size > 1
-            value[CONTENT_ROOT] = block.call(content)
-            value
-          else
-            block.call(content)
-          end
-        else
-          block.call(content, value)
-        end
-      else
-        (value.keys.size > 1) ? value : content
-      end
+
+      return (value.keys.size > 1) ? value : content unless block
+      return block.call(content, value) unless block.arity == 1
+
+      value.delete("type")
+      (value.keys.size > 1) ? value.merge(CONTENT_ROOT => block.call(content)) : block.call(content)
+    end
+
+    # Returns true if the value should be treated as nil:
+    # - Empty hash or explicitly marked as nil
+    # - Only contains a type attribute (and type is not a nested Hash)
+    def null_value?(value)
+      value.empty? ||
+        value["nil"] == "true" ||
+        (value["type"] && value.size == 1 && !value["type"].is_a?(Hash))
     end
   end
 
@@ -256,26 +228,10 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       @parser
     end
 
-    # The default parser based on what you currently
-    # have loaded and installed. First checks to see
-    # if any parsers are already loaded, then checks
-    # to see which are installed if none are loaded.
+    # The default parser based on what you currently have loaded and installed.
+    # First checks to see if any parsers are already loaded, then checks to see which are installed.
     def default_parser
-      return :ox if defined?(::Ox)
-      return :libxml if defined?(::LibXML)
-      return :nokogiri if defined?(::Nokogiri)
-      return :oga if defined?(::Oga)
-
-      REQUIREMENT_MAP.each do |library, parser|
-        require library
-        return parser
-      rescue LoadError
-        next
-      end
-      raise(NoParserError,
-        "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your " \
-        "Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see " \
-        "https://github.com/sferik/multi_xml/issues/42.")
+      detect_loaded_parser || detect_installable_parser || raise_no_parser_error
     end
 
     # Set the XML parser utilizing a symbol, string, or class.
@@ -343,6 +299,33 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
+    end
+
+    private
+
+    def detect_loaded_parser
+      return :ox if defined?(::Ox)
+      return :libxml if defined?(::LibXML)
+      return :nokogiri if defined?(::Nokogiri)
+
+      :oga if defined?(::Oga)
+    end
+
+    def detect_installable_parser
+      REQUIREMENT_MAP.each do |library, parser|
+        require library
+        return parser
+      rescue LoadError
+        next
+      end
+      nil
+    end
+
+    def raise_no_parser_error
+      raise(NoParserError,
+        "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your " \
+        "Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see " \
+        "https://github.com/sferik/multi_xml/issues/42.")
     end
   end
 end

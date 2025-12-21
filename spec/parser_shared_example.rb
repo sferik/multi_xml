@@ -8,7 +8,7 @@ shared_examples_for "a parser" do |parser|
   end
 
   describe ".parse" do
-    context "a blank string" do
+    context "with a blank string" do
       before do
         @xml = ""
       end
@@ -18,28 +18,16 @@ shared_examples_for "a parser" do |parser|
       end
     end
 
-    context "a whitespace string" do
-      before do
-        @xml = " "
-      end
-
-      it "returns an empty Hash" do
-        expect(MultiXml.parse(@xml)).to eq({})
-      end
-    end
-
-    context "a frozen string" do
-      before do
-        @xml = " "
-      end
-
-      it "returns an empty Hash" do
-        expect(MultiXml.parse(@xml)).to eq({})
+    ["a whitespace string", " ", "a frozen string", " ".freeze].each_slice(2) do |description, xml|
+      context description do
+        it "returns an empty Hash" do
+          expect(MultiXml.parse(xml)).to eq({})
+        end
       end
     end
 
     unless parser == "Oga"
-      context "an invalid XML document" do
+      context "with an invalid XML document" do
         before do
           @xml = "<open></close>"
         end
@@ -62,7 +50,7 @@ shared_examples_for "a parser" do |parser|
       end
     end
 
-    context "a valid XML document" do
+    context "with a valid XML document" do
       before do
         @xml = "<user/>"
       end
@@ -107,7 +95,7 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
-      context "element with the same inner element and attribute name" do
+      context "with element having the same inner element and attribute name" do
         before do
           @xml = "<user name='John'><name>Smith</name></user>"
         end
@@ -143,39 +131,25 @@ shared_examples_for "a parser" do |parser|
         end
 
         it "returns the correct attributes" do
-          expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Berlin")
-          expect(MultiXml.parse(@xml)["user"]["screen_name"]).to eq("sferik")
+          expect(MultiXml.parse(@xml)["user"]).to include("name" => "Erik Berlin", "screen_name" => "sferik")
         end
       end
 
-      context "typecast management" do
-        before do
-          @xml = %(
-            <global-settings>
-              <group>
-                <name>Settings</name>
-                <setting type="string">
-                  <description>Test</description>
-                </setting>
-              </group>
-            </global-settings>
-          )
+      context "with typecast_xml_value: true (default)" do
+        it "typecasts string type" do
+          xml = "<global-settings><group><name>Settings</name>" \
+                '<setting type="string"><description>Test</description></setting></group></global-settings>'
+          setting = MultiXml.parse(xml)["global_settings"]["group"]["setting"]
+          expect(setting).to eq ""
         end
+      end
 
-        context "with :typecast_xml_value => true" do
-          before do
-            @setting = MultiXml.parse(@xml)["global_settings"]["group"]["setting"]
-          end
-
-          it { expect(@setting).to eq "" }
-        end
-
-        context "with :typecast_xml_value => false" do
-          before do
-            @setting = MultiXml.parse(@xml, typecast_xml_value: false)["global_settings"]["group"]["setting"]
-          end
-
-          it { expect(@setting).to eq("type" => "string", "description" => {"__content__" => "Test"}) }
+      context "with typecast_xml_value: false" do
+        it "preserves type attribute" do
+          xml = "<global-settings><group><name>Settings</name>" \
+                '<setting type="string"><description>Test</description></setting></group></global-settings>'
+          setting = MultiXml.parse(xml, typecast_xml_value: false)["global_settings"]["group"]["setting"]
+          expect(setting).to eq("type" => "string", "description" => {"__content__" => "Test"})
         end
       end
 
@@ -192,71 +166,32 @@ shared_examples_for "a parser" do |parser|
       end
 
       context 'with an attribute type="boolean"' do
-        %w[true false].each do |boolean|
-          context "when #{boolean}" do
-            it "returns #{boolean}" do
-              xml = "<tag type=\"boolean\">#{boolean}</tag>"
-              expect(MultiXml.parse(xml)["tag"]).to be instance_eval(boolean)
-            end
-          end
+        it "returns true for 'true'" do
+          expect(MultiXml.parse('<tag type="boolean">true</tag>')["tag"]).to be true
         end
 
-        context "when 1" do
-          before do
-            @xml = '<tag type="boolean">1</tag>'
-          end
-
-          it "returns true" do
-            expect(MultiXml.parse(@xml)["tag"]).to be true
-          end
+        it "returns false for 'false'" do
+          expect(MultiXml.parse('<tag type="boolean">false</tag>')["tag"]).to be false
         end
 
-        context "when 0" do
-          before do
-            @xml = '<tag type="boolean">0</tag>'
-          end
+        it "returns true for '1'" do
+          expect(MultiXml.parse('<tag type="boolean">1</tag>')["tag"]).to be true
+        end
 
-          it "returns false" do
-            expect(MultiXml.parse(@xml)["tag"]).to be false
-          end
+        it "returns false for '0'" do
+          expect(MultiXml.parse('<tag type="boolean">0</tag>')["tag"]).to be false
         end
       end
 
       context 'with an attribute type="integer"' do
-        context "with a positive integer" do
-          before do
-            @xml = '<tag type="integer">1</tag>'
-          end
-
-          it "returns a Integer" do
-            expect(MultiXml.parse(@xml)["tag"]).to be_a(Integer)
-          end
-
-          it "returns a positive number" do
-            expect(MultiXml.parse(@xml)["tag"]).to be > 0
-          end
-
-          it "returns the correct number" do
-            expect(MultiXml.parse(@xml)["tag"]).to eq(1)
-          end
+        it "returns a positive Integer" do
+          result = MultiXml.parse('<tag type="integer">1</tag>')["tag"]
+          expect(result).to be_a(Integer).and eq(1)
         end
 
-        context "with a negative integer" do
-          before do
-            @xml = '<tag type="integer">-1</tag>'
-          end
-
-          it "returns a Integer" do
-            expect(MultiXml.parse(@xml)["tag"]).to be_a(Integer)
-          end
-
-          it "returns a negative number" do
-            expect(MultiXml.parse(@xml)["tag"]).to be < 0
-          end
-
-          it "returns the correct number" do
-            expect(MultiXml.parse(@xml)["tag"]).to eq(-1)
-          end
+        it "returns a negative Integer" do
+          result = MultiXml.parse('<tag type="integer">-1</tag>')["tag"]
+          expect(result).to be_a(Integer).and eq(-1)
         end
       end
 
@@ -288,31 +223,19 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
-      context 'with an attribute type="datetime"' do
-        before do
-          @xml = '<tag type="datetime">1970-01-01 00:00</tag>'
-        end
+      %w[datetime dateTime].each do |type|
+        context %(with an attribute type="#{type}") do
+          before do
+            @xml = %(<tag type="#{type}">1970-01-01 00:00</tag>)
+          end
 
-        it "returns a Time" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(Time)
-        end
+          it "returns a Time" do
+            expect(MultiXml.parse(@xml)["tag"]).to be_a(Time)
+          end
 
-        it "returns the correct time" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq(Time.parse("1970-01-01 00:00"))
-        end
-      end
-
-      context 'with an attribute type="dateTime"' do
-        before do
-          @xml = '<tag type="datetime">1970-01-01 00:00</tag>'
-        end
-
-        it "returns a Time" do
-          expect(MultiXml.parse(@xml)["tag"]).to be_a(Time)
-        end
-
-        it "returns the correct time" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq(Time.parse("1970-01-01 00:00"))
+          it "returns the correct time" do
+            expect(MultiXml.parse(@xml)["tag"]).to eq(Time.parse("1970-01-01 00:00"))
+          end
         end
       end
 
@@ -409,27 +332,27 @@ shared_examples_for "a parser" do |parser|
         it "has the correct content type" do
           expect(MultiXml.parse(@xml)["tag"].content_type).to eq("text/plain")
         end
+      end
 
-        context "with missing name and content type" do
-          before do
-            @xml = '<tag type="file">ZGF0YQ==</tag>'
-          end
+      context 'with an attribute type="file" with missing name and content type' do
+        before do
+          @xml = '<tag type="file">ZGF0YQ==</tag>'
+        end
 
-          it "returns a StringIO" do
-            expect(MultiXml.parse(@xml)["tag"]).to be_a(StringIO)
-          end
+        it "returns a StringIO" do
+          expect(MultiXml.parse(@xml)["tag"]).to be_a(StringIO)
+        end
 
-          it "is decoded correctly" do
-            expect(MultiXml.parse(@xml)["tag"].string).to eq("data")
-          end
+        it "is decoded correctly" do
+          expect(MultiXml.parse(@xml)["tag"].string).to eq("data")
+        end
 
-          it "has the default file name" do
-            expect(MultiXml.parse(@xml)["tag"].original_filename).to eq("untitled")
-          end
+        it "has the default file name" do
+          expect(MultiXml.parse(@xml)["tag"].original_filename).to eq("untitled")
+        end
 
-          it "has the default content type" do
-            expect(MultiXml.parse(@xml)["tag"].content_type).to eq("application/octet-stream")
-          end
+        it "has the default content type" do
+          expect(MultiXml.parse(@xml)["tag"].content_type).to eq("application/octet-stream")
         end
       end
 
@@ -504,51 +427,27 @@ shared_examples_for "a parser" do |parser|
       end
 
       context 'with an empty attribute type="array"' do
-        before do
-          @xml = '<tag type="array"/>'
-        end
-
         it "returns an empty Array" do
-          expect(MultiXml.parse(@xml)["tag"]).to eq([])
+          expect(MultiXml.parse('<tag type="array"/>')["tag"]).to eq([])
         end
 
-        context "with whitespace" do
-          before do
-            @xml = '<tag type="array"> </tag>'
-          end
+        it "returns an empty Array with whitespace" do
+          expect(MultiXml.parse('<tag type="array"> </tag>')["tag"]).to eq([])
+        end
+      end
 
-          it "returns an empty Array" do
-            expect(MultiXml.parse(@xml)["tag"]).to eq([])
+      context "with XML entities in content" do
+        it "returns unescaped XML entities" do
+          {"<" => "&lt;", ">" => "&gt;", '"' => "&quot;", "'" => "&apos;", "&" => "&amp;"}.each do |char, entity|
+            expect(MultiXml.parse("<tag>#{entity}</tag>")["tag"]).to eq(char)
           end
         end
       end
 
-      context "with XML entities" do
-        before do
-          @xml_entities = {
-            "<" => "&lt;",
-            ">" => "&gt;",
-            '"' => "&quot;",
-            "'" => "&apos;",
-            "&" => "&amp;"
-          }
-        end
-
-        context "in content" do
-          it "returns unescaped XML entities" do
-            @xml_entities.each do |key, value|
-              xml = "<tag>#{value}</tag>"
-              expect(MultiXml.parse(xml)["tag"]).to eq(key)
-            end
-          end
-        end
-
-        context "in attribute" do
-          it "returns unescaped XML entities" do
-            @xml_entities.each do |key, value|
-              xml = "<tag attribute=\"#{value}\"/>"
-              expect(MultiXml.parse(xml)["tag"]["attribute"]).to eq(key)
-            end
+      context "with XML entities in attribute" do
+        it "returns unescaped XML entities" do
+          {"<" => "&lt;", ">" => "&gt;", '"' => "&quot;", "'" => "&apos;", "&" => "&amp;"}.each do |char, entity|
+            expect(MultiXml.parse("<tag attribute=\"#{entity}\"/>")["tag"]["attribute"]).to eq(char)
           end
         end
       end
@@ -573,158 +472,81 @@ shared_examples_for "a parser" do |parser|
         end
       end
 
-      context "with children" do
-        context "with attributes" do
-          before do
-            @xml = '<users><user name="Erik Berlin"/></users>'
-          end
-
-          it "returns the correct attributes" do
-            expect(MultiXml.parse(@xml)["users"]["user"]["name"]).to eq("Erik Berlin")
-          end
+      context "with children with attributes" do
+        it "returns the correct attributes" do
+          xml = '<users><user name="Erik Berlin"/></users>'
+          expect(MultiXml.parse(xml)["users"]["user"]["name"]).to eq("Erik Berlin")
         end
+      end
 
-        context "with text" do
-          before do
-            @xml = "<user><name>Erik Berlin</name></user>"
-          end
-
-          it "returns the correct text" do
-            expect(MultiXml.parse(@xml)["user"]["name"]).to eq("Erik Berlin")
-          end
+      context "with children with text" do
+        it "returns the correct text" do
+          xml = "<user><name>Erik Berlin</name></user>"
+          expect(MultiXml.parse(xml)["user"]["name"]).to eq("Erik Berlin")
         end
+      end
 
-        context "with an unrecognized attribute type" do
-          before do
-            @xml = '<user type="admin"><name>Erik Berlin</name></user>'
-          end
-
-          it "passes through the type" do
-            expect(MultiXml.parse(@xml)["user"]["type"]).to eq("admin")
-          end
+      context "with children with an unrecognized attribute type" do
+        it "passes through the type" do
+          xml = '<user type="admin"><name>Erik Berlin</name></user>'
+          expect(MultiXml.parse(xml)["user"]["type"]).to eq("admin")
         end
+      end
 
-        context "with attribute tags on content nodes" do
-          context "non 'type' attributes" do
-            before do
-              @xml = <<-XML
-                <options>
-                  <value currency='USD'>123</value>
-                  <value number='percent'>0.123</value>
-                </options>
-              XML
-              @parsed_xml = MultiXml.parse(@xml)
-            end
-
-            it "adds the attributes to the value hash" do
-              expect(@parsed_xml["options"]["value"][0]["__content__"]).to eq("123")
-              expect(@parsed_xml["options"]["value"][0]["currency"]).to eq("USD")
-              expect(@parsed_xml["options"]["value"][1]["__content__"]).to eq("0.123")
-              expect(@parsed_xml["options"]["value"][1]["number"]).to eq("percent")
-            end
-          end
-
-          context "unrecognized type attributes" do
-            before do
-              @xml = <<-XML
-                <options>
-                  <value type='USD'>123</value>
-                  <value type='percent'>0.123</value>
-                  <value currency='USD'>123</value>
-                </options>
-              XML
-              @parsed_xml = MultiXml.parse(@xml)
-            end
-
-            it "adds the attributes to the value hash passing through the type" do
-              expect(@parsed_xml["options"]["value"][0]["__content__"]).to eq("123")
-              expect(@parsed_xml["options"]["value"][0]["type"]).to eq("USD")
-              expect(@parsed_xml["options"]["value"][1]["__content__"]).to eq("0.123")
-              expect(@parsed_xml["options"]["value"][1]["type"]).to eq("percent")
-              expect(@parsed_xml["options"]["value"][2]["__content__"]).to eq("123")
-              expect(@parsed_xml["options"]["value"][2]["currency"]).to eq("USD")
-            end
-          end
-
-          context "mixing attributes and non-attributes content nodes type attributes" do
-            before do
-              @xml = <<-XML
-                <options>
-                  <value type='USD'>123</value>
-                  <value type='percent'>0.123</value>
-                  <value>123</value>
-                </options>
-              XML
-              @parsed_xml = MultiXml.parse(@xml)
-            end
-
-            it "adds the attributes to the value hash passing through the type" do
-              expect(@parsed_xml["options"]["value"][0]["__content__"]).to eq("123")
-              expect(@parsed_xml["options"]["value"][0]["type"]).to eq("USD")
-              expect(@parsed_xml["options"]["value"][1]["__content__"]).to eq("0.123")
-              expect(@parsed_xml["options"]["value"][1]["type"]).to eq("percent")
-              expect(@parsed_xml["options"]["value"][2]).to eq("123")
-            end
-          end
-
-          context "mixing recognized type attribute and non-type attributes on content nodes" do
-            before do
-              @xml = <<-XML
-                <options>
-                  <value number='USD' type='integer'>123</value>
-                </options>
-              XML
-              @parsed_xml = MultiXml.parse(@xml)
-            end
-
-            it "adds the the non-type attribute and remove the recognized type attribute and do the typecast" do
-              expect(@parsed_xml["options"]["value"]["__content__"]).to eq(123)
-              expect(@parsed_xml["options"]["value"]["number"]).to eq("USD")
-            end
-          end
-
-          context "mixing unrecognized type attribute and non-type attributes on content nodes" do
-            before do
-              @xml = <<-XML
-                <options>
-                  <value number='USD' type='currency'>123</value>
-                </options>
-              XML
-              @parsed_xml = MultiXml.parse(@xml)
-            end
-
-            it "adds the the non-type attributes and type attribute to the value hash" do
-              expect(@parsed_xml["options"]["value"]["__content__"]).to eq("123")
-              expect(@parsed_xml["options"]["value"]["number"]).to eq("USD")
-              expect(@parsed_xml["options"]["value"]["type"]).to eq("currency")
-            end
-          end
+      context "with children with non 'type' attribute tags on content nodes" do
+        it "adds the attributes to the value hash", :aggregate_failures do
+          xml = "<options><value currency='USD'>123</value><value number='percent'>0.123</value></options>"
+          values = MultiXml.parse(xml)["options"]["value"]
+          expect(values[0]).to include("__content__" => "123", "currency" => "USD")
+          expect(values[1]).to include("__content__" => "0.123", "number" => "percent")
         end
+      end
 
-        context "with newlines and whitespace" do
-          before do
-            @xml = <<-XML
-              <user>
-                <name>Erik Berlin</name>
-              </user>
-            XML
-          end
-
-          it "parses correctly" do
-            expect(MultiXml.parse(@xml)).to eq("user" => {"name" => "Erik Berlin"})
-          end
+      context "with children with unrecognized type attribute tags on content nodes" do
+        it "adds the attributes to the value hash passing through the type", :aggregate_failures do
+          xml = "<options><value type='USD'>123</value><value type='percent'>0.123</value><value currency='USD'>123</value></options>"
+          values = MultiXml.parse(xml)["options"]["value"]
+          expect(values[0]).to include("__content__" => "123", "type" => "USD")
+          expect(values[1]).to include("__content__" => "0.123", "type" => "percent")
+          expect(values[2]).to include("__content__" => "123", "currency" => "USD")
         end
+      end
 
-        # Babies having babies
-        context "with children" do
-          before do
-            @xml = '<users><user name="Erik Berlin"><status text="Hello"/></user></users>'
-          end
+      context "with children mixing attributes and non-attributes content nodes" do
+        it "adds the attributes to the value hash passing through the type", :aggregate_failures do
+          xml = "<options><value type='USD'>123</value><value type='percent'>0.123</value><value>123</value></options>"
+          values = MultiXml.parse(xml)["options"]["value"]
+          expect(values[0]).to include("__content__" => "123", "type" => "USD")
+          expect(values[1]).to include("__content__" => "0.123", "type" => "percent")
+          expect(values[2]).to eq("123")
+        end
+      end
 
-          it "parses correctly" do
-            expect(MultiXml.parse(@xml)).to eq("users" => {"user" => {"name" => "Erik Berlin",
-                                                                      "status" => {"text" => "Hello"}}})
-          end
+      context "with children mixing recognized type attribute and non-type attributes" do
+        it "adds the non-type attribute and typecasts" do
+          xml = "<options><value number='USD' type='integer'>123</value></options>"
+          expect(MultiXml.parse(xml)["options"]["value"]).to include("__content__" => 123, "number" => "USD")
+        end
+      end
+
+      context "with children mixing unrecognized type attribute and non-type attributes" do
+        it "adds all attributes to the value hash" do
+          xml = "<options><value number='USD' type='currency'>123</value></options>"
+          expect(MultiXml.parse(xml)["options"]["value"]).to include("__content__" => "123", "number" => "USD", "type" => "currency")
+        end
+      end
+
+      context "with children with newlines and whitespace" do
+        it "parses correctly" do
+          xml = "<user>\n  <name>Erik Berlin</name>\n</user>"
+          expect(MultiXml.parse(xml)).to eq("user" => {"name" => "Erik Berlin"})
+        end
+      end
+
+      context "with nested children" do
+        it "parses correctly" do
+          xml = '<users><user name="Erik Berlin"><status text="Hello"/></user></users>'
+          expect(MultiXml.parse(xml)).to eq("users" => {"user" => {"name" => "Erik Berlin", "status" => {"text" => "Hello"}}})
         end
       end
 
@@ -743,7 +565,7 @@ shared_examples_for "a parser" do |parser|
       end
     end
 
-    context "a duplexed stream" do
+    context "with a duplexed stream" do
       before do
         @xml, wr = IO.pipe
 

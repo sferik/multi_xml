@@ -8,22 +8,24 @@ module MultiXml
       #
       # hash::
       #   Hash to merge the converted element into.
-      def node_to_hash(node, hash = {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
+      def node_to_hash(node, hash = {})
         node_hash = {MultiXml::CONTENT_ROOT => ""}
+        insert_node_hash(hash, node_name(node), node_hash)
+        process_children(node, node_hash)
+        process_attributes(node, node_hash)
+        remove_empty_content(node_hash)
+        hash
+      end
 
-        name = node_name(node)
-
-        # Insert node hash into parent hash correctly.
+      def insert_node_hash(hash, name, node_hash)
         case hash[name]
-        when Array
-          hash[name] << node_hash
-        when Hash
-          hash[name] = [hash[name], node_hash]
-        when NilClass
-          hash[name] = node_hash
+        when Array then hash[name] << node_hash
+        when Hash then hash[name] = [hash[name], node_hash]
+        when NilClass then hash[name] = node_hash
         end
+      end
 
-        # Handle child elements
+      def process_children(node, node_hash)
         each_child(node) do |c|
           if c.element?
             node_to_hash(c, node_hash)
@@ -31,22 +33,19 @@ module MultiXml
             node_hash[MultiXml::CONTENT_ROOT] += c.content
           end
         end
+      end
 
-        # Handle attributes
+      def process_attributes(node, node_hash)
         each_attr(node) do |a|
           key = node_name(a)
           v = node_hash[key]
-          node_hash[key] = (v ? [a.value, v] : a.value)
+          node_hash[key] = v ? [a.value, v] : a.value
         end
+      end
 
-        # Remove content node if:
-        # 1. It is completely empty (no text at all), OR
-        # 2. It is whitespace-only AND there are child elements/attributes
-        # (consistent with ActiveSupport::XmlMini behavior)
+      def remove_empty_content(node_hash)
         content = node_hash[MultiXml::CONTENT_ROOT]
         node_hash.delete(MultiXml::CONTENT_ROOT) if content.empty? || (node_hash.length > 1 && content.strip.empty?)
-
-        hash
       end
 
       # Parse an XML Document IO into a simple hash.

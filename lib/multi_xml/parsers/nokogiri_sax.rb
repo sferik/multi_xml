@@ -60,25 +60,22 @@ module MultiXml
         end
 
         def end_element(_name)
-          # Handle attributes after child elements (like the DOM parser)
-          # This ensures proper merging when attribute name matches child element name
-          @attrs_stack.pop.each do |attr|
-            key = attr[0]
-            # Decode numeric character references (e.g., &#38; -> &)
-            # SAX parsers encode entities differently than DOM parsers
-            value = CGI.unescapeHTML(attr[1])
-            existing = current_hash[key]
-            current_hash[key] = existing ? [value, existing] : value
-          end
+          merge_attrs_into_hash(@attrs_stack.pop)
+          remove_empty_content
+          @hash_stack.pop
+        end
 
-          # Remove content if:
-          # 1. It is completely empty (no text at all), OR
-          # 2. It is whitespace-only AND there are child elements/attributes
-          # (consistent with ActiveSupport::XmlMini behavior)
+        def merge_attrs_into_hash(attrs)
+          attrs.each do |attr|
+            value = CGI.unescapeHTML(attr[1])
+            existing = current_hash[attr[0]]
+            current_hash[attr[0]] = existing ? [value, existing] : value
+          end
+        end
+
+        def remove_empty_content
           content = current_hash[CONTENT_KEY]
           current_hash.delete(CONTENT_KEY) if content.empty? || (current_hash.length > 1 && content.strip.empty?)
-
-          @hash_stack.pop
         end
 
         def characters(string)

@@ -83,16 +83,11 @@ module MultiXml
         def append(key, value)
           key = key.to_s
           h = @stack.last
-          if h.key?(key)
-            v = h[key]
-            if v.is_a?(Array)
-              v << value
-            else
-              h[key] = [v, value]
-            end
-          else
-            h[key] = value
-          end
+          h[key] = h.key?(key) ? append_to_existing(h[key], value) : value
+        end
+
+        def append_to_existing(existing, value)
+          existing.is_a?(Array) ? existing << value : [existing, value]
         end
       end
     end
