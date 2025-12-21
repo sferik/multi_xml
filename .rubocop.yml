@@ -49,11 +49,11 @@ Style/EmptyMethod:
 Style/FrozenStringLiteralComment:
   EnforcedStyle: never
 
-Style/OpenStructUse:
-  Enabled: false
-
 Style/RedundantConstantBase:
   Enabled: false
+
+Style/RescueStandardError:
+  EnforcedStyle: implicit
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes

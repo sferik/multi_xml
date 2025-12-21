@@ -4,85 +4,91 @@ require "stringio"
 
 module MultiXml
   module Parsers
-    module NokogiriSax # :nodoc:
+    # SAX-based parser using Nokogiri (faster for large documents)
+    module NokogiriSax
       module_function
 
-      def parse_error
-        ::Nokogiri::XML::SyntaxError
-      end
+      def parse_error = ::Nokogiri::XML::SyntaxError
 
       def parse(xml)
-        xml = StringIO.new(xml) unless xml.respond_to?(:read)
+        io = xml.respond_to?(:read) ? xml : StringIO.new(xml)
+        return {} if io.eof?
 
-        return {} if xml.eof?
-
-        document = HashBuilder.new
-        parser = ::Nokogiri::XML::SAX::Parser.new(document)
-        parser.parse(xml)
-        document.hash
+        handler = SaxHandler.new
+        ::Nokogiri::XML::SAX::Parser.new(handler).parse(io)
+        handler.result
       end
 
-      # Class that builds a hash while parsing XML using SAX events.
-      class HashBuilder < ::Nokogiri::XML::SAX::Document
-        CONTENT_KEY = "__content__".freeze
-
-        attr_reader :hash
-
-        def current_hash
-          @hash_stack.last
+      # Nokogiri SAX handler
+      class SaxHandler < ::Nokogiri::XML::SAX::Document
+        def initialize
+          super
+          @result = {}
+          @stack = [@result]
+          @pending_attrs = []
         end
 
+        attr_reader :result
+
         def start_document
-          @hash = {}
-          @hash_stack = [@hash]
-          @attrs_stack = []
         end
 
         def end_document
-          raise "Parse stack not empty!" if @hash_stack.size > 1
         end
 
-        def error(error_message)
-          raise(::Nokogiri::XML::SyntaxError, error_message)
+        def error(message)
+          raise ::Nokogiri::XML::SyntaxError, message
         end
 
         def start_element(name, attrs = [])
-          new_hash = {CONTENT_KEY => +""}
-
-          case current_hash[name]
-          when Array then current_hash[name] << new_hash
-          when Hash then current_hash[name] = [current_hash[name], new_hash]
-          when nil then current_hash[name] = new_hash
-          end
-
-          @hash_stack.push(new_hash)
-          @attrs_stack.push(attrs)
+          push_element(name)
+          @pending_attrs << attrs.to_h
         end
 
         def end_element(_name)
-          merge_attrs_into_hash(@attrs_stack.pop)
-          remove_empty_content
-          @hash_stack.pop
+          apply_attributes(@pending_attrs.pop)
+          strip_whitespace_content
+          @stack.pop
         end
 
-        def merge_attrs_into_hash(attrs)
-          attrs.each do |attr|
-            value = CGI.unescapeHTML(attr[1])
-            existing = current_hash[attr[0]]
-            current_hash[attr[0]] = existing ? [value, existing] : value
+        def characters(text) = append_text(text)
+        alias_method :cdata_block, :characters
+
+        private
+
+        def current = @stack.last
+
+        def push_element(name)
+          child = {TEXT_CONTENT_KEY => +""}
+          add_value(name, child)
+          @stack << child
+        end
+
+        def append_text(text)
+          current[TEXT_CONTENT_KEY] << text
+        end
+
+        def add_value(name, value)
+          existing = current[name]
+          current[name] = case existing
+          when Array then existing << value
+          when Hash then [existing, value]
+          else value
           end
         end
 
-        def remove_empty_content
-          content = current_hash[CONTENT_KEY]
-          current_hash.delete(CONTENT_KEY) if content.empty? || (current_hash.length > 1 && content.strip.empty?)
+        def apply_attributes(attrs)
+          attrs.each do |name, value|
+            value = CGI.unescapeHTML(value)
+            existing = current[name]
+            current[name] = existing ? [value, existing] : value
+          end
         end
 
-        def characters(string)
-          current_hash[CONTENT_KEY] << string
+        def strip_whitespace_content
+          content = current[TEXT_CONTENT_KEY]
+          current.delete(TEXT_CONTENT_KEY) if content.empty? || (current.size > 1 && content.strip.empty?)
         end
-
-        alias_method :cdata_block, :characters
       end
     end
   end

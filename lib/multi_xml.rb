@@ -3,119 +3,87 @@ require "date"
 require "stringio"
 require "time"
 require "yaml"
-require "multi_xml/constants"
-require "multi_xml/errors"
-require "multi_xml/file_like"
-require "multi_xml/helpers"
-require "multi_xml/parsing"
+require_relative "multi_xml/constants"
+require_relative "multi_xml/errors"
+require_relative "multi_xml/file_like"
+require_relative "multi_xml/helpers"
 
 module MultiXml
   class << self
     include Helpers
 
-    # Get the current parser class.
+    # Returns the current parser module
     def parser
-      return @parser if defined?(@parser)
-
-      self.parser = default_parser
-      @parser
+      @parser ||= resolve_parser(detect_parser)
     end
 
-    # The default parser based on what you currently have loaded and installed.
-    # First checks to see if any parsers are already loaded, then checks to see which are installed.
-    def default_parser
-      detect_loaded_parser || detect_installable_parser || raise_no_parser_error
-    end
-
-    # Set the XML parser utilizing a symbol, string, or class.
-    # Supported by default are:
+    # Sets the XML parser
     #
-    # * <tt>:libxml</tt>
-    # * <tt>:nokogiri</tt>
-    # * <tt>:ox</tt>
-    # * <tt>:rexml</tt>
-    # * <tt>:oga</tt>
+    # @param new_parser [Symbol, String, Module] Parser specification
+    #   - Symbol/String: :libxml, :nokogiri, :ox, :rexml, :oga
+    #   - Module: Custom parser implementing parse(io) and parse_error
     def parser=(new_parser)
       @parser = resolve_parser(new_parser)
     end
 
-    # Resolve a parser from a symbol, string, or class/module.
-    # Returns the parser module/class.
-    def resolve_parser(parser_spec)
-      case parser_spec
-      when String, Symbol
-        require "multi_xml/parsers/#{parser_spec.to_s.downcase}"
-        MultiXml::Parsers.const_get(parser_spec.to_s.split("_").collect(&:capitalize).join.to_s)
-      when Class, Module
-        parser_spec
-      else
-        raise("Did not recognize your parser specification. Please specify either a symbol or a class.")
-      end
-    end
-
-    # Parse an XML string or IO into Ruby.
+    # Parse XML into a Ruby Hash
     #
-    # <b>Options</b>
-    #
-    # <tt>:parser</tt> :: The parser to use for this parse operation. Can be a symbol
-    #                     (e.g. +:nokogiri+), string, or class/module. Defaults to the class-level parser.
-    #
-    # <tt>:symbolize_keys</tt> :: If true, will use symbols instead of strings for the keys.
-    #
-    # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
-    #
-    # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
+    # @param xml [String, IO] XML content
+    # @param options [Hash] Parsing options
+    # @option options [Symbol, String, Module] :parser Parser to use
+    # @option options [Boolean] :symbolize_keys Convert keys to symbols (default: false)
+    # @option options [Array<String>] :disallowed_types Types to reject (default: ['yaml', 'symbol'])
+    # @option options [Boolean] :typecast_xml_value Apply type conversions (default: true)
+    # @return [Hash] Parsed XML as nested hash
     def parse(xml, options = {})
       options = DEFAULT_OPTIONS.merge(options)
-      current_parser = options[:parser] ? resolve_parser(options[:parser]) : parser
-      xml, original_xml = prepare_xml(xml)
+      xml_parser = options[:parser] ? resolve_parser(options[:parser]) : parser
 
-      return {} if xml_empty?(xml)
+      io = normalize_input(xml)
+      return {} if io.eof?
 
-      hash = parse_with_error_handling(xml, original_xml, current_parser)
-      hash = typecast_xml_value(hash, options[:disallowed_types]) if options[:typecast_xml_value]
-      hash = symbolize_keys(hash) if options[:symbolize_keys]
-      hash
+      result = parse_with_error_handling(io, xml, xml_parser)
+      result = typecast_xml_value(result, options[:disallowed_types]) if options[:typecast_xml_value]
+      result = symbolize_keys(result) if options[:symbolize_keys]
+      result
     end
 
     private
 
-    def prepare_xml(xml)
-      xml = (xml || "").strip if xml.nil? || xml.respond_to?(:strip)
-      original_xml = xml
-      xml = StringIO.new(xml) unless xml.respond_to?(:read)
-      [xml, original_xml]
+    def resolve_parser(spec)
+      case spec
+      when String, Symbol then load_parser(spec)
+      when Class, Module then spec
+      else raise "Invalid parser specification: expected Symbol, String, or Module"
+      end
     end
 
-    def xml_empty?(xml)
-      char = xml.getc
-      return true if char.nil?
-
-      xml.ungetc(char)
-      false
+    def load_parser(name)
+      require "multi_xml/parsers/#{name.to_s.downcase}"
+      Parsers.const_get(camelize(name.to_s))
     end
 
-    def parse_with_error_handling(xml, original_xml, current_parser)
-      undasherize_keys(current_parser.parse(xml) || {})
-    rescue DisallowedTypeError
-      raise
-    rescue current_parser.parse_error => e
-      xml_string = original_xml.respond_to?(:read) ? original_xml.tap(&:rewind).read : original_xml
-      raise ParseError.new(e.message, xml: xml_string)
+    def camelize(name)
+      name.split("_").map(&:capitalize).join
     end
 
-    def detect_loaded_parser
+    def detect_parser
+      find_loaded_parser || find_available_parser || raise_no_parser_error
+    end
+
+    def find_loaded_parser
       return :ox if defined?(::Ox)
       return :libxml if defined?(::LibXML)
       return :nokogiri if defined?(::Nokogiri)
+      return :oga if defined?(::Oga)
 
-      :oga if defined?(::Oga)
+      nil
     end
 
-    def detect_installable_parser
-      REQUIREMENT_MAP.each do |library, parser|
+    def find_available_parser
+      PARSER_PREFERENCE.each do |library, parser_name|
         require library
-        return parser
+        return parser_name
       rescue LoadError
         next
       end
@@ -123,10 +91,25 @@ module MultiXml
     end
 
     def raise_no_parser_error
-      raise(NoParserError,
-        "No XML parser detected. If you're using Rubinius and Bundler, try adding an XML parser to your " \
-        "Gemfile (e.g. libxml-ruby, nokogiri, or rubysl-rexml). For more information, see " \
-        "https://github.com/sferik/multi_xml/issues/42.")
+      raise NoParserError, <<~MSG.chomp
+        No XML parser detected. Install one of: ox, nokogiri, libxml-ruby, or oga.
+        See https://github.com/sferik/multi_xml for more information.
+      MSG
+    end
+
+    def normalize_input(xml)
+      return xml if xml.respond_to?(:read)
+
+      StringIO.new(xml.to_s.strip)
+    end
+
+    def parse_with_error_handling(io, original_input, xml_parser)
+      undasherize_keys(xml_parser.parse(io) || {})
+    rescue DisallowedTypeError
+      raise
+    rescue xml_parser.parse_error => e
+      xml_string = original_input.respond_to?(:read) ? original_input.tap(&:rewind).read : original_input.to_s
+      raise ParseError.new(e.message, xml: xml_string, cause: e)
     end
   end
 end

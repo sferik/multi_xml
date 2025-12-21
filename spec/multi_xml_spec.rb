@@ -57,7 +57,7 @@ describe "MultiXml" do
     end
 
     it "raises error for invalid per-parse parser" do
-      expect { MultiXml.parse("<user/>", parser: 123) }.to raise_error(RuntimeError, /Did not recognize your parser specification/)
+      expect { MultiXml.parse("<user/>", parser: 123) }.to raise_error(RuntimeError, /Invalid parser specification/)
     end
 
     it "wraps parser errors correctly with per-parse parser" do

@@ -29,7 +29,7 @@ end
 
 require "yardstick/rake/verify"
 Yardstick::Rake::Verify.new do |verify|
-  verify.threshold = 47
+  verify.threshold = 47.1
 end
 
 desc "Run linters"
