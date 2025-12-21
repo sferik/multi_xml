@@ -32,4 +32,7 @@ Yardstick::Rake::Verify.new do |verify|
   verify.threshold = 47
 end
 
-task default: %i[spec rubocop verify_measurements]
+desc "Run linters"
+task lint: %i[rubocop standard]
+
+task default: %i[spec lint verify_measurements]
