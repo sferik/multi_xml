@@ -5,7 +5,14 @@ require "time"
 require "yaml"
 
 module MultiXml # rubocop:disable Metrics/ModuleLength
-  class ParseError < StandardError; end
+  class ParseError < StandardError
+    attr_reader :xml
+
+    def initialize(message = nil, xml: nil)
+      @xml = xml
+      super(message)
+    end
+  end
 
   class NoParserError < StandardError; end
 
@@ -143,9 +150,10 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       xml ||= ""
 
       options = DEFAULT_OPTIONS.merge(options)
-      current_parser = (options[:parser]) ? resolve_parser(options[:parser]) : parser
+      current_parser = options[:parser] ? resolve_parser(options[:parser]) : parser
 
       xml = xml.strip if xml.respond_to?(:strip)
+      original_xml = xml
       begin
         xml = StringIO.new(xml) unless xml.respond_to?(:read)
 
@@ -159,7 +167,9 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
       rescue DisallowedTypeError
         raise
       rescue current_parser.parse_error => e
-        raise(ParseError, e.message, e.backtrace)
+        # Capture the original XML for debugging; cause is set automatically by Ruby
+        xml_string = original_xml.respond_to?(:read) ? original_xml.tap(&:rewind).read : original_xml
+        raise ParseError.new(e.message, xml: xml_string)
       end
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
