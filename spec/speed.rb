@@ -35,9 +35,9 @@ end
 files = opts.parse(ARGV)
 
 if $parsers.empty?
-  $parsers << "libxml" if defined?(LibXML)
-  $parsers << "nokogiri" if defined?(Nokogiri)
-  $parsers << "ox" if defined?(Ox)
+  $parsers << "libxml" if defined?(::LibXML)
+  $parsers << "nokogiri" if defined?(::Nokogiri)
+  $parsers << "ox" if defined?(::Ox)
 end
 
 files.each do |filename|
@@ -53,6 +53,7 @@ files.each do |filename|
     times[p] = Time.now - start
   end
   times.each do |p, t|
-    puts format("%8s took %0.3f seconds to parse %s %d times.", p, t, filename, $iterations)
+    puts format("%<parser>8s took %<time>0.3f seconds to parse %<file>s %<iterations>d times.",
+      parser: p, time: t, file: filename, iterations: $iterations)
   end
 end
