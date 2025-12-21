@@ -3,220 +3,13 @@ require "date"
 require "stringio"
 require "time"
 require "yaml"
+require "multi_xml/constants"
+require "multi_xml/errors"
+require "multi_xml/file_like"
+require "multi_xml/helpers"
+require "multi_xml/parsing"
 
-module MultiXml # rubocop:disable Metrics/ModuleLength
-  class ParseError < StandardError
-    attr_reader :xml
-
-    def initialize(message = nil, xml: nil)
-      @xml = xml
-      super(message)
-    end
-  end
-
-  class NoParserError < StandardError; end
-
-  class DisallowedTypeError < StandardError
-    def initialize(type)
-      super("Disallowed type attribute: #{type.inspect}")
-    end
-  end
-
-  unless defined?(REQUIREMENT_MAP)
-    REQUIREMENT_MAP = [
-      ["ox", :ox],
-      ["libxml", :libxml],
-      ["nokogiri", :nokogiri],
-      ["rexml/document", :rexml],
-      ["oga", :oga]
-    ].freeze
-  end
-
-  CONTENT_ROOT = "__content__".freeze unless defined?(CONTENT_ROOT)
-
-  unless defined?(TYPE_NAMES)
-    TYPE_NAMES = {
-      "Symbol" => "symbol",
-      "Integer" => "integer",
-      "BigDecimal" => "decimal",
-      "Float" => "float",
-      "TrueClass" => "boolean",
-      "FalseClass" => "boolean",
-      "Date" => "date",
-      "DateTime" => "datetime",
-      "Time" => "datetime",
-      "Array" => "array",
-      "Hash" => "hash"
-    }.freeze
-  end
-
-  DISALLOWED_XML_TYPES = %w[symbol yaml].freeze
-
-  # This module decorates files with the <tt>original_filename</tt>
-  # and <tt>content_type</tt> methods.
-  module FileLike # :nodoc:
-    attr_writer :original_filename, :content_type
-
-    def original_filename
-      @original_filename || "untitled"
-    end
-
-    def content_type
-      @content_type || "application/octet-stream"
-    end
-  end
-
-  # Internal helper methods for XML parsing and typecasting
-  module Helpers # :nodoc:
-    module_function
-
-    def symbolize_keys(params)
-      case params
-      when Hash
-        params.transform_keys(&:to_sym).transform_values { |v| symbolize_keys(v) }
-      when Array
-        params.map { |value| symbolize_keys(value) }
-      else
-        params
-      end
-    end
-
-    def undasherize_keys(params)
-      case params
-      when Hash
-        params.transform_keys { |key| key.to_s.tr("-", "_") }.transform_values { |v| undasherize_keys(v) }
-      when Array
-        params.map { |value| undasherize_keys(value) }
-      else
-        params
-      end
-    end
-
-    # TODO: Add support for other encodings
-    def parse_binary(binary, entity) # :nodoc:
-      case entity["encoding"]
-      when "base64"
-        base64_decode(binary)
-      else
-        binary
-      end
-    end
-
-    def parse_file(file, entity)
-      f = StringIO.new(base64_decode(file))
-      f.extend(FileLike)
-      f.original_filename = entity["name"]
-      f.content_type = entity["content_type"]
-      f
-    end
-
-    def base64_decode(input)
-      input.unpack1("m")
-    end
-
-    def typecast_xml_value(value, disallowed_types = nil) # rubocop:disable Metrics/MethodLength
-      disallowed_types ||= DISALLOWED_XML_TYPES
-
-      case value
-      when Hash
-        typecast_hash_value(value, disallowed_types)
-      when Array
-        value.map! { |i| typecast_xml_value(i, disallowed_types) }
-        (value.length > 1) ? value : value.first
-      when String
-        value
-      else
-        raise("can't typecast #{value.class.name}: #{value.inspect}")
-      end
-    end
-
-    def typecast_hash_value(value, disallowed_types) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
-      if value.include?("type") && !value["type"].is_a?(Hash) && disallowed_types.include?(value["type"])
-        raise(DisallowedTypeError, value["type"])
-      end
-
-      if value["type"] == "array"
-        typecast_array_value(value, disallowed_types)
-      elsif value.key?(CONTENT_ROOT)
-        typecast_content_value(value)
-      elsif value["type"] == "string" && value["nil"] != "true"
-        ""
-      elsif null_value?(value)
-        nil
-      else
-        xml_value = value.transform_values { |v| typecast_xml_value(v, disallowed_types) }
-
-        # Turn {:files => {:file => #<StringIO>} into {:files => #<StringIO>} so it is compatible with
-        # how multipart uploaded files from HTML appear
-        xml_value["file"].is_a?(StringIO) ? xml_value["file"] : xml_value
-      end
-    end
-
-    # Finds array entries, ignoring non-convertible attribute entries.
-    # See: https://github.com/jnunemaker/httparty/issues/102
-    def typecast_array_value(value, disallowed_types)
-      _, entries = value.detect { |k, v| k != "type" && (v.is_a?(Array) || v.is_a?(Hash)) }
-      typecast_array_entries(entries, disallowed_types)
-    end
-
-    def typecast_array_entries(entries, disallowed_types)
-      case entries
-      when NilClass, String then []
-      when Array then entries.map { |entry| typecast_xml_value(entry, disallowed_types) }
-      when Hash then [typecast_xml_value(entries, disallowed_types)]
-      else raise("can't typecast #{entries.class.name}: #{entries.inspect}")
-      end
-    end
-
-    def typecast_content_value(value)
-      content = value[CONTENT_ROOT]
-      block = PARSING[value["type"]]
-
-      return (value.keys.size > 1) ? value : content unless block
-      return block.call(content, value) unless block.arity == 1
-
-      value.delete("type")
-      (value.keys.size > 1) ? value.merge(CONTENT_ROOT => block.call(content)) : block.call(content)
-    end
-
-    # Returns true if the value should be treated as nil:
-    # - Empty hash or explicitly marked as nil
-    # - Only contains a type attribute (and type is not a nested Hash)
-    def null_value?(value)
-      value.empty? ||
-        value["nil"] == "true" ||
-        (value["type"] && value.size == 1 && !value["type"].is_a?(Hash))
-    end
-  end
-
-  unless defined?(PARSING)
-    float_proc = proc { |float| float.to_f }
-    datetime_proc = proc { |time| Time.parse(time).utc rescue DateTime.parse(time).utc } # rubocop:disable Style/RescueModifier
-
-    PARSING = {
-      "symbol" => proc { |symbol| symbol.to_sym },
-      "date" => proc { |date| Date.parse(date) },
-      "datetime" => datetime_proc,
-      "dateTime" => datetime_proc,
-      "integer" => proc { |integer| integer.to_i },
-      "float" => float_proc,
-      "double" => float_proc,
-      "decimal" => proc { |number| BigDecimal(number) },
-      "boolean" => proc { |boolean| !%w[0 false].include?(boolean.strip) },
-      "string" => proc { |string| string.to_s },
-      "yaml" => proc { |yaml| YAML.load(yaml) rescue yaml }, # rubocop:disable Style/RescueModifier
-      "base64Binary" => proc { |binary| base64_decode(binary) },
-      "binary" => proc { |binary, entity| parse_binary(binary, entity) },
-      "file" => proc { |file, entity| parse_file(file, entity) }
-    }.freeze
-  end
-
-  DEFAULT_OPTIONS = {
-    typecast_xml_value: true,
-    disallowed_types: DISALLOWED_XML_TYPES,
-    symbolize_keys: false
-  }.freeze
-
+module MultiXml
   class << self
     include Helpers
 
@@ -272,36 +65,44 @@ module MultiXml # rubocop:disable Metrics/ModuleLength
     # <tt>:disallowed_types</tt> :: Types to disallow from being typecasted. Defaults to `['yaml', 'symbol']`. Use `[]` to allow all types.
     #
     # <tt>:typecast_xml_value</tt> :: If true, won't typecast values for parsed document
-    def parse(xml, options = {}) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
-      xml ||= ""
-
+    def parse(xml, options = {})
       options = DEFAULT_OPTIONS.merge(options)
       current_parser = options[:parser] ? resolve_parser(options[:parser]) : parser
+      xml, original_xml = prepare_xml(xml)
 
-      xml = xml.strip if xml.respond_to?(:strip)
-      original_xml = xml
-      begin
-        xml = StringIO.new(xml) unless xml.respond_to?(:read)
+      return {} if xml_empty?(xml)
 
-        char = xml.getc
-        return {} if char.nil?
-
-        xml.ungetc(char)
-
-        hash = undasherize_keys(current_parser.parse(xml) || {})
-        hash = typecast_xml_value(hash, options[:disallowed_types]) if options[:typecast_xml_value]
-      rescue DisallowedTypeError
-        raise
-      rescue current_parser.parse_error => e
-        # Capture the original XML for debugging; cause is set automatically by Ruby
-        xml_string = original_xml.respond_to?(:read) ? original_xml.tap(&:rewind).read : original_xml
-        raise ParseError.new(e.message, xml: xml_string)
-      end
+      hash = parse_with_error_handling(xml, original_xml, current_parser)
+      hash = typecast_xml_value(hash, options[:disallowed_types]) if options[:typecast_xml_value]
       hash = symbolize_keys(hash) if options[:symbolize_keys]
       hash
     end
 
     private
+
+    def prepare_xml(xml)
+      xml = (xml || "").strip if xml.nil? || xml.respond_to?(:strip)
+      original_xml = xml
+      xml = StringIO.new(xml) unless xml.respond_to?(:read)
+      [xml, original_xml]
+    end
+
+    def xml_empty?(xml)
+      char = xml.getc
+      return true if char.nil?
+
+      xml.ungetc(char)
+      false
+    end
+
+    def parse_with_error_handling(xml, original_xml, current_parser)
+      undasherize_keys(current_parser.parse(xml) || {})
+    rescue DisallowedTypeError
+      raise
+    rescue current_parser.parse_error => e
+      xml_string = original_xml.respond_to?(:read) ? original_xml.tap(&:rewind).read : original_xml
+      raise ParseError.new(e.message, xml: xml_string)
+    end
 
     def detect_loaded_parser
       return :ox if defined?(::Ox)
