@@ -35,4 +35,9 @@ end
 desc "Run linters"
 task lint: %i[rubocop standard]
 
+desc "Run mutation testing"
+task :mutant do
+  system("bundle", "exec", "mutant", "run") || exit(1)
+end
+
 task default: %i[test lint verify_measurements]

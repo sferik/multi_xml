@@ -1,0 +1,16 @@
+usage: opensource
+
+integration:
+  name: minitest
+
+includes:
+  - lib
+  - test
+
+requires:
+  - multi_xml
+  - mutant/minitest/coverage
+
+matcher:
+  subjects:
+    - MultiXml*
