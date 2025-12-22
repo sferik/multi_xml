@@ -63,11 +63,3 @@ Style/SymbolProc:
 
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
-
-Metrics/ModuleLength:
-  Exclude:
-    - "test/**/*"
-
-Metrics/MethodLength:
-  Exclude:
-    - "test/**/*"
