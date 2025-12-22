@@ -79,7 +79,7 @@ module MultiXml
   PARSE_DATETIME = lambda do |s|
     Time.parse(s).utc
   rescue ArgumentError
-    DateTime.parse(s).utc
+    DateTime.parse(s).to_time.utc
   end.freeze
 
   # Type converters for XML type attributes

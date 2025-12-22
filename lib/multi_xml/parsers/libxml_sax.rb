@@ -1,4 +1,4 @@
-require "cgi"
+require "cgi/escape"
 require "libxml" unless defined?(::LibXML)
 require "stringio"
 

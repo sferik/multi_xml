@@ -185,11 +185,8 @@ module MultiXml
     # @param xml_parser [Module] Parser to use
     # @return [Hash] Parsed XML with undasherized keys
     # @raise [ParseError] if XML is malformed
-    # @raise [DisallowedTypeError] if XML contains a disallowed type
     def parse_with_error_handling(io, original_input, xml_parser)
       undasherize_keys(xml_parser.parse(io) || {})
-    rescue DisallowedTypeError
-      raise
     rescue xml_parser.parse_error => e
       xml_string = original_input.respond_to?(:read) ? original_input.tap(&:rewind).read : original_input.to_s
       raise ParseError.new(e.message, xml: xml_string, cause: e)

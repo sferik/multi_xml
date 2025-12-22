@@ -6,8 +6,7 @@ require "simplecov"
 
 SimpleCov.start do
   add_filter "/test"
-  percent = jruby? ? 91.38 : 93.16
-  minimum_coverage(percent)
+  minimum_coverage(100)
 end
 
 require "multi_xml"

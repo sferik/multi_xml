@@ -1,4 +1,4 @@
-require "cgi"
+require "cgi/escape"
 require "nokogiri" unless defined?(::Nokogiri)
 require "stringio"
 

@@ -67,3 +67,7 @@ Style/TernaryParentheses:
 Metrics/ModuleLength:
   Exclude:
     - "test/**/*"
+
+Metrics/MethodLength:
+  Exclude:
+    - "test/**/*"
