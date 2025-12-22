@@ -40,9 +40,6 @@ Metrics/ParameterLists:
 Style/Alias:
   EnforcedStyle: prefer_alias_method
 
-Style/Documentation:
-  Enabled: false
-
 Style/EmptyMethod:
   EnforcedStyle: expanded
 

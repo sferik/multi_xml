@@ -2,20 +2,42 @@ require "oga" unless defined?(::Oga)
 require_relative "dom_parser"
 
 module MultiXml
+  # Namespace for XML parser implementations
+  #
+  # @api private
   module Parsers
     # XML parser using the Oga library
+    #
+    # @api private
     module Oga
       include DomParser
       extend self
 
+      # Get the parse error class for this parser
+      #
+      # @api private
+      # @return [Class] LL::ParserError
       def parse_error = LL::ParserError
 
+      # Parse XML from an IO object
+      #
+      # @api private
+      # @param io [IO] IO-like object containing XML
+      # @return [Hash] Parsed XML as a hash
+      # @raise [LL::ParserError] if XML is malformed
       def parse(io)
         doc = ::Oga.parse_xml(io)
         node_to_hash(doc.children.first)
       end
 
-      # Oga uses different node types than Nokogiri/LibXML
+      # Collect child nodes into a hash (Oga-specific implementation)
+      #
+      # Oga uses different node types than Nokogiri/LibXML.
+      #
+      # @api private
+      # @param node [Oga::XML::Element] Parent node
+      # @param node_hash [Hash] Hash to populate
+      # @return [void]
       def collect_children(node, node_hash)
         each_child(node) do |child|
           case child
@@ -29,8 +51,27 @@ module MultiXml
 
       private
 
+      # Iterate over child nodes
+      #
+      # @api private
+      # @param node [Oga::XML::Element] Parent node
+      # @yield [Oga::XML::Node] Each child node
+      # @return [void]
       def each_child(node, &) = node.children.each(&)
+
+      # Iterate over attribute nodes
+      #
+      # @api private
+      # @param node [Oga::XML::Element] Element node
+      # @yield [Oga::XML::Attribute] Each attribute
+      # @return [void]
       def each_attr(node, &) = node.attributes.each(&)
+
+      # Get the name of a node or attribute
+      #
+      # @api private
+      # @param node [Oga::XML::Node] Node to get name from
+      # @return [String] Node name
       def node_name(node) = node.name
     end
   end

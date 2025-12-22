@@ -1,13 +1,28 @@
 require "rexml/document" unless defined?(::REXML::Document)
 
 module MultiXml
+  # Namespace for XML parser implementations
+  #
+  # @api private
   module Parsers
     # XML parser using Ruby's built-in REXML library
+    #
+    # @api private
     module Rexml
       extend self
 
+      # Get the parse error class for this parser
+      #
+      # @api private
+      # @return [Class] REXML::ParseException
       def parse_error = ::REXML::ParseException
 
+      # Parse XML from an IO object
+      #
+      # @api private
+      # @param io [IO] IO-like object containing XML
+      # @return [Hash] Parsed XML as a hash
+      # @raise [REXML::ParseException] if XML is malformed
       def parse(io)
         doc = REXML::Document.new(io)
         raise REXML::ParseException, "Document has no valid root element" unless doc.root
@@ -17,10 +32,21 @@ module MultiXml
 
       private
 
+      # Convert an element to hash format
+      #
+      # @api private
+      # @param hash [Hash] Accumulator hash
+      # @param element [REXML::Element] Element to convert
+      # @return [Hash] Updated hash
       def element_to_hash(hash, element)
         add_to_hash(hash, element.name, collapse_element(element))
       end
 
+      # Collapse an element into a hash with attributes and content
+      #
+      # @api private
+      # @param element [REXML::Element] Element to collapse
+      # @return [Hash] Hash representation
       def collapse_element(element)
         node_hash = element.attributes.each_with_object({}) { |(k, v), h| h[k] = v }
 
@@ -34,6 +60,12 @@ module MultiXml
         node_hash
       end
 
+      # Add text content from an element to a hash
+      #
+      # @api private
+      # @param hash [Hash] Target hash
+      # @param element [REXML::Element] Element with text
+      # @return [Hash] Updated hash
       def add_text_content(hash, element)
         return hash unless element.has_text?
 
@@ -41,6 +73,13 @@ module MultiXml
         add_to_hash(hash, TEXT_CONTENT_KEY, text)
       end
 
+      # Add a value to a hash, handling duplicates as arrays
+      #
+      # @api private
+      # @param hash [Hash] Target hash
+      # @param key [String] Key to add
+      # @param value [Object] Value to add
+      # @return [Hash] Updated hash
       def add_to_hash(hash, key, value)
         existing = hash[key]
         hash[key] = if existing
@@ -53,6 +92,11 @@ module MultiXml
         hash
       end
 
+      # Check if element contains only whitespace text
+      #
+      # @api private
+      # @param element [REXML::Element] Element to check
+      # @return [Boolean] true if whitespace only
       def whitespace_only?(element)
         element.texts.join.strip.empty?
       end
