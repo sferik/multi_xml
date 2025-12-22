@@ -290,7 +290,13 @@ end
   "Ox" => %w[ox Ox],
   "Oga" => %w[oga Oga]
 }.each do |parser_name, (require_name, class_name)|
+  # Suppress parse-time warnings from oga gem
+  if require_name == "oga"
+    original_verbose = $VERBOSE
+    $VERBOSE = nil
+  end
   require require_name
+  $VERBOSE = original_verbose if require_name == "oga"
 
   klass = Class.new(Minitest::Test) do
     include ParserTests
