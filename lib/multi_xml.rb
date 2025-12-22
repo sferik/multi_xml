@@ -132,13 +132,19 @@ module MultiXml
     # @api private
     # @return [Symbol, nil] Parser name or nil if none loaded
     def find_loaded_parser
-      return :ox if defined?(::Ox)
-      return :libxml if defined?(::LibXML)
-      return :nokogiri if defined?(::Nokogiri)
-      return :oga if defined?(::Oga)
-
+      LOADED_PARSER_CHECKS.each do |const, parser_name|
+        return parser_name if Object.const_defined?(const)
+      end
       nil
     end
+
+    # Parser constant checks in preference order
+    LOADED_PARSER_CHECKS = [
+      [:Ox, :ox],
+      [:LibXML, :libxml],
+      [:Nokogiri, :nokogiri],
+      [:Oga, :oga]
+    ].freeze
 
     # Try to load and find an available parser
     #
@@ -146,12 +152,21 @@ module MultiXml
     # @return [Symbol, nil] Parser name or nil if none available
     def find_available_parser
       PARSER_PREFERENCE.each do |library, parser_name|
-        require library
-        return parser_name
-      rescue LoadError
-        next
+        return parser_name if try_require(library)
       end
       nil
+    end
+
+    # Attempt to require a library
+    #
+    # @api private
+    # @param library [String] Library to require
+    # @return [Boolean] true if successful, false if LoadError
+    def try_require(library)
+      require library
+      true
+    rescue LoadError
+      false
     end
 
     # Raise an error indicating no parser is available
