@@ -127,6 +127,15 @@ module MultiXml
       find_loaded_parser || find_available_parser || raise_no_parser_error
     end
 
+    # Parser constant checks in preference order
+    LOADED_PARSER_CHECKS = [
+      %i[Ox ox],
+      %i[LibXML libxml],
+      %i[Nokogiri nokogiri],
+      %i[Oga oga]
+    ].freeze
+    private_constant :LOADED_PARSER_CHECKS
+
     # Find an already-loaded parser library
     #
     # @api private
@@ -137,14 +146,6 @@ module MultiXml
       end
       nil
     end
-
-    # Parser constant checks in preference order
-    LOADED_PARSER_CHECKS = [
-      [:Ox, :ox],
-      [:LibXML, :libxml],
-      [:Nokogiri, :nokogiri],
-      [:Oga, :oga]
-    ].freeze
 
     # Try to load and find an available parser
     #

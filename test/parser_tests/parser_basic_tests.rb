@@ -1,0 +1,42 @@
+# Tests fundamental parsing: empty input, invalid XML errors, and CDATA handling
+module ParserBasicTests
+  def test_blank_string_returns_empty_hash
+    assert_empty(MultiXml.parse(""))
+  end
+
+  def test_whitespace_string_returns_empty_hash
+    assert_empty(MultiXml.parse(" "))
+  end
+
+  def test_frozen_whitespace_string_returns_empty_hash
+    assert_empty(MultiXml.parse(" ".freeze))
+  end
+
+  def test_invalid_xml_raises_parse_error
+    skip if self.class::PARSER == "Oga"
+    assert_raises(MultiXml::ParseError) { MultiXml.parse("<open></close>") }
+  end
+
+  def test_invalid_xml_includes_original_xml_in_exception
+    skip if self.class::PARSER == "Oga"
+    xml = "<open></close>"
+    MultiXml.parse(xml)
+  rescue MultiXml::ParseError => e
+    assert_equal xml, e.xml
+  end
+
+  def test_invalid_xml_includes_underlying_cause_in_exception
+    skip if self.class::PARSER == "Oga"
+    MultiXml.parse("<open></close>")
+  rescue MultiXml::ParseError => e
+    refute_nil e.cause
+  end
+
+  def test_valid_xml_parses_correctly
+    assert_equal({"user" => nil}, MultiXml.parse("<user/>"))
+  end
+
+  def test_cdata_returns_correct_content
+    assert_equal "Erik Berlin", MultiXml.parse("<user><![CDATA[Erik Berlin]]></user>")["user"]
+  end
+end
