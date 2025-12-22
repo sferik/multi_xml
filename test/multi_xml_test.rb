@@ -1,5 +1,6 @@
 require "test_helper"
 require "parser_test_module"
+require "mutant/minitest/coverage"
 
 class MockDecoder
   def self.parse
@@ -7,6 +8,8 @@ class MockDecoder
 end
 
 class MultiXmlTest < Minitest::Test
+  cover "MultiXml*"
+
   def test_picks_a_default_parser
     parser = MultiXml.parser
 
@@ -134,6 +137,8 @@ class MultiXmlTest < Minitest::Test
 end
 
 class ParserDetectionTest < Minitest::Test
+  cover "MultiXml*"
+
   def setup
     # Save the current parser state
     @original_parser = MultiXml.instance_variable_get(:@parser)
@@ -244,6 +249,8 @@ class ParserDetectionTest < Minitest::Test
 end
 
 class DateTimeFallbackTest < Minitest::Test
+  cover "MultiXml*"
+
   def test_parse_datetime_falls_back_to_datetime_for_iso_week_format
     # ISO week format (e.g., "2020-W01") raises ArgumentError in Time.parse
     # but is handled by DateTime.parse, triggering the rescue branch
@@ -257,6 +264,8 @@ class DateTimeFallbackTest < Minitest::Test
 end
 
 class RexmlArrayBranchTest < Minitest::Test
+  cover "MultiXml*"
+
   def test_add_to_hash_wraps_array_value_in_array
     # Test the elsif value.is_a?(Array) branch in REXML parser
     # This happens when a new key's value is already an array

@@ -1,4 +1,11 @@
+require "mutant/minitest/coverage"
+
 module ParserTests
+  def self.included(base)
+    base.extend(Mutant::Minitest::Coverage)
+    base.cover("MultiXml*")
+  end
+
   def setup
     MultiXml.parser = self.class::PARSER
 
