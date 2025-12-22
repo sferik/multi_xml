@@ -4,7 +4,7 @@ require:
 plugins:
   - rubocop-performance
   - rubocop-rake
-  - rubocop-rspec
+  - rubocop-minitest
   - standard-performance
 
 AllCops:
@@ -63,3 +63,7 @@ Style/SymbolProc:
 
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
+
+Metrics/ModuleLength:
+  Exclude:
+    - "test/**/*"

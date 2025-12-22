@@ -1,11 +1,11 @@
 require "bundler"
 Bundler::GemHelper.install_tasks
 
-require "rspec/core/rake_task"
-RSpec::Core::RakeTask.new(:spec)
-
-desc "Alias for spec task"
-task test: :spec
+require "rake/testtask"
+Rake::TestTask.new(:test) do |t|
+  t.libs << "test"
+  t.test_files = FileList["test/**/*_test.rb"]
+end
 
 require "standard/rake"
 require "rubocop/rake_task"
@@ -35,4 +35,4 @@ end
 desc "Run linters"
 task lint: %i[rubocop standard]
 
-task default: %i[spec lint verify_measurements]
+task default: %i[test lint verify_measurements]

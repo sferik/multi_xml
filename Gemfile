@@ -6,13 +6,13 @@ gem "oga", ">= 2.3", require: nil
 gem "ox", require: nil, platforms: :ruby
 gem "rexml", require: nil
 
+gem "minitest", ">= 5.27"
 gem "rake", ">= 13.3.1"
 gem "rdoc", ">= 7.0.2"
-gem "rspec", ">= 3.13.2"
 gem "rubocop", ">= 1.81.7"
+gem "rubocop-minitest", ">= 0.36"
 gem "rubocop-performance", ">= 1.26.1"
 gem "rubocop-rake", ">= 0.7.1"
-gem "rubocop-rspec", ">= 3.8"
 gem "simplecov", ">= 0.22"
 gem "standard", ">= 1.52"
 gem "standard-performance", ">= 1.9"
