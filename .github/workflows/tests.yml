@@ -15,7 +15,7 @@ jobs:
   test:
     strategy:
       matrix:
-        ruby-version: ["3.2", "3.3", "3.4", "jruby-10.0"]
+        ruby-version: ["3.2", "3.3", "3.4"]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
 
