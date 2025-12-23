@@ -26,7 +26,7 @@ class MultiXmlParserConfigTest < Minitest::Test
 
   def test_defaults_to_the_best_available_gem
     MultiXml.send(:remove_instance_variable, :@parser) if MultiXml.instance_variable_defined?(:@parser)
-    expected = jruby? ? "MultiXml::Parsers::Nokogiri" : "MultiXml::Parsers::Ox"
+    expected = (windows? || jruby?) ? "MultiXml::Parsers::Nokogiri" : "MultiXml::Parsers::Ox"
 
     assert_equal expected, MultiXml.parser.name
   end
@@ -133,7 +133,7 @@ class MultiXmlTypecastTest < Minitest::Test
   end
 
   def test_float_type_returns_float
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse('<tag type="float">3.14</tag>')["tag"]
 
     assert_kind_of Float, result
@@ -141,7 +141,7 @@ class MultiXmlTypecastTest < Minitest::Test
   end
 
   def test_string_type_with_content_returns_string
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse('<tag type="string">hello</tag>')["tag"]
 
     assert_kind_of String, result
@@ -149,28 +149,28 @@ class MultiXmlTypecastTest < Minitest::Test
   end
 
   def test_binary_type_with_base64_encoding_decodes_content
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse('<tag type="binary" encoding="base64">ZGF0YQ==</tag>')["tag"]
 
     assert_equal "data", result
   end
 
   def test_binary_type_without_encoding_returns_raw_content
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse('<tag type="binary">raw data</tag>')["tag"]
 
     assert_equal "raw data", result
   end
 
   def test_datetime_fallback_to_datetime_class
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse('<tag type="datetime">1970-01-01T00:00:00+00:00</tag>')["tag"]
 
     assert_kind_of Time, result
   end
 
   def test_invalid_yaml_returns_original_string
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     xml = '<tag type="yaml">{ invalid yaml content</tag>'
     result = MultiXml.parse(xml, disallowed_types: [])["tag"]
 
@@ -178,7 +178,7 @@ class MultiXmlTypecastTest < Minitest::Test
   end
 
   def test_three_sibling_elements_creates_array
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     xml = "<users><user>A</user><user>B</user><user>C</user></users>"
     result = MultiXml.parse(xml)["users"]["user"]
 
@@ -217,7 +217,7 @@ class MultiXmlKeyTransformTest < Minitest::Test
 
   def setup
     @original_parser = MultiXml.instance_variable_get(:@parser)
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
   end
 
   def teardown

@@ -1,4 +1,4 @@
-name: Mutation Testing
+name: mutation tests
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: "3.4"
+        ruby-version: "3.2"
         bundler-cache: true
     - name: Run mutation testing
       run: bundle exec rake mutant

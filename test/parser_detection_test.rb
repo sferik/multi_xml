@@ -20,12 +20,8 @@ class FindLoadedParserTest < Minitest::Test
   cover "MultiXml*"
   include ParserStateReset
 
-  def test_returns_ox_when_defined
-    assert_equal :ox, MultiXml.send(:find_loaded_parser)
-  end
-
-  def test_returns_libxml_when_ox_not_defined
-    with_hidden_consts(:Ox) { assert_equal :libxml, MultiXml.send(:find_loaded_parser) }
+  def test_returns_best_available_parser_when_defined
+    assert_equal best_available_parser, MultiXml.send(:find_loaded_parser)
   end
 
   def test_returns_nokogiri_when_ox_and_libxml_not_defined
@@ -43,11 +39,13 @@ class FindLoadedParserTest < Minitest::Test
   private
 
   def with_hidden_consts(*const_names)
-    saved = const_names.to_h { |name| [name, Object.send(:remove_const, name)] }
+    # Only hide constants that are actually defined
+    existing = const_names.select { |name| Object.const_defined?(name) }
+    saved = existing.to_h { |name| [name, Object.send(:remove_const, name)] }
     MultiXml.send(:remove_instance_variable, :@parser) if MultiXml.instance_variable_defined?(:@parser)
     yield
   ensure
-    saved.each { |name, value| Object.const_set(name, value) }
+    saved&.each { |name, value| Object.const_set(name, value) }
   end
 end
 
@@ -60,7 +58,7 @@ class FindAvailableParserTest < Minitest::Test
   end
 
   def test_returns_first_loadable_parser
-    assert_equal :ox, MultiXml.send(:find_available_parser)
+    assert_equal best_available_parser, MultiXml.send(:find_available_parser)
   end
 
   def test_returns_nil_when_no_parsers_available
@@ -70,8 +68,9 @@ class FindAvailableParserTest < Minitest::Test
   end
 
   def test_continues_after_load_error
-    with_parser_preference([["nonexistent_parser_gem", :nonexistent], ["ox", :ox]]) do
-      assert_equal :ox, MultiXml.send(:find_available_parser)
+    # Use nokogiri as fallback since it's available on all platforms
+    with_parser_preference([["nonexistent_parser_gem", :nonexistent], ["nokogiri", :nokogiri]]) do
+      assert_equal :nokogiri, MultiXml.send(:find_available_parser)
     end
   end
 
@@ -94,18 +93,18 @@ class DetectParserTest < Minitest::Test
   include ParserStateReset
 
   def test_returns_loaded_parser_when_available
-    assert_equal :ox, MultiXml.send(:detect_parser)
+    assert_equal best_available_parser, MultiXml.send(:detect_parser)
   end
 
   def test_falls_back_to_find_available_when_loaded_returns_nil
     MultiXml.stub(:find_loaded_parser, nil) do
-      assert_equal :ox, MultiXml.send(:detect_parser)
+      assert_equal best_available_parser, MultiXml.send(:detect_parser)
     end
   end
 
   def test_uses_find_loaded_result_not_find_available
     MultiXml.stub(:find_available_parser, :rexml) do
-      assert_equal :ox, MultiXml.send(:detect_parser)
+      assert_equal best_available_parser, MultiXml.send(:detect_parser)
     end
   end
 
@@ -118,7 +117,9 @@ class DetectParserTest < Minitest::Test
   private
 
   def with_no_parsers_available
-    saved_consts = %i[Ox LibXML Nokogiri Oga].to_h { |n| [n, Object.send(:remove_const, n)] }
+    # Only remove constants that are actually defined
+    existing = %i[Ox LibXML Nokogiri Oga].select { |n| Object.const_defined?(n) }
+    saved_consts = existing.to_h { |n| [n, Object.send(:remove_const, n)] }
     saved_pref = MultiXml::PARSER_PREFERENCE
     MultiXml.send(:remove_const, :PARSER_PREFERENCE)
     MultiXml.const_set(:PARSER_PREFERENCE, [["nonexistent", :fake]])

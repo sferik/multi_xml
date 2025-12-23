@@ -17,7 +17,7 @@ gem "rubocop-rake", ">= 0.7.1"
 gem "simplecov", ">= 0.22"
 gem "standard", ">= 1.52"
 gem "standard-performance", ">= 1.9"
-gem "steep", ">= 1.10"
+gem "steep", ">= 1.10", platforms: :ruby
 gem "yard", ">= 0.9.38"
 gem "yardstick", ">= 0.9.9"
 

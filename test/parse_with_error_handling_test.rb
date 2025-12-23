@@ -49,7 +49,7 @@ class ParseWithErrorHandlingTest < Minitest::Test
   end
 
   def test_parse_returns_empty_hash_when_parser_returns_nil
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse("<root/>")
 
     assert_kind_of Hash, result
@@ -116,7 +116,7 @@ class ParseWithErrorHandlingNilTest < Minitest::Test
 
   def test_parse_with_error_handling_handles_nil_parser_result
     # When parser returns nil, should get empty hash not nil
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse("<empty/>")
 
     # Result should be a hash, not nil

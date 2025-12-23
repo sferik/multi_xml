@@ -6,7 +6,7 @@ class ParseOptionsTest < Minitest::Test
 
   def setup
     @original_parser = MultiXml.instance_variable_get(:@parser)
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
   end
 
   def teardown
@@ -53,13 +53,13 @@ class ParseOptionsTest < Minitest::Test
 
   def test_parse_uses_parser_option_when_provided
     MultiXml.parser = :rexml
-    result = MultiXml.parse("<root>test</root>", parser: :ox)
+    result = MultiXml.parse("<root>test</root>", parser: :nokogiri)
 
     assert_equal({"root" => "test"}, result)
   end
 
   def test_parse_uses_class_parser_when_parser_option_nil
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     # When options[:parser] is nil (falsy), should use class-level parser
     result = MultiXml.parse("<root>test</root>", parser: nil)
 
@@ -83,7 +83,7 @@ class ParseWithParserOptionTest < Minitest::Test
   end
 
   def test_parse_uses_parser_option_when_truthy
-    result = MultiXml.parse("<root>test</root>", parser: :ox)
+    result = MultiXml.parse("<root>test</root>", parser: :nokogiri)
 
     assert_equal({"root" => "test"}, result)
   end
@@ -103,10 +103,10 @@ class ParseWithParserOptionTest < Minitest::Test
   end
 
   def test_parse_with_explicit_parser_option
-    MultiXml.parser = :nokogiri
-    result = MultiXml.parse("<root>value</root>", parser: :ox)
+    MultiXml.parser = :rexml
+    result = MultiXml.parse("<root>value</root>", parser: :nokogiri)
 
-    # Should use Ox, not Nokogiri
+    # Should use Nokogiri, not REXML
     assert_equal({"root" => "value"}, result)
   end
 end
@@ -127,7 +127,7 @@ class ParseOptionsAccessTest < Minitest::Test
 
   def test_parse_accesses_parser_option_with_bracket
     # With fetch, missing key raises, with [] returns nil
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
 
     # options without :parser key should work (use class-level parser)
     result = MultiXml.parse("<test>value</test>", symbolize_keys: false)
@@ -148,13 +148,13 @@ class ParseOptionsAccessTest < Minitest::Test
     MultiXml.parser = :rexml
 
     # Truthy parser option should be used
-    result = MultiXml.parse("<r>v</r>", parser: :ox)
+    result = MultiXml.parse("<r>v</r>", parser: :nokogiri)
 
     assert_equal({"r" => "v"}, result)
   end
 
   def test_parse_accesses_typecast_option_correctly
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
 
     result_with = MultiXml.parse('<n type="integer">42</n>', typecast_xml_value: true)
     result_without = MultiXml.parse('<n type="integer">42</n>', typecast_xml_value: false)
@@ -164,7 +164,7 @@ class ParseOptionsAccessTest < Minitest::Test
   end
 
   def test_parse_accesses_symbolize_keys_option_correctly
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
 
     result_with = MultiXml.parse("<root><name>v</name></root>", symbolize_keys: true)
     result_without = MultiXml.parse("<root><name>v</name></root>", symbolize_keys: false)
@@ -174,7 +174,7 @@ class ParseOptionsAccessTest < Minitest::Test
   end
 
   def test_parse_accesses_disallowed_types_option_correctly
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
 
     assert_raises(MultiXml::DisallowedTypeError) do
       MultiXml.parse('<n type="yaml">test</n>', disallowed_types: ["yaml"])
