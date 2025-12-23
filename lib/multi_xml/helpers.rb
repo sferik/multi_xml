@@ -17,10 +17,9 @@ module MultiXml
     #   symbolize_keys({"name" => "John"}) #=> {name: "John"}
     def symbolize_keys(data)
       case data
-      when Hash
-        data.each_with_object({}) do |(key, value), result|
-          result[key.to_sym] = symbolize_keys(value)
-        end
+      when Hash then data.each_with_object(
+        {} #: Hash[Symbol, MultiXml::xmlValue] # rubocop:disable Layout/LeadingCommentSpace
+      ) { |(key, value), acc| acc[key.to_sym] = symbolize_keys(value) }
       when Array
         data.map { |item| symbolize_keys(item) }
       else
@@ -37,10 +36,9 @@ module MultiXml
     #   undasherize_keys({"first-name" => "John"}) #=> {"first_name" => "John"}
     def undasherize_keys(data)
       case data
-      when Hash
-        data.each_with_object({}) do |(key, value), result|
-          result[key.tr("-", "_")] = undasherize_keys(value)
-        end
+      when Hash then data.each_with_object(
+        {} #: Hash[String, MultiXml::xmlValue] # rubocop:disable Layout/LeadingCommentSpace
+      ) { |(key, value), acc| acc[key.tr("-", "_")] = undasherize_keys(value) }
       when Array
         data.map { |item| undasherize_keys(item) }
       else
