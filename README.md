@@ -49,7 +49,6 @@ implementations:
 * 3.2
 * 3.3
 * 3.4
-* JRuby 10
 
 If something doesn't work on one of these versions, it's a bug.
 
