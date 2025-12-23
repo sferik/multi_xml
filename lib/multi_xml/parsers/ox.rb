@@ -20,7 +20,7 @@ module MultiXml
       # @param io [IO] IO-like object containing XML
       # @return [Hash] Parsed XML as a hash
       def parse(io)
-        handler = SaxHandler.new
+        handler = Handler.new
         ::Ox.sax_parse(handler, io, convert_special: true, skip: :skip_return)
         handler.result
       end
@@ -28,10 +28,10 @@ module MultiXml
       # SAX event handler that builds a hash tree while parsing
       #
       # @api private
-      class SaxHandler
+      class Handler
         # Create a new SAX handler
         #
-        # @return [SaxHandler] new handler instance
+        # @return [Handler] new handler instance
         def initialize
           @stack = []
         end
@@ -48,7 +48,7 @@ module MultiXml
         def start_element(name)
           @stack << {} if @stack.empty?
           child = {}
-          add_value(name, child)
+          add_value(name.to_s, child)
           @stack << child
         end
 
@@ -67,7 +67,7 @@ module MultiXml
         # @param value [String] Attribute value
         # @return [void]
         def attr(name, value)
-          add_value(name, value) unless @stack.empty?
+          add_value(name.to_s, value) unless @stack.empty?
         end
 
         # Handle text content
@@ -100,15 +100,14 @@ module MultiXml
         # @return [Hash] current hash being built
         def current = @stack.last
 
-        # Add a value to the current hash
+        # Add a value to the current hash, merging with existing if needed
         #
-        # @param key [Symbol, String] Key to add
+        # @param key [String] Key to add
         # @param value [Object] Value to add
         # @return [void]
         def add_value(key, value)
-          key = key.to_s
           existing = current[key]
-          current[key] = existing ? merge_value(existing, value) : value
+          current[key] = existing ? merge_values(existing, value) : value
         end
 
         # Merge a value with an existing value, creating array if needed
@@ -116,7 +115,7 @@ module MultiXml
         # @param existing [Object] Existing value
         # @param value [Object] Value to append
         # @return [Array] array with both values
-        def merge_value(existing, value)
+        def merge_values(existing, value)
           existing.is_a?(Array) ? existing << value : [existing, value]
         end
 
@@ -125,7 +124,8 @@ module MultiXml
         # @return [void]
         def strip_whitespace_content
           content = current[TEXT_CONTENT_KEY]
-          current.delete(TEXT_CONTENT_KEY) if content.empty? || (current.size > 1 && content.strip.empty?)
+          should_remove = content.empty? || (current.size > 1 && content.strip.empty?)
+          current.delete(TEXT_CONTENT_KEY) if should_remove
         end
       end
     end
