@@ -1,4 +1,4 @@
-require "ox" unless defined?(::Ox)
+require "ox"
 
 module MultiXml
   module Parsers

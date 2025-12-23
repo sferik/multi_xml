@@ -39,4 +39,12 @@ module ParserBasicTests
   def test_cdata_returns_correct_content
     assert_equal "Erik Berlin", MultiXml.parse("<user><![CDATA[Erik Berlin]]></user>")["user"]
   end
+
+  def test_xml_with_comment_ignores_comment_nodes
+    assert_equal({"root" => "content"}, MultiXml.parse("<root><!-- comment -->content</root>"))
+  end
+
+  def test_xml_with_processing_instruction
+    assert_equal({"root" => "content"}, MultiXml.parse('<?xml version="1.0"?><root>content</root>'))
+  end
 end

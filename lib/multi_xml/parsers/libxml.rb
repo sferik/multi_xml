@@ -1,4 +1,4 @@
-require "libxml" unless defined?(::LibXML)
+require "libxml"
 require_relative "dom_parser"
 
 module MultiXml

@@ -1,4 +1,4 @@
-require "rexml/document" unless defined?(::REXML::Document)
+require "rexml/document"
 
 module MultiXml
   module Parsers
@@ -22,8 +22,6 @@ module MultiXml
       # @raise [REXML::ParseException] if XML is malformed
       def parse(io)
         doc = REXML::Document.new(io)
-        raise REXML::ParseException, "Document has no valid root element" unless doc.root
-
         element_to_hash({}, doc.root)
       end
 

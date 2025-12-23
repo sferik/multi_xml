@@ -1,4 +1,4 @@
-require "oga" unless defined?(::Oga)
+require "oga"
 require_relative "dom_parser"
 
 module MultiXml

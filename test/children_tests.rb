@@ -42,4 +42,10 @@ module ParserChildrenTests
 
     assert_equal({"users" => {"user" => ["Erik Berlin", "Wynn Netherland"]}}, MultiXml.parse(xml))
   end
+
+  def test_element_with_children_and_mixed_text
+    result = MultiXml.parse("<root><child>inner</child> text </root>")
+
+    assert result.dig("root", "child")
+  end
 end

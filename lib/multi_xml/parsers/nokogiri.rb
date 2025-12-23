@@ -1,4 +1,4 @@
-require "nokogiri" unless defined?(::Nokogiri)
+require "nokogiri"
 require_relative "dom_parser"
 
 module MultiXml
