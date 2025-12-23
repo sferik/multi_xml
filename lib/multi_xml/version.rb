@@ -3,5 +3,5 @@ module MultiXml
   #
   # @api public
   # @return [Gem::Version] the gem version
-  VERSION = Gem::Version.create("0.7.2")
+  VERSION = Gem::Version.create("0.8.0")
 end

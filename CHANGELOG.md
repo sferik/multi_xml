@@ -1,3 +1,11 @@
+0.8.0
+-----
+* [Add per-parse :parser option to MultiXml.parse](https://github.com/sferik/multi_xml/commit/eb0c1ccadd9026980ba8b6dd0128d6862dc361c4)
+* [Add SAX parsers for Nokogiri and LibXML](https://github.com/sferik/multi_xml/commit/5d67fe6cae3c1ef2c306f1e83fc91b9accfcb724)
+* [Fix inconsistent whitespace handling across parsers](https://github.com/sferik/multi_xml/commit/55aa23f1c401e66984ad1c7d753c1b4258bf0dfd)
+* [Make parsing errors inspectable with cause and xml accessors](https://github.com/sferik/multi_xml/commit/f676f1b657f3352a80ac171d9b839e41ad52a14d)
+* [Drop support for JRuby](https://github.com/sferik/multi_xml/commit/27895ca3918c681ad7ddaa57c5cae7b8340bd601)
+
 0.7.2
 -----
 * [Drop support for Ruby 3.1](https://github.com/sferik/multi_xml/commit/fab6288edd36c58a2b13e0206d8bed305fcb4a4b)
