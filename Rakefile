@@ -32,15 +32,26 @@ Yardstick::Rake::Verify.new do |verify|
   verify.threshold = 100
 end
 
-require "steep/rake_task"
-Steep::RakeTask.new
+# Steep requires native extensions not available on JRuby or Windows
+unless RUBY_PLATFORM == "java" || Gem.win_platform?
+  require "steep/rake_task"
+  Steep::RakeTask.new
+end
 
 desc "Run linters"
 task lint: %i[rubocop standard]
 
+# Mutant uses fork() which is not available on Windows or JRuby
 desc "Run mutation testing"
 task :mutant do
-  system("bundle", "exec", "mutant", "run") || exit(1)
+  if Gem.win_platform? || RUBY_PLATFORM == "java"
+    puts "Skipping mutant on Windows/JRuby (fork not supported)"
+  else
+    system("bundle", "exec", "mutant", "run") || exit(1)
+  end
 end
 
-task default: %i[test lint verify_measurements steep mutant]
+default_tasks = %i[test lint verify_measurements mutant]
+default_tasks << :steep unless RUBY_PLATFORM == "java" || Gem.win_platform?
+
+task default: default_tasks

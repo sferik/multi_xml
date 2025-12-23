@@ -6,7 +6,7 @@ class ParseMethodTest < Minitest::Test
 
   def setup
     @original_parser = MultiXml.instance_variable_get(:@parser)
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
   end
 
   def teardown
@@ -19,13 +19,13 @@ class ParseMethodTest < Minitest::Test
 
   def test_options_merge_preserves_parser
     MultiXml.parser = :rexml
-    result = MultiXml.parse("<r>a</r>", parser: :ox)
+    result = MultiXml.parse("<r>a</r>", parser: :nokogiri)
 
     assert_equal({"r" => "a"}, result)
   end
 
   def test_options_merge_uses_defaults
-    MultiXml.parser = :ox
+    MultiXml.parser = best_available_parser
     result = MultiXml.parse('<r type="integer">1</r>')
 
     assert_equal 1, result["r"]

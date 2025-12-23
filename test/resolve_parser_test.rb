@@ -6,10 +6,10 @@ class ResolveParserTest < Minitest::Test
   cover "MultiXml*"
 
   def test_resolve_parser_with_module
-    require "multi_xml/parsers/ox"
-    result = MultiXml.send(:resolve_parser, MultiXml::Parsers::Ox)
+    require "multi_xml/parsers/nokogiri"
+    result = MultiXml.send(:resolve_parser, MultiXml::Parsers::Nokogiri)
 
-    assert_equal MultiXml::Parsers::Ox, result
+    assert_equal MultiXml::Parsers::Nokogiri, result
   end
 
   def test_resolve_parser_with_class
@@ -32,10 +32,10 @@ class ResolveParserDetailedTest < Minitest::Test
   cover "MultiXml*"
 
   def test_resolve_parser_accepts_module
-    require "multi_xml/parsers/ox"
-    result = MultiXml.send(:resolve_parser, MultiXml::Parsers::Ox)
+    require "multi_xml/parsers/nokogiri"
+    result = MultiXml.send(:resolve_parser, MultiXml::Parsers::Nokogiri)
 
-    assert_equal MultiXml::Parsers::Ox, result
+    assert_equal MultiXml::Parsers::Nokogiri, result
   end
 
   def test_resolve_parser_accepts_class
@@ -66,22 +66,22 @@ class ResolveParserCaseTest < Minitest::Test
   cover "MultiXml*"
 
   def test_resolve_parser_handles_string
-    result = MultiXml.send(:resolve_parser, "ox")
+    result = MultiXml.send(:resolve_parser, "nokogiri")
 
-    assert_equal MultiXml::Parsers::Ox, result
+    assert_equal MultiXml::Parsers::Nokogiri, result
   end
 
   def test_resolve_parser_handles_symbol
-    result = MultiXml.send(:resolve_parser, :ox)
+    result = MultiXml.send(:resolve_parser, :nokogiri)
 
-    assert_equal MultiXml::Parsers::Ox, result
+    assert_equal MultiXml::Parsers::Nokogiri, result
   end
 
   def test_resolve_parser_handles_module
-    require "multi_xml/parsers/ox"
-    result = MultiXml.send(:resolve_parser, MultiXml::Parsers::Ox)
+    require "multi_xml/parsers/nokogiri"
+    result = MultiXml.send(:resolve_parser, MultiXml::Parsers::Nokogiri)
 
-    assert_equal MultiXml::Parsers::Ox, result
+    assert_equal MultiXml::Parsers::Nokogiri, result
   end
 
   def test_resolve_parser_handles_class
