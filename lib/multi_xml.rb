@@ -73,14 +73,14 @@ module MultiXml
     #   #=> {root: {name: "John"}}
     def parse(xml, options = {})
       options = DEFAULT_OPTIONS.merge(options)
-      xml_parser = options[:parser] ? resolve_parser(options[:parser]) : parser
+      xml_parser = options[:parser] ? resolve_parser(options.fetch(:parser)) : parser
 
       io = normalize_input(xml)
       return {} if io.eof?
 
       result = parse_with_error_handling(io, xml, xml_parser)
-      result = typecast_xml_value(result, options[:disallowed_types]) if options[:typecast_xml_value]
-      result = symbolize_keys(result) if options[:symbolize_keys]
+      result = typecast_xml_value(result, options.fetch(:disallowed_types)) if options.fetch(:typecast_xml_value)
+      result = symbolize_keys(result) if options.fetch(:symbolize_keys)
       result
     end
 
@@ -94,7 +94,7 @@ module MultiXml
     def resolve_parser(spec)
       case spec
       when String, Symbol then load_parser(spec)
-      when Class, Module then spec
+      when Module then spec
       else raise "Invalid parser specification: expected Symbol, String, or Module"
       end
     end
@@ -105,8 +105,9 @@ module MultiXml
     # @param name [Symbol, String] Parser name
     # @return [Module] Loaded parser module
     def load_parser(name)
-      require "multi_xml/parsers/#{name.to_s.downcase}"
-      Parsers.const_get(camelize(name.to_s))
+      name = name.to_s.downcase
+      require "multi_xml/parsers/#{name}"
+      Parsers.const_get(camelize(name))
     end
 
     # Convert underscored string to CamelCase
@@ -142,7 +143,7 @@ module MultiXml
     # @return [Symbol, nil] Parser name or nil if none loaded
     def find_loaded_parser
       LOADED_PARSER_CHECKS.each do |const, parser_name|
-        return parser_name if Object.const_defined?(const)
+        return parser_name if const_defined?(const)
       end
       nil
     end
@@ -205,7 +206,7 @@ module MultiXml
       undasherize_keys(xml_parser.parse(io) || {})
     rescue xml_parser.parse_error => e
       xml_string = original_input.respond_to?(:read) ? original_input.tap(&:rewind).read : original_input.to_s
-      raise ParseError.new(e.message, xml: xml_string, cause: e)
+      raise(ParseError.new(e, xml: xml_string, cause: e))
     end
   end
 end

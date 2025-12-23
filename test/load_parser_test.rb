@@ -84,3 +84,25 @@ class LoadParserMutantKillerTest < Minitest::Test
     assert_equal MultiXml::Parsers::Ox, result
   end
 end
+
+# Tests that verify downcase is actually called on the require path
+class LoadParserRequirePathTest < Minitest::Test
+  cover "MultiXml*"
+
+  def test_load_parser_requires_lowercase_path
+    # Track the actual require path used
+    required_paths = []
+    original_require = Kernel.instance_method(:require)
+
+    Kernel.define_method(:require) do |path|
+      required_paths << path
+      original_require.bind_call(self, path)
+    end
+
+    MultiXml.send(:load_parser, "REXML")
+
+    assert_includes required_paths, "multi_xml/parsers/rexml"
+  ensure
+    Kernel.define_method(:require) { |path| original_require.bind_call(self, path) }
+  end
+end

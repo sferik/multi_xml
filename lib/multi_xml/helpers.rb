@@ -101,7 +101,7 @@ module MultiXml
     def convert_hash(hash, type, disallowed_types)
       return extract_array_entries(hash, disallowed_types) if type == "array"
       return convert_text_content(hash) if hash.key?(TEXT_CONTENT_KEY)
-      return "" if type == "string" && hash["nil"] != "true"
+      return "" if type == "string" && !hash["nil"].eql?("true")
       return nil if empty_value?(hash, type)
 
       typecast_children(hash, disallowed_types)
@@ -116,7 +116,7 @@ module MultiXml
     def typecast_children(hash, disallowed_types)
       result = hash.transform_values { |v| typecast_xml_value(v, disallowed_types) }
       # Unwrap single file element for HTML multipart compatibility
-      result["file"].is_a?(StringIO) ? result["file"] : result
+      result["file"].is_a?(StringIO) ? result.fetch("file") : result
     end
 
     # Extract array entries from element with type="array"
@@ -127,7 +127,7 @@ module MultiXml
     # @return [Array] Extracted and typecasted entries
     # @see https://github.com/jnunemaker/httparty/issues/102
     def extract_array_entries(hash, disallowed_types)
-      _, entries = hash.find { |k, v| k != "type" && (v.is_a?(Array) || v.is_a?(Hash)) }
+      _, entries = hash.find { |k, v| !k.eql?("type") && (v.is_a?(Array) || v.is_a?(Hash)) }
 
       case entries
       when Array then entries.map { |e| typecast_xml_value(e, disallowed_types) }
@@ -142,7 +142,7 @@ module MultiXml
     # @param hash [Hash] Hash containing text content and type
     # @return [Object] Converted value
     def convert_text_content(hash)
-      content = hash[TEXT_CONTENT_KEY]
+      content = hash.fetch(TEXT_CONTENT_KEY)
       converter = TYPE_CONVERTERS[hash["type"]]
 
       return unwrap_if_simple(hash, content) unless converter

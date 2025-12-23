@@ -40,4 +40,4 @@ task :mutant do
   system("bundle", "exec", "mutant", "run") || exit(1)
 end
 
-task default: %i[test lint verify_measurements]
+task default: %i[test lint verify_measurements mutant]
