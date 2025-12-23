@@ -1,0 +1,208 @@
+# Type signatures for MultiXml
+
+# Recursive type alias for parsed XML values
+# XML parsing produces nested structures of hashes, arrays, and primitive values
+type MultiXml::xmlValue = String
+                        | Integer
+                        | Float
+                        | bool
+                        | Symbol
+                        | Time
+                        | Date
+                        | BigDecimal
+                        | StringIO
+                        | nil
+                        | Array[MultiXml::xmlValue]
+                        | Hash[String, MultiXml::xmlValue]
+                        | Hash[Symbol, MultiXml::xmlValue]
+
+# Type for hash with string keys used internally during parsing
+type MultiXml::xmlHash = Hash[String, MultiXml::xmlValue]
+
+# Interface for parser modules
+interface MultiXml::_Parser
+  def parse: (StringIO io) -> MultiXml::xmlHash?
+  def parse_error: () -> singleton(Exception)
+end
+
+module MultiXml
+  VERSION: Gem::Version
+
+  TEXT_CONTENT_KEY: String
+
+  RUBY_TYPE_TO_XML: Hash[String, String]
+
+  DISALLOWED_TYPES: Array[String]
+
+  FALSE_BOOLEAN_VALUES: Set[String]
+
+  DEFAULT_OPTIONS: Hash[Symbol, bool | Array[String]]
+
+  # Array of [library_name, parser_symbol] pairs
+  PARSER_PREFERENCE: Array[Array[String | Symbol]]
+
+  PARSE_DATETIME: ^(String) -> Time
+
+  # Type converters keyed by XML type attribute string
+  # Uses untyped key because hash["type"] returns xmlValue, and Hash#[] with non-String returns nil
+  TYPE_CONVERTERS: Hash[untyped, Proc | Method]
+
+  LOADED_PARSER_CHECKS: Hash[Symbol, Symbol]
+
+  self.@parser: Module
+
+  extend Helpers
+
+  # Public API: Get the current XML parser module
+  def self.parser: () -> Module
+
+  # Public API: Set the XML parser to use
+  def self.parser=: (Symbol | String | Module new_parser) -> Module
+
+  # Public API: Parse XML into a Ruby Hash
+  # Uses untyped for options because values vary by key (:parser, :symbolize_keys, :disallowed_types, :typecast_xml_value)
+  def self.parse: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
+
+  private
+
+  # Resolve a parser specification (Symbol, String, or Module) to a parser
+  def self.resolve_parser: (Symbol | String | Module spec) -> Module
+
+  # Load a parser module by name
+  def self.load_parser: (Symbol | String name) -> Module
+
+  # Convert snake_case to CamelCase
+  def self.camelize: (String name) -> String
+
+  # Detect the best available parser
+  def self.detect_parser: () -> (Symbol | String)
+
+  # Find an already-loaded parser library
+  def self.find_loaded_parser: () -> Symbol?
+
+  # Try to find an available parser by requiring libraries
+  def self.find_available_parser: () -> (String | Symbol | nil)
+
+  # Attempt to require a library, returning success/failure
+  # Kernel#require accepts String; library may be Symbol from PARSER_PREFERENCE (coerced at runtime)
+  def self.try_require: (untyped library) -> bool
+
+  # Raise NoParserError - never returns
+  def self.raise_no_parser_error: () -> bot
+
+  # Convert String to StringIO, pass through IO-like objects
+  # Uses respond_to?(:read) duck typing - returns input unchanged if IO-like
+  def self.normalize_input: (String | StringIO xml) -> untyped
+
+  # Parse with error handling and key normalization
+  # xml_parser implements _Parser interface; original_input uses respond_to? duck typing
+  def self.parse_with_error_handling: (StringIO io, untyped original_input, untyped xml_parser) -> xmlHash
+
+  module Helpers
+    # Recursively convert all hash keys to symbols
+    # Uses case/when type dispatch - Steep can't track flow narrowing
+    def self?.symbolize_keys: (untyped data) -> untyped
+
+    # Recursively convert dashes in hash keys to underscores
+    # Uses case/when type dispatch - Steep can't track flow narrowing
+    def self?.undasherize_keys: (untyped data) -> untyped
+
+    # Recursively typecast XML values based on type attributes
+    # Uses case/when type dispatch - Steep can't track flow narrowing
+    def self?.typecast_xml_value: (untyped value, ?Array[String] disallowed_types) -> xmlValue
+
+    # Typecast array elements and unwrap single-element arrays
+    def self?.typecast_array: (Array[xmlValue] array, Array[String] disallowed_types) -> xmlValue
+
+    # Typecast a hash based on its type attribute
+    def self?.typecast_hash: (xmlHash hash, Array[String] disallowed_types) -> xmlValue
+
+    # Check if a type is in the disallowed list
+    # Uses is_a?(Hash) guard then include? - Steep can't narrow xmlValue to String
+    def self?.disallowed_type?: (untyped type, Array[String] disallowed_types) -> boolish
+
+    # Convert a hash based on its type and content
+    def self?.convert_hash: (xmlHash hash, xmlValue type, Array[String] disallowed_types) -> xmlValue
+
+    # Typecast all child values in a hash
+    def self?.typecast_children: (xmlHash hash, Array[String] disallowed_types) -> (xmlHash | StringIO)
+
+    # Extract array entries from element with type="array"
+    def self?.extract_array_entries: (xmlHash hash, Array[String] disallowed_types) -> Array[xmlValue]
+
+    # Find array or hash entries in a hash, excluding the type key
+    # Returns xmlValue subset (Array or Hash) - uses is_a? that Steep can't narrow
+    def self?.find_array_entries: (xmlHash hash) -> untyped
+
+    # Wrap hash in array if needed and typecast all entries
+    def self?.wrap_and_typecast: (Array[xmlValue] | xmlHash entries, Array[String] disallowed_types) -> Array[xmlValue]
+
+    # Convert text content using type converters
+    # hash["type"] is xmlValue, used as Hash key - Steep requires String
+    def self?.convert_text_content: (xmlHash hash) -> xmlValue
+
+    # Unwrap value if hash has no other significant keys
+    def self?.unwrap_if_simple: (xmlHash hash, xmlValue value) -> (xmlValue | xmlHash)
+
+    # Check if a hash represents an empty value
+    def self?.empty_value?: (xmlHash hash, xmlValue type) -> bool
+  end
+
+  module FileLike
+    DEFAULT_FILENAME: String
+
+    DEFAULT_CONTENT_TYPE: String
+
+    @original_filename: String?
+
+    @content_type: String?
+
+    attr_writer original_filename: String?
+
+    attr_writer content_type: String?
+
+    def original_filename: () -> String
+
+    def content_type: () -> String
+  end
+
+  # Represents a StringIO that has been extended with FileLike
+  # Used for file type conversions in XML parsing
+  class FileIO < StringIO
+    include FileLike
+  end
+
+  class ParseError < StandardError
+    @xml: String?
+
+    @cause: Exception?
+
+    attr_reader xml: String?
+
+    attr_reader cause: Exception?
+
+    # Message can be String (normal) or Exception (from parser errors), or nil for default
+    def initialize: (?(String | Exception | nil) message, ?xml: String?, ?cause: Exception?) -> void
+  end
+
+  class NoParserError < StandardError
+  end
+
+  class DisallowedTypeError < StandardError
+    @type: String
+
+    attr_reader type: String
+
+    def initialize: (String type) -> void
+  end
+
+  # Parsers module - parser implementations depend on optional external gems
+  module Parsers
+  end
+end
+
+# Stub for Psych::SyntaxError which is part of the yaml library
+module Psych
+  class SyntaxError < ::StandardError
+  end
+end

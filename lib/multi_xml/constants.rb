@@ -112,8 +112,9 @@ module MultiXml
     "file" => lambda do |s, entity|
       StringIO.new(s.unpack1("m")).tap do |io|
         io.extend(FileLike)
-        io.original_filename = entity["name"]
-        io.content_type = entity["content_type"]
+        file_io = io # : FileIO
+        file_io.original_filename = entity["name"]
+        file_io.content_type = entity["content_type"]
       end
     end
   }.freeze

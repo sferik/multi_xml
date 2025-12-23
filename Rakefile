@@ -32,6 +32,9 @@ Yardstick::Rake::Verify.new do |verify|
   verify.threshold = 100
 end
 
+require "steep/rake_task"
+Steep::RakeTask.new
+
 desc "Run linters"
 task lint: %i[rubocop standard]
 
@@ -40,4 +43,4 @@ task :mutant do
   system("bundle", "exec", "mutant", "run") || exit(1)
 end
 
-task default: %i[test lint verify_measurements mutant]
+task default: %i[test lint verify_measurements steep mutant]
