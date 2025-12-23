@@ -2,9 +2,21 @@ require "test_helper"
 require "mutant/minitest/coverage"
 require "support/mock_decoder"
 
-# Tests for MultiXml parser configuration
+# Tests setting and retrieving the global XML parser backend
 class MultiXmlParserConfigTest < Minitest::Test
   cover "MultiXml*"
+
+  def setup
+    @original_parser = MultiXml.instance_variable_get(:@parser)
+  end
+
+  def teardown
+    if @original_parser
+      MultiXml.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXml.instance_variable_defined?(:@parser)
+      MultiXml.send(:remove_instance_variable, :@parser)
+    end
+  end
 
   def test_picks_a_default_parser
     parser = MultiXml.parser
@@ -33,9 +45,21 @@ class MultiXmlParserConfigTest < Minitest::Test
   end
 end
 
-# Tests for per-parse parser option
+# Tests overriding the parser on a per-call basis via the :parser option
 class MultiXmlPerParseParserTest < Minitest::Test
   cover "MultiXml*"
+
+  def setup
+    @original_parser = MultiXml.instance_variable_get(:@parser)
+  end
+
+  def teardown
+    if @original_parser
+      MultiXml.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXml.instance_variable_defined?(:@parser)
+      MultiXml.send(:remove_instance_variable, :@parser)
+    end
+  end
 
   def test_allows_per_parse_parser_via_symbol
     MultiXml.parser = :rexml
@@ -93,9 +117,21 @@ class MultiXmlPerParseParserTest < Minitest::Test
   end
 end
 
-# Tests for XML type casting
+# Tests automatic type conversion based on XML type attributes (float, binary, datetime, etc.)
 class MultiXmlTypecastTest < Minitest::Test
   cover "MultiXml*"
+
+  def setup
+    @original_parser = MultiXml.instance_variable_get(:@parser)
+  end
+
+  def teardown
+    if @original_parser
+      MultiXml.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXml.instance_variable_defined?(:@parser)
+      MultiXml.send(:remove_instance_variable, :@parser)
+    end
+  end
 
   def test_float_type_returns_float
     MultiXml.parser = :ox
@@ -176,9 +212,22 @@ class MultiXmlEmptyInputTest < Minitest::Test
   end
 end
 
-# Tests for key transformation
+# Tests conversion of dashed XML element names to underscored Ruby hash keys
 class MultiXmlKeyTransformTest < Minitest::Test
   cover "MultiXml*"
+
+  def setup
+    @original_parser = MultiXml.instance_variable_get(:@parser)
+    MultiXml.parser = :ox
+  end
+
+  def teardown
+    if @original_parser
+      MultiXml.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXml.instance_variable_defined?(:@parser)
+      MultiXml.send(:remove_instance_variable, :@parser)
+    end
+  end
 
   def test_parse_with_error_handling_undasherizes_keys
     result = MultiXml.parse("<root><my-key>value</my-key></root>")
@@ -189,9 +238,21 @@ class MultiXmlKeyTransformTest < Minitest::Test
   end
 end
 
-# Tests for parse error handling
+# Tests that malformed XML raises ParseError with a meaningful message
 class MultiXmlParseErrorTest < Minitest::Test
   cover "MultiXml*"
+
+  def setup
+    @original_parser = MultiXml.instance_variable_get(:@parser)
+  end
+
+  def teardown
+    if @original_parser
+      MultiXml.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXml.instance_variable_defined?(:@parser)
+      MultiXml.send(:remove_instance_variable, :@parser)
+    end
+  end
 
   def test_parse_error_message_is_string
     MultiXml.parser = :nokogiri

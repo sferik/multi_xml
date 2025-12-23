@@ -1,0 +1,26 @@
+name: Mutation Testing
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+  workflow_dispatch:
+
+jobs:
+  mutant:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.4"
+        bundler-cache: true
+    - name: Run mutation testing
+      run: bundle exec rake mutant
