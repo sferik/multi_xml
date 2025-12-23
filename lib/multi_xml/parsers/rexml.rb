@@ -29,6 +29,7 @@ module MultiXml
 
       # Convert an element to hash format
       #
+      # @api private
       # @param hash [Hash] Accumulator hash
       # @param element [REXML::Element] Element to convert
       # @return [Hash] Updated hash
@@ -38,13 +39,14 @@ module MultiXml
 
       # Collapse an element into a hash with attributes and content
       #
+      # @api private
       # @param element [REXML::Element] Element to collapse
       # @return [Hash] Hash representation
       def collapse_element(element)
-        node_hash = element.attributes.each_with_object({}) { |(k, v), h| h[k] = v }
+        node_hash = collect_attributes(element)
 
         if element.has_elements?
-          element.each_element { |child| element_to_hash(node_hash, child) }
+          collect_child_elements(element, node_hash)
           add_text_content(node_hash, element) unless whitespace_only?(element)
         elsif node_hash.empty? || !whitespace_only?(element)
           add_text_content(node_hash, element)
@@ -53,8 +55,28 @@ module MultiXml
         node_hash
       end
 
+      # Collect all attributes from an element into a hash
+      #
+      # @api private
+      # @param element [REXML::Element] Element with attributes
+      # @return [Hash] Hash of attribute name-value pairs
+      def collect_attributes(element)
+        element.attributes.each_with_object({}) { |(name, value), hash| hash[name] = value }
+      end
+
+      # Collect all child elements into a hash
+      #
+      # @api private
+      # @param element [REXML::Element] Parent element
+      # @param node_hash [Hash] Hash to populate
+      # @return [void]
+      def collect_child_elements(element, node_hash)
+        element.each_element { |child| element_to_hash(node_hash, child) }
+      end
+
       # Add text content from an element to a hash
       #
+      # @api private
       # @param hash [Hash] Target hash
       # @param element [REXML::Element] Element with text
       # @return [Hash] Updated hash
@@ -67,6 +89,7 @@ module MultiXml
 
       # Add a value to a hash, handling duplicates as arrays
       #
+      # @api private
       # @param hash [Hash] Target hash
       # @param key [String] Key to add
       # @param value [Object] Value to add
@@ -85,6 +108,7 @@ module MultiXml
 
       # Check if element contains only whitespace text
       #
+      # @api private
       # @param element [REXML::Element] Element to check
       # @return [Boolean] true if whitespace only
       def whitespace_only?(element)

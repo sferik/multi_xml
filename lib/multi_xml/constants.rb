@@ -76,10 +76,23 @@ module MultiXml
   #
   # @api private
   # @return [Proc] lambda that parses datetime strings
-  PARSE_DATETIME = lambda do |s|
-    Time.parse(s).utc
+  PARSE_DATETIME = lambda do |string|
+    Time.parse(string).utc
   rescue ArgumentError
-    DateTime.parse(s).to_time.utc
+    DateTime.parse(string).to_time.utc
+  end
+
+  # Creates a file-like StringIO from base64-encoded content
+  #
+  # @api private
+  # @return [Proc] lambda that creates file objects
+  FILE_CONVERTER = lambda do |content, entity|
+    StringIO.new(content.unpack1("m")).tap do |io|
+      io.extend(FileLike)
+      file_io = io # : FileIO
+      file_io.original_filename = entity["name"]
+      file_io.content_type = entity["content_type"]
+    end
   end
 
   # Type converters for XML type attributes
@@ -92,30 +105,30 @@ module MultiXml
   # @example Using a converter
   #   TYPE_CONVERTERS["integer"].call("42") #=> 42
   TYPE_CONVERTERS = {
+    # Primitive types
     "symbol" => :to_sym.to_proc,
-    "date" => Date.method(:parse),
-    "datetime" => PARSE_DATETIME,
-    "dateTime" => PARSE_DATETIME,
+    "string" => :to_s.to_proc,
     "integer" => :to_i.to_proc,
     "float" => :to_f.to_proc,
     "double" => :to_f.to_proc,
     "decimal" => ->(s) { BigDecimal(s) },
     "boolean" => ->(s) { !FALSE_BOOLEAN_VALUES.include?(s.strip) },
-    "string" => :to_s.to_proc,
-    "yaml" => lambda do |s|
-      YAML.safe_load(s, permitted_classes: [Symbol, Date, Time])
-    rescue ArgumentError, Psych::SyntaxError
-      s
-    end,
+
+    # Date and time types
+    "date" => Date.method(:parse),
+    "datetime" => PARSE_DATETIME,
+    "dateTime" => PARSE_DATETIME,
+
+    # Binary types
     "base64Binary" => ->(s) { s.unpack1("m") },
     "binary" => ->(s, entity) { (entity["encoding"] == "base64") ? s.unpack1("m") : s },
-    "file" => lambda do |s, entity|
-      StringIO.new(s.unpack1("m")).tap do |io|
-        io.extend(FileLike)
-        file_io = io # : FileIO
-        file_io.original_filename = entity["name"]
-        file_io.content_type = entity["content_type"]
-      end
+    "file" => FILE_CONVERTER,
+
+    # Structured types
+    "yaml" => lambda do |string|
+      YAML.safe_load(string, permitted_classes: [Symbol, Date, Time])
+    rescue ArgumentError, Psych::SyntaxError
+      string
     end
   }.freeze
 end

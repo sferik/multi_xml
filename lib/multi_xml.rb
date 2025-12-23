@@ -91,6 +91,7 @@ module MultiXml
     # @api private
     # @param spec [Symbol, String, Class, Module] Parser specification
     # @return [Module] Resolved parser module
+    # @raise [RuntimeError] if spec is invalid
     def resolve_parser(spec)
       case spec
       when String, Symbol then load_parser(spec)
@@ -129,6 +130,8 @@ module MultiXml
     end
 
     # Parser constant names mapped to their symbols, in preference order
+    #
+    # @api private
     LOADED_PARSER_CHECKS = {
       Ox: :ox,
       LibXML: :libxml,

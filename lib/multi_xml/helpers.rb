@@ -16,15 +16,7 @@ module MultiXml
     # @example Symbolize hash keys
     #   symbolize_keys({"name" => "John"}) #=> {name: "John"}
     def symbolize_keys(data)
-      case data
-      when Hash then data.each_with_object(
-        {} #: Hash[Symbol, MultiXml::xmlValue] # rubocop:disable Layout/LeadingCommentSpace
-      ) { |(key, value), acc| acc[key.to_sym] = symbolize_keys(value) }
-      when Array
-        data.map { |item| symbolize_keys(item) }
-      else
-        data
-      end
+      transform_keys(data, &:to_sym)
     end
 
     # Recursively convert dashes in hash keys to underscores
@@ -35,15 +27,7 @@ module MultiXml
     # @example Convert dashed keys
     #   undasherize_keys({"first-name" => "John"}) #=> {"first_name" => "John"}
     def undasherize_keys(data)
-      case data
-      when Hash then data.each_with_object(
-        {} #: Hash[String, MultiXml::xmlValue] # rubocop:disable Layout/LeadingCommentSpace
-      ) { |(key, value), acc| acc[key.tr("-", "_")] = undasherize_keys(value) }
-      when Array
-        data.map { |item| undasherize_keys(item) }
-      else
-        data
-      end
+      transform_keys(data) { |key| key.tr("-", "_") }
     end
 
     # Recursively typecast XML values based on type attributes
@@ -123,8 +107,7 @@ module MultiXml
     # @return [Hash, StringIO] Typecasted hash or unwrapped file
     def typecast_children(hash, disallowed_types)
       result = hash.transform_values { |v| typecast_xml_value(v, disallowed_types) }
-      file = result["file"]
-      file.is_a?(StringIO) ? file : result
+      unwrap_file_if_present(result)
     end
 
     # Extract array entries from element with type="array"
@@ -147,8 +130,8 @@ module MultiXml
     # @param hash [Hash] Hash to search
     # @return [Array, Hash, nil] Found entries or nil
     def find_array_entries(hash)
-      hash.each do |k, v|
-        return v if !k.eql?("type") && (v.is_a?(Array) || v.is_a?(Hash))
+      hash.each do |key, value|
+        return value if !key.eql?("type") && (value.is_a?(Array) || value.is_a?(Hash))
       end
       nil
     end
@@ -161,7 +144,7 @@ module MultiXml
     # @return [Array] Typecasted entries
     def wrap_and_typecast(entries, disallowed_types)
       entries = [entries] if entries.is_a?(Hash)
-      entries.map { |e| typecast_xml_value(e, disallowed_types) }
+      entries.map { |entry| typecast_xml_value(entry, disallowed_types) }
     end
 
     # Convert text content using type converters
@@ -175,11 +158,7 @@ module MultiXml
 
       return unwrap_if_simple(hash, content) unless converter
 
-      # Binary converters need access to entity attributes (e.g., encoding, name)
-      return converter.call(content, hash) if converter.arity == 2
-
-      hash.delete("type")
-      unwrap_if_simple(hash, converter.call(content))
+      apply_converter(hash, content, converter)
     end
 
     # Unwrap value if hash has no other significant keys
@@ -202,6 +181,48 @@ module MultiXml
       hash.empty? ||
         hash["nil"] == "true" ||
         (type && hash.size == 1 && !type.is_a?(Hash))
+    end
+
+    private
+
+    # Recursively transform hash keys using a block
+    #
+    # @api private
+    # @param data [Hash, Array, Object] Data to transform
+    # @return [Hash, Array, Object] Transformed data
+    def transform_keys(data, &block)
+      case data
+      when Hash then data.each_with_object(
+        {} #: Hash[Symbol, MultiXml::xmlValue] # rubocop:disable Layout/LeadingCommentSpace
+      ) { |(key, value), acc| acc[yield(key)] = transform_keys(value, &block) }
+      when Array then data.map { |item| transform_keys(item, &block) }
+      else data
+      end
+    end
+
+    # Unwrap a file object from the result hash if present
+    #
+    # @api private
+    # @param result [Hash] Hash that may contain a file
+    # @return [Hash, StringIO] The file if present, otherwise the hash
+    def unwrap_file_if_present(result)
+      file = result["file"]
+      file.is_a?(StringIO) ? file : result
+    end
+
+    # Apply a type converter to content
+    #
+    # @api private
+    # @param hash [Hash] Original hash with type info
+    # @param content [String] Content to convert
+    # @param converter [Proc] Converter to apply
+    # @return [Object] Converted value
+    def apply_converter(hash, content, converter)
+      # Binary converters need access to entity attributes (e.g., encoding, name)
+      return converter.call(content, hash) if converter.arity == 2
+
+      hash.delete("type")
+      unwrap_if_simple(hash, converter.call(content))
     end
   end
 end

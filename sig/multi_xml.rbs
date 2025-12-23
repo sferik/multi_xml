@@ -43,6 +43,11 @@ module MultiXml
 
   PARSE_DATETIME: ^(String) -> Time
 
+  # Lambda for creating file-like StringIO from base64 content
+  # Uses untyped for content because unpack1 returns various types
+  # Uses untyped for entity because hash values are xmlValue but we access specific String keys
+  FILE_CONVERTER: ^(untyped, untyped) -> StringIO
+
   # Type converters keyed by XML type attribute string
   # Uses untyped key because hash["type"] returns xmlValue, and Hash#[] with non-String returns nil
   TYPE_CONVERTERS: Hash[untyped, Proc | Method]
@@ -146,6 +151,20 @@ module MultiXml
 
     # Check if a hash represents an empty value
     def self?.empty_value?: (xmlHash hash, xmlValue type) -> bool
+
+    private
+
+    # Recursively transform hash keys using a block
+    # Block receives key (String) and returns transformed key
+    # Uses untyped because &:to_sym Proc type narrowing not supported by Steep
+    def self?.transform_keys: (untyped data) { (untyped) -> untyped } -> untyped
+
+    # Unwrap a file object from the result hash if present
+    def self?.unwrap_file_if_present: (xmlHash result) -> (xmlHash | StringIO)
+
+    # Apply a type converter to content
+    # Content is xmlValue (from hash.fetch) but typically String in practice
+    def self?.apply_converter: (xmlHash hash, untyped content, Proc | Method converter) -> xmlValue
   end
 
   module FileLike

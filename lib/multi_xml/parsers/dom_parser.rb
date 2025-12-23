@@ -27,13 +27,13 @@ module MultiXml
 
       private
 
-      # Add a value to a hash, handling duplicates as arrays
+      # Add a value to a hash, converting to array on duplicates
       #
       # @api private
       # @param hash [Hash] Target hash
       # @param key [String] Key to add
       # @param value [Object] Value to add
-      # @return [Object] The added value or array
+      # @return [void]
       def add_value(hash, key, value)
         existing = hash[key]
         hash[key] = case existing
@@ -53,10 +53,19 @@ module MultiXml
         each_child(node) do |child|
           if child.element?
             node_to_hash(child, node_hash)
-          elsif child.text? || child.cdata?
+          elsif text_or_cdata?(child)
             node_hash[TEXT_CONTENT_KEY] << child.content
           end
         end
+      end
+
+      # Check if a node is text or CDATA
+      #
+      # @api private
+      # @param node [Object] Node to check
+      # @return [Boolean] true if text or CDATA
+      def text_or_cdata?(node)
+        node.text? || node.cdata?
       end
 
       # Collect all attributes from a node
@@ -80,7 +89,8 @@ module MultiXml
       # @return [void]
       def strip_whitespace_content(node_hash)
         content = node_hash[TEXT_CONTENT_KEY]
-        node_hash.delete(TEXT_CONTENT_KEY) if content.empty? || (node_hash.size > 1 && content.strip.empty?)
+        should_remove = content.empty? || (node_hash.size > 1 && content.strip.empty?)
+        node_hash.delete(TEXT_CONTENT_KEY) if should_remove
       end
     end
   end
