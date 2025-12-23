@@ -1,7 +1,4 @@
 module MultiXml
-  # Namespace for XML parser implementations
-  #
-  # @api private
   module Parsers
     # Shared DOM traversal logic for converting XML nodes to hashes
     #
@@ -83,8 +80,7 @@ module MultiXml
       # @return [void]
       def strip_whitespace_content(node_hash)
         content = node_hash[TEXT_CONTENT_KEY]
-        removable = content.empty? || (node_hash.size > 1 && content.strip.empty?)
-        node_hash.delete(TEXT_CONTENT_KEY) if removable
+        node_hash.delete(TEXT_CONTENT_KEY) if content.empty? || (node_hash.size > 1 && content.strip.empty?)
       end
     end
   end

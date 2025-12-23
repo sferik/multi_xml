@@ -1,4 +1,3 @@
-
 # Shared setup that configures the parser backend before each test
 module ParserTestSetup
   def self.included(base)

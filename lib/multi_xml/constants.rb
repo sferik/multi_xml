@@ -41,10 +41,10 @@ module MultiXml
   # Values that represent false in XML boolean attributes
   #
   # @api public
-  # @return [Array<String>] values considered false
+  # @return [Set<String>] values considered false
   # @example Check false values
   #   FALSE_BOOLEAN_VALUES.include?("0") #=> true
-  FALSE_BOOLEAN_VALUES = %w[0 false].freeze
+  FALSE_BOOLEAN_VALUES = Set.new(%w[0 false]).freeze
 
   # Default parsing options
   #
@@ -80,7 +80,7 @@ module MultiXml
     Time.parse(s).utc
   rescue ArgumentError
     DateTime.parse(s).to_time.utc
-  end.freeze
+  end
 
   # Type converters for XML type attributes
   #
@@ -92,16 +92,16 @@ module MultiXml
   # @example Using a converter
   #   TYPE_CONVERTERS["integer"].call("42") #=> 42
   TYPE_CONVERTERS = {
-    "symbol" => ->(s) { s.to_sym },
-    "date" => ->(s) { Date.parse(s) },
+    "symbol" => :to_sym.to_proc,
+    "date" => Date.method(:parse),
     "datetime" => PARSE_DATETIME,
     "dateTime" => PARSE_DATETIME,
-    "integer" => ->(s) { s.to_i },
-    "float" => ->(s) { s.to_f },
-    "double" => ->(s) { s.to_f },
+    "integer" => :to_i.to_proc,
+    "float" => :to_f.to_proc,
+    "double" => :to_f.to_proc,
     "decimal" => ->(s) { BigDecimal(s) },
     "boolean" => ->(s) { !FALSE_BOOLEAN_VALUES.include?(s.strip) },
-    "string" => ->(s) { s.to_s },
+    "string" => :to_s.to_proc,
     "yaml" => lambda do |s|
       YAML.safe_load(s, permitted_classes: [Symbol, Date, Time])
     rescue ArgumentError, Psych::SyntaxError

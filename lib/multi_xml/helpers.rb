@@ -17,9 +17,14 @@ module MultiXml
     #   symbolize_keys({"name" => "John"}) #=> {name: "John"}
     def symbolize_keys(data)
       case data
-      when Hash then data.transform_keys(&:to_sym).transform_values { |v| symbolize_keys(v) }
-      when Array then data.map { |item| symbolize_keys(item) }
-      else data
+      when Hash
+        data.each_with_object({}) do |(key, value), result|
+          result[key.to_sym] = symbolize_keys(value)
+        end
+      when Array
+        data.map { |item| symbolize_keys(item) }
+      else
+        data
       end
     end
 
@@ -32,9 +37,14 @@ module MultiXml
     #   undasherize_keys({"first-name" => "John"}) #=> {"first_name" => "John"}
     def undasherize_keys(data)
       case data
-      when Hash then data.transform_keys { |k| k.tr("-", "_") }.transform_values { |v| undasherize_keys(v) }
-      when Array then data.map { |item| undasherize_keys(item) }
-      else data
+      when Hash
+        data.each_with_object({}) do |(key, value), result|
+          result[key.tr("-", "_")] = undasherize_keys(value)
+        end
+      when Array
+        data.map { |item| undasherize_keys(item) }
+      else
+        data
       end
     end
 
@@ -115,8 +125,8 @@ module MultiXml
     # @return [Hash, StringIO] Typecasted hash or unwrapped file
     def typecast_children(hash, disallowed_types)
       result = hash.transform_values { |v| typecast_xml_value(v, disallowed_types) }
-      # Unwrap single file element for HTML multipart compatibility
-      result["file"].is_a?(StringIO) ? result.fetch("file") : result
+      file = result["file"]
+      file.is_a?(StringIO) ? file : result
     end
 
     # Extract array entries from element with type="array"
@@ -127,13 +137,33 @@ module MultiXml
     # @return [Array] Extracted and typecasted entries
     # @see https://github.com/jnunemaker/httparty/issues/102
     def extract_array_entries(hash, disallowed_types)
-      _, entries = hash.find { |k, v| !k.eql?("type") && (v.is_a?(Array) || v.is_a?(Hash)) }
+      entries = find_array_entries(hash)
+      return [] unless entries
 
-      case entries
-      when Array then entries.map { |e| typecast_xml_value(e, disallowed_types) }
-      when Hash then [typecast_xml_value(entries, disallowed_types)]
-      else []
+      wrap_and_typecast(entries, disallowed_types)
+    end
+
+    # Find array or hash entries in a hash, excluding the type key
+    #
+    # @api private
+    # @param hash [Hash] Hash to search
+    # @return [Array, Hash, nil] Found entries or nil
+    def find_array_entries(hash)
+      hash.each do |k, v|
+        return v if !k.eql?("type") && (v.is_a?(Array) || v.is_a?(Hash))
       end
+      nil
+    end
+
+    # Wrap hash in array if needed and typecast all entries
+    #
+    # @api private
+    # @param entries [Array, Hash] Entries to process
+    # @param disallowed_types [Array<String>] Types to reject
+    # @return [Array] Typecasted entries
+    def wrap_and_typecast(entries, disallowed_types)
+      entries = [entries] if entries.is_a?(Hash)
+      entries.map { |e| typecast_xml_value(e, disallowed_types) }
     end
 
     # Convert text content using type converters

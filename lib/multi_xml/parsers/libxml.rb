@@ -2,9 +2,6 @@ require "libxml" unless defined?(::LibXML)
 require_relative "dom_parser"
 
 module MultiXml
-  # Namespace for XML parser implementations
-  #
-  # @api private
   module Parsers
     # XML parser using the LibXML library
     #
@@ -33,23 +30,18 @@ module MultiXml
 
       # Iterate over child nodes
       #
-      # @api private
       # @param node [LibXML::XML::Node] Parent node
-      # @yield [LibXML::XML::Node] Each child node
       # @return [void]
       def each_child(node, &) = node.each_child(&)
 
       # Iterate over attribute nodes
       #
-      # @api private
       # @param node [LibXML::XML::Node] Element node
-      # @yield [LibXML::XML::Attr] Each attribute
       # @return [void]
       def each_attr(node, &) = node.each_attr(&)
 
       # Get the name of a node or attribute
       #
-      # @api private
       # @param node [LibXML::XML::Node] Node to get name from
       # @return [String] Node name
       def node_name(node) = node.name

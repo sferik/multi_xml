@@ -128,13 +128,13 @@ module MultiXml
       find_loaded_parser || find_available_parser || raise_no_parser_error
     end
 
-    # Parser constant checks in preference order
-    LOADED_PARSER_CHECKS = [
-      %i[Ox ox],
-      %i[LibXML libxml],
-      %i[Nokogiri nokogiri],
-      %i[Oga oga]
-    ].freeze
+    # Parser constant names mapped to their symbols, in preference order
+    LOADED_PARSER_CHECKS = {
+      Ox: :ox,
+      LibXML: :libxml,
+      Nokogiri: :nokogiri,
+      Oga: :oga
+    }.freeze
     private_constant :LOADED_PARSER_CHECKS
 
     # Find an already-loaded parser library
@@ -142,8 +142,8 @@ module MultiXml
     # @api private
     # @return [Symbol, nil] Parser name or nil if none loaded
     def find_loaded_parser
-      LOADED_PARSER_CHECKS.each do |const, parser_name|
-        return parser_name if const_defined?(const)
+      LOADED_PARSER_CHECKS.each do |const_name, parser_name|
+        return parser_name if const_defined?(const_name)
       end
       nil
     end

@@ -2,9 +2,6 @@ require "oga" unless defined?(::Oga)
 require_relative "dom_parser"
 
 module MultiXml
-  # Namespace for XML parser implementations
-  #
-  # @api private
   module Parsers
     # XML parser using the Oga library
     #
@@ -41,10 +38,8 @@ module MultiXml
       def collect_children(node, node_hash)
         each_child(node) do |child|
           case child
-          when ::Oga::XML::Element
-            node_to_hash(child, node_hash)
-          when ::Oga::XML::Text, ::Oga::XML::Cdata
-            node_hash[TEXT_CONTENT_KEY] << child.text
+          when ::Oga::XML::Element then node_to_hash(child, node_hash)
+          when ::Oga::XML::Text, ::Oga::XML::Cdata then node_hash[TEXT_CONTENT_KEY] << child.text
           end
         end
       end
@@ -53,23 +48,18 @@ module MultiXml
 
       # Iterate over child nodes
       #
-      # @api private
       # @param node [Oga::XML::Element] Parent node
-      # @yield [Oga::XML::Node] Each child node
       # @return [void]
       def each_child(node, &) = node.children.each(&)
 
       # Iterate over attribute nodes
       #
-      # @api private
       # @param node [Oga::XML::Element] Element node
-      # @yield [Oga::XML::Attribute] Each attribute
       # @return [void]
       def each_attr(node, &) = node.attributes.each(&)
 
       # Get the name of a node or attribute
       #
-      # @api private
       # @param node [Oga::XML::Node] Node to get name from
       # @return [String] Node name
       def node_name(node) = node.name

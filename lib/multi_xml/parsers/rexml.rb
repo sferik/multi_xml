@@ -1,9 +1,6 @@
 require "rexml/document" unless defined?(::REXML::Document)
 
 module MultiXml
-  # Namespace for XML parser implementations
-  #
-  # @api private
   module Parsers
     # XML parser using Ruby's built-in REXML library
     #
@@ -34,7 +31,6 @@ module MultiXml
 
       # Convert an element to hash format
       #
-      # @api private
       # @param hash [Hash] Accumulator hash
       # @param element [REXML::Element] Element to convert
       # @return [Hash] Updated hash
@@ -44,7 +40,6 @@ module MultiXml
 
       # Collapse an element into a hash with attributes and content
       #
-      # @api private
       # @param element [REXML::Element] Element to collapse
       # @return [Hash] Hash representation
       def collapse_element(element)
@@ -62,7 +57,6 @@ module MultiXml
 
       # Add text content from an element to a hash
       #
-      # @api private
       # @param hash [Hash] Target hash
       # @param element [REXML::Element] Element with text
       # @return [Hash] Updated hash
@@ -75,7 +69,6 @@ module MultiXml
 
       # Add a value to a hash, handling duplicates as arrays
       #
-      # @api private
       # @param hash [Hash] Target hash
       # @param key [String] Key to add
       # @param value [Object] Value to add
@@ -94,7 +87,6 @@ module MultiXml
 
       # Check if element contains only whitespace text
       #
-      # @api private
       # @param element [REXML::Element] Element to check
       # @return [Boolean] true if whitespace only
       def whitespace_only?(element)
