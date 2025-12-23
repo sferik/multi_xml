@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 
 # Tests for ParseWithErrorHandlingTest
 class ParseWithErrorHandlingTest < Minitest::Test
@@ -240,8 +239,8 @@ class ParseWithErrorHandlingNilReturnTest < Minitest::Test
   end
 end
 
-# Tests for ParseWithErrorHandlingMessageMutantsTest
-class ParseWithErrorHandlingMessageMutantsTest < Minitest::Test
+# Tests parse error message handling
+class ParseWithErrorHandlingMessageTest < Minitest::Test
   cover "MultiXml*"
 
   def setup
@@ -285,8 +284,8 @@ class ParseWithErrorHandlingMessageMutantsTest < Minitest::Test
   end
 end
 
-# Tests for ParseWithErrorHandlingToSMutantsTest
-class ParseWithErrorHandlingToSMutantsTest < Minitest::Test
+# Tests parse error to_s behavior
+class ParseWithErrorHandlingToSTest < Minitest::Test
   cover "MultiXml*"
 
   def setup

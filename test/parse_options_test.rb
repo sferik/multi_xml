@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 
 # Tests for ParseOptionsTest
 class ParseOptionsTest < Minitest::Test
@@ -112,8 +111,8 @@ class ParseWithParserOptionTest < Minitest::Test
   end
 end
 
-# Tests for ParseOptionsAccessMutantTest
-class ParseOptionsAccessMutantTest < Minitest::Test
+# Tests parse option access behavior
+class ParseOptionsAccessTest < Minitest::Test
   cover "MultiXml*"
 
   def setup

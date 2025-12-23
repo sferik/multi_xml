@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 require "support/mock_decoder"
 
 # Tests setting and retrieving the global XML parser backend

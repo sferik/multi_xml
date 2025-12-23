@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 
 # Tests for DisallowedTypeErrorTest
 class DisallowedTypeErrorTest < Minitest::Test

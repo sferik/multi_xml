@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 
 # Tests for ParseErrorTest
 class ParseErrorTest < Minitest::Test
