@@ -97,19 +97,38 @@ class LoadParserRequirePathTest < Minitest::Test
   cover "MultiXml*"
 
   def test_load_parser_requires_lowercase_path
-    # Track the actual require path used
     required_paths = []
-    original_require = Kernel.instance_method(:require)
+    stub_require(required_paths) { MultiXml.send(:load_parser, "REXML") }
 
+    assert_includes required_paths, "multi_xml/parsers/rexml"
+  end
+
+  private
+
+  def stub_require(required_paths)
+    original_require = Kernel.instance_method(:require)
+    suppress_warnings { define_require(required_paths, original_require) }
+    yield
+  ensure
+    suppress_warnings { restore_require(original_require) }
+  end
+
+  def define_require(required_paths, original_require)
     Kernel.define_method(:require) do |path|
       required_paths << path
       original_require.bind_call(self, path)
     end
+  end
 
-    MultiXml.send(:load_parser, "REXML")
-
-    assert_includes required_paths, "multi_xml/parsers/rexml"
-  ensure
+  def restore_require(original_require)
     Kernel.define_method(:require) { |path| original_require.bind_call(self, path) }
+  end
+
+  def suppress_warnings
+    old_verbose = $VERBOSE
+    $VERBOSE = nil
+    yield
+  ensure
+    $VERBOSE = old_verbose
   end
 end

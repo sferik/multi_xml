@@ -1,5 +1,5 @@
 require "cgi/escape"
-require "libxml" unless defined?(::LibXML)
+require "libxml"
 require "stringio"
 
 module MultiXml
@@ -51,19 +51,13 @@ module MultiXml
           @result = {}
           @stack = [@result]
           @pending_attrs = []
-          @error = nil
         end
 
         # Get the parsed result
         #
         # @api private
         # @return [Hash] the parsed hash
-        # @raise [LibXML::XML::Error] if parsing failed
-        def result
-          raise @error if @error
-
-          @result
-        end
+        attr_reader :result
 
         # Handle start of document
         #
@@ -82,10 +76,9 @@ module MultiXml
         # Handle parse errors
         #
         # @api private
-        # @param error [String] Error message
+        # @param _error [String] Error message (unused, LibXML raises directly)
         # @return [void]
-        def on_error(error)
-          @error = ::LibXML::XML::Error.new(error)
+        def on_error(_error)
         end
 
         # Handle start of an element

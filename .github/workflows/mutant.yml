@@ -24,3 +24,5 @@ jobs:
         bundler-cache: true
     - name: Run mutation testing
       run: bundle exec rake mutant
+      env:
+        MUTANT: "true"

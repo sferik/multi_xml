@@ -25,7 +25,8 @@ require "simplecov"
 
 SimpleCov.start do
   add_filter "/test"
-  minimum_coverage(100)
+  enable_coverage :branch
+  minimum_coverage line: 100, branch: 100 unless ENV["MUTANT"]
 end
 
 require "multi_xml"
