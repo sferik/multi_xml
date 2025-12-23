@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 
 # Tests for NormalizeInputTest
 class NormalizeInputTest < Minitest::Test

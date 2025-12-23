@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 
 # Tests for LoadParserTest
 class LoadParserTest < Minitest::Test
@@ -59,8 +58,8 @@ class LoadParserCamelizeTest < Minitest::Test
   end
 end
 
-# Tests for LoadParserMutantKillerTest
-class LoadParserMutantKillerTest < Minitest::Test
+# Tests load_parser string conversion
+class LoadParserStringConversionTest < Minitest::Test
   cover "MultiXml*"
 
   def test_load_parser_calls_to_s_on_symbol

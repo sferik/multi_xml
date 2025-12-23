@@ -1,4 +1,3 @@
-require "mutant/minitest/coverage"
 
 # Shared setup that configures the parser backend before each test
 module ParserTestSetup

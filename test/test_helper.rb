@@ -11,3 +11,4 @@ end
 
 require "multi_xml"
 require "minitest/autorun"
+require "mutant/minitest/coverage"

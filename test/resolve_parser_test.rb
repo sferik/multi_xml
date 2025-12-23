@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 require "support/mock_decoder"
 
 # Tests for ResolveParserTest
@@ -62,8 +61,8 @@ class ResolveParserDetailedTest < Minitest::Test
   end
 end
 
-# Tests for ResolveParserCaseMutantTest
-class ResolveParserCaseMutantTest < Minitest::Test
+# Tests resolve_parser case statement branches
+class ResolveParserCaseTest < Minitest::Test
   cover "MultiXml*"
 
   def test_resolve_parser_handles_string

@@ -1,5 +1,4 @@
 require "test_helper"
-require "mutant/minitest/coverage"
 
 # Tests for ParserDetectionTest
 class ParserDetectionTest < Minitest::Test
@@ -168,7 +167,7 @@ class DetectParserOrChainTest < Minitest::Test
 
   def test_detect_parser_falls_back_to_find_available_when_loaded_returns_nil
     # Stub find_loaded_parser to return nil to test the fallback
-    MultiXml.stub :find_loaded_parser, nil do
+    MultiXml.stub(:find_loaded_parser, nil) do
       result = MultiXml.send(:detect_parser)
 
       # Should fall back to find_available_parser, which returns :ox
@@ -178,7 +177,7 @@ class DetectParserOrChainTest < Minitest::Test
 
   def test_detect_parser_uses_find_loaded_result_not_find_available
     # Both return :ox in test env, but we can stub find_available to verify
-    MultiXml.stub :find_available_parser, :rexml do
+    MultiXml.stub(:find_available_parser, :rexml) do
       result = MultiXml.send(:detect_parser)
 
       # Should use find_loaded_parser (:ox), not find_available_parser (:rexml stub)
