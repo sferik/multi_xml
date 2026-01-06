@@ -6,8 +6,9 @@ gem "oga", ">= 2.3", require: nil
 gem "ox", require: nil, platforms: :ruby
 gem "rexml", require: nil
 
-gem "minitest", ">= 5.27"
-gem "mutant-minitest", ">= 0.13.5"
+gem "minitest", ">= 6"
+gem "minitest-mock", ">= 5.27"
+gem "mutant-minitest", ">= 0.14.1"
 gem "rake", ">= 13.3.1"
 gem "rdoc", ">= 7.0.2"
 gem "rubocop", ">= 1.81.7"
