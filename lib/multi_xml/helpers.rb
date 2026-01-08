@@ -56,7 +56,7 @@ module MultiXml
     # @return [Object, Array] Typecasted array or single element
     def typecast_array(array, disallowed_types)
       array.map! { |item| typecast_xml_value(item, disallowed_types) }
-      array.one? ? array.first : array
+      (array.size == 1) ? array.first : array
     end
 
     # Typecast a hash based on its type attribute

@@ -62,4 +62,25 @@ class TypecastArrayTest < Minitest::Test
       typecast_array(input, ["integer"])
     end
   end
+
+  def test_preserves_array_with_nil_and_value
+    input = [{}, {"__content__" => "value"}]
+    result = typecast_array(input, [])
+
+    assert_equal [nil, "value"], result
+  end
+
+  def test_preserves_array_with_multiple_nils
+    input = [{}, {}]
+    result = typecast_array(input, [])
+
+    assert_equal [nil, nil], result
+  end
+
+  def test_preserves_array_with_false_and_value
+    input = [{"type" => "boolean", "__content__" => "false"}, {"__content__" => "value"}]
+    result = typecast_array(input, [])
+
+    assert_equal [false, "value"], result
+  end
 end
