@@ -1,3 +1,7 @@
+0.8.1
+-----
+* [Fix array unwrapping when elements contain nil](https://github.com/sferik/multi_xml/commit/09a875d832c45e2b567889398f45361ec9e36685)
+
 0.8.0
 -----
 * [Add per-parse :parser option to MultiXml.parse](https://github.com/sferik/multi_xml/commit/eb0c1ccadd9026980ba8b6dd0128d6862dc361c4)
