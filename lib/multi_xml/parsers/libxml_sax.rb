@@ -1,4 +1,4 @@
-require "libxml"
+require "libxml-ruby"
 require "stringio"
 require_relative "sax_handler"
 
