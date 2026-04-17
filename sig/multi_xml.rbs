@@ -219,9 +219,3 @@ module MultiXml
   module Parsers
   end
 end
-
-# Stub for Psych::SyntaxError which is part of the yaml library
-module Psych
-  class SyntaxError < ::StandardError
-  end
-end
