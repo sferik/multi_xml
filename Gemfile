@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "libxml-ruby", require: nil, platforms: :ruby
+gem "libxml-ruby", "< 6", require: nil, platforms: :ruby
 gem "nokogiri", require: nil
 gem "oga", ">= 2.3", require: nil
 gem "ox", require: nil, platforms: :ruby
