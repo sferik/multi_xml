@@ -66,7 +66,7 @@ module MultiXml
   #   PARSER_PREFERENCE.first #=> ["ox", :ox]
   PARSER_PREFERENCE = [
     ["ox", :ox],
-    ["libxml", :libxml],
+    ["libxml-ruby", :libxml],
     ["nokogiri", :nokogiri],
     ["rexml/document", :rexml],
     ["oga", :oga]

@@ -1,4 +1,4 @@
-require "libxml"
+require "libxml-ruby"
 require_relative "dom_parser"
 
 module MultiXml
