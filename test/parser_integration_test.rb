@@ -3,7 +3,7 @@ require "parser_tests"
 
 # Parser configurations: [require_name, class_name, test_module]
 DOM_PARSERS = {
-  "LibXML" => ["libxml", "LibXML", DomParserTests],
+  "LibXML" => ["libxml-ruby", "LibXML", DomParserTests],
   "REXML" => ["rexml/document", "REXML", DomParserTests],
   "Nokogiri" => ["nokogiri", "Nokogiri", DomParserTests],
   "Ox" => ["ox", "Ox", DomParserTests],
@@ -11,7 +11,7 @@ DOM_PARSERS = {
 }.freeze
 
 SAX_PARSERS = {
-  "libxml_sax" => ["libxml", "LibxmlSax", SaxParserFullTests],
+  "libxml_sax" => ["libxml-ruby", "LibxmlSax", SaxParserFullTests],
   "nokogiri_sax" => ["nokogiri", "NokogiriSax", SaxParserFullTests]
 }.freeze
 

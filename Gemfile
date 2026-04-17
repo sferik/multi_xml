@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "libxml-ruby", "< 6", require: nil, platforms: :ruby
+gem "libxml-ruby", require: nil, platforms: :ruby
 gem "nokogiri", require: nil
 gem "oga", ">= 2.3", require: nil
 gem "ox", require: nil, platforms: :ruby
@@ -19,7 +19,7 @@ gem "rubocop-rake", ">= 0.7.1"
 gem "simplecov", ">= 0.22"
 gem "standard", ">= 1.52"
 gem "standard-performance", ">= 1.9"
-gem "steep", ">= 1.10", platforms: :ruby
+gem "steep", ">= 2", platforms: :ruby
 gem "yard", ">= 0.9.38"
 gem "yardstick", ">= 0.9.9"
 
