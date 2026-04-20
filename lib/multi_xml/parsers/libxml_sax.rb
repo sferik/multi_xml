@@ -25,18 +25,67 @@ module MultiXml
       # @return [Hash] Parsed XML as a hash
       # @raise [LibXML::XML::Error] if XML is malformed
       def parse(xml, namespaces: :strip)
-        io = xml.respond_to?(:read) ? xml : StringIO.new(xml)
-        return {} if io.eof?
+        source = xml.respond_to?(:read) ? xml.read : xml.to_s
+        return {} if source.empty?
 
-        # libxml-ruby's SAX callback strips prefixes from attribute qnames,
-        # so we can't reconstruct per-attribute namespace info for non-strip
-        # modes. Delegate to the DOM libxml parser in that case; it exposes
-        # the namespace metadata we need.
-        return Libxml.parse(io, namespaces: namespaces) unless namespaces == :strip
+        return parse_with_dom(source, namespaces) if dom_fallback?(source, namespaces)
 
+        parse_with_sax(source, namespaces)
+      end
+
+      # Detect whether a start tag has attributes that collide after stripping
+      #
+      # @api private
+      # @param source [String] XML source
+      # @return [Boolean] true when stripped attribute locals collide
+      def stripped_attribute_collision?(source)
+        source.scan(%r{<(?![!?/])[^>]*>}m).any? do |tag|
+          local_names = attribute_names(tag).map { |name| name.split(":", 2).last }
+          local_names.uniq.length < local_names.length
+        end
+      end
+
+      # Extract non-xmlns attribute names from a start tag
+      #
+      # @api private
+      # @param tag [String] Start tag source
+      # @return [Array<String>] attribute names
+      def attribute_names(tag)
+        tag.scan(/\s([a-zA-Z_][\w.-]*(?::[a-zA-Z_][\w.-]*)?)\s*=/).flatten.reject do |name|
+          name == "xmlns" || name.start_with?("xmlns:")
+        end
+      end
+
+      # Determine whether libxml_sax must fall back to the DOM parser
+      #
+      # @api private
+      # @param source [String] XML source
+      # @param namespaces [Symbol] Namespace handling mode
+      # @return [Boolean] true when DOM parsing is required
+      def dom_fallback?(source, namespaces)
+        namespaces != :strip || stripped_attribute_collision?(source)
+      end
+
+      # Parse via the DOM libxml backend
+      #
+      # @api private
+      # @param source [String] XML source
+      # @param namespaces [Symbol] Namespace handling mode
+      # @return [Hash] Parsed XML as a hash
+      def parse_with_dom(source, namespaces)
+        Libxml.parse(StringIO.new(source), namespaces: namespaces)
+      end
+
+      # Parse via libxml-ruby's SAX parser
+      #
+      # @api private
+      # @param source [String] XML source
+      # @param namespaces [Symbol] Namespace handling mode
+      # @return [Hash] Parsed XML as a hash
+      def parse_with_sax(source, namespaces)
         LibXML::XML::Error.set_handler(&LibXML::XML::Error::QUIET_HANDLER)
         handler = Handler.new(namespaces)
-        parser = ::LibXML::XML::SaxParser.io(io)
+        parser = ::LibXML::XML::SaxParser.io(StringIO.new(source))
         parser.callbacks = handler
         parser.parse
         handler.result

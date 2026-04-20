@@ -25,8 +25,17 @@ require "simplecov"
 
 SimpleCov.start do
   add_filter "/test"
-  enable_coverage :branch
-  minimum_coverage line: 100, branch: 100 unless ENV["MUTANT"]
+  # libxml-ruby and ox are :ruby-only gems, so their parser files are
+  # unreachable on Windows / JRuby and would drag coverage below 100%.
+  if windows? || jruby?
+    add_filter "lib/multi_xml/parsers/libxml.rb"
+    add_filter "lib/multi_xml/parsers/libxml_sax.rb"
+    add_filter "lib/multi_xml/parsers/ox.rb"
+  end
+  enable_coverage :branch unless jruby?
+  unless ENV["MUTANT"]
+    jruby? ? minimum_coverage(line: 100) : minimum_coverage(line: 100, branch: 100)
+  end
 end
 
 require "multi_xml"

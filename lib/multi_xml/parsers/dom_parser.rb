@@ -112,9 +112,7 @@ module MultiXml
       # @return [void]
       def collect_attributes(node, node_hash, mode)
         each_element_attr(node) do |attr|
-          name = format_attr_name(attr, mode)
-          existing = node_hash[name]
-          node_hash[name] = existing ? [attr.value, existing] : attr.value
+          add_attribute_value(node_hash, format_attr_name(attr, mode), attr.value)
         end
       end
 
@@ -147,6 +145,34 @@ module MultiXml
       # @return [String] formatted name
       def format_name(prefix, local, mode)
         (mode == :preserve && prefix) ? "#{prefix}:#{local}" : local
+      end
+
+      # Add an attribute value, preserving attr-before-child collision order
+      #
+      # @api private
+      # @param hash [Hash] Target hash
+      # @param key [String] Attribute key
+      # @param value [String] Attribute value
+      # @return [void]
+      def add_attribute_value(hash, key, value)
+        existing = hash[key]
+        hash[key] = case existing
+        when nil then value
+        when Array then insert_attribute_before_children(existing, value)
+        when Hash then [value, existing]
+        else [existing, value]
+        end
+      end
+
+      # Insert a later attribute before any child-element entries
+      #
+      # @api private
+      # @param values [Array] Existing colliding values
+      # @param value [String] Attribute value to insert
+      # @return [Array] Updated value list
+      def insert_attribute_before_children(values, value)
+        child_index = values.index { |entry| entry.is_a?(Hash) } || values.length
+        values.dup.insert(child_index, value)
       end
 
       # Remove empty or whitespace-only text content
