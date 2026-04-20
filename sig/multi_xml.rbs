@@ -21,7 +21,7 @@ type MultiXml::xmlHash = Hash[String, MultiXml::xmlValue]
 
 # Interface for parser modules
 interface MultiXml::_Parser
-  def parse: (StringIO io) -> MultiXml::xmlHash?
+  def parse: (StringIO io, ?namespaces: Symbol) -> MultiXml::xmlHash?
   def parse_error: () -> singleton(Exception)
 end
 
@@ -36,7 +36,9 @@ module MultiXml
 
   FALSE_BOOLEAN_VALUES: Set[String]
 
-  DEFAULT_OPTIONS: Hash[Symbol, bool | Array[String]]
+  NAMESPACE_MODES: Array[Symbol]
+
+  DEFAULT_OPTIONS: Hash[Symbol, bool | Array[String] | Symbol]
 
   # Array of [library_name, parser_symbol] pairs
   PARSER_PREFERENCE: Array[Array[String | Symbol]]
@@ -101,7 +103,16 @@ module MultiXml
 
   # Parse with error handling and key normalization
   # xml_parser implements _Parser interface; original_input uses respond_to? duck typing
-  def self.parse_with_error_handling: (StringIO io, untyped original_input, untyped xml_parser) -> xmlHash
+  def self.parse_with_error_handling: (StringIO io, untyped original_input, untyped xml_parser, Symbol namespaces) -> xmlHash
+
+  # Validate the :namespaces option value
+  def self.validate_namespaces_mode: (untyped mode) -> Symbol
+
+  # Resolve which parser this parse call should use, honoring the :parser option
+  def self.resolve_parse_parser: (Hash[Symbol, untyped] options) -> Module
+
+  # Apply typecasting and key-symbolization as configured
+  def self.apply_postprocessing: (xmlHash result, Hash[Symbol, untyped] options) -> xmlHash
 
   module Helpers
     # Recursively convert all hash keys to symbols

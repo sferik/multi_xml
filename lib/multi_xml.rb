@@ -73,15 +73,11 @@ module MultiXml
     #   #=> {root: {name: "John"}}
     def parse(xml, options = {})
       options = DEFAULT_OPTIONS.merge(options)
-      xml_parser = options[:parser] ? resolve_parser(options.fetch(:parser)) : parser
-
       io = normalize_input(xml)
       return {} if io.eof?
 
-      result = parse_with_error_handling(io, xml, xml_parser)
-      result = typecast_xml_value(result, options.fetch(:disallowed_types)) if options.fetch(:typecast_xml_value)
-      result = symbolize_keys(result) if options.fetch(:symbolize_keys)
-      result
+      result = parse_with_error_handling(io, xml, resolve_parse_parser(options), validate_namespaces_mode(options.fetch(:namespaces)))
+      apply_postprocessing(result, options)
     end
 
     private
@@ -203,13 +199,49 @@ module MultiXml
     # @param io [IO] IO-like object containing XML
     # @param original_input [String, IO] Original input for error reporting
     # @param xml_parser [Module] Parser to use
-    # @return [Hash] Parsed XML with undasherized keys
+    # @param namespaces [Symbol] Namespace handling mode
+    # @return [Hash] Parsed XML (undasherized only when mode is :strip)
     # @raise [ParseError] if XML is malformed
-    def parse_with_error_handling(io, original_input, xml_parser)
-      undasherize_keys(xml_parser.parse(io) || {})
+    def parse_with_error_handling(io, original_input, xml_parser, namespaces)
+      result = xml_parser.parse(io, namespaces: namespaces) || {}
+      (namespaces == :strip) ? undasherize_keys(result) : result
     rescue xml_parser.parse_error => e
       xml_string = original_input.respond_to?(:read) ? original_input.tap(&:rewind).read : original_input.to_s
       raise(ParseError.new(e, xml: xml_string, cause: e))
+    end
+
+    # Validate the :namespaces mode option
+    #
+    # @api private
+    # @param mode [Symbol] Namespace handling mode to validate
+    # @return [Symbol] the validated mode
+    # @raise [ArgumentError] if mode is not a recognized value
+    def validate_namespaces_mode(mode)
+      return mode if NAMESPACE_MODES.include?(mode)
+
+      expected_modes = "[#{NAMESPACE_MODES.map(&:inspect).join(", ")}]"
+      raise ArgumentError, "invalid :namespaces mode #{mode.inspect}; expected one of #{expected_modes}"
+    end
+
+    # Pick the parser to use for this call, honoring the :parser option
+    #
+    # @api private
+    # @param options [Hash] Parsing options
+    # @return [Module] Resolved parser module
+    def resolve_parse_parser(options)
+      options[:parser] ? resolve_parser(options.fetch(:parser)) : parser
+    end
+
+    # Apply typecasting and key-symbolization as configured
+    #
+    # @api private
+    # @param result [Hash] Parsed hash
+    # @param options [Hash] Parsing options
+    # @return [Hash] Post-processed hash
+    def apply_postprocessing(result, options)
+      result = typecast_xml_value(result, options.fetch(:disallowed_types)) if options.fetch(:typecast_xml_value)
+      result = symbolize_keys(result) if options.fetch(:symbolize_keys)
+      result
     end
   end
 end

@@ -18,11 +18,12 @@ module MultiXml
       #
       # @api private
       # @param io [IO] IO-like object containing XML
+      # @param namespaces [Symbol] Namespace handling mode
       # @return [Hash] Parsed XML as a hash
       # @raise [REXML::ParseException] if XML is malformed
-      def parse(io)
+      def parse(io, namespaces: :strip)
         doc = REXML::Document.new(io)
-        element_to_hash({}, doc.root)
+        element_to_hash({}, doc.root, namespaces)
       end
 
       private
@@ -32,21 +33,54 @@ module MultiXml
       # @api private
       # @param hash [Hash] Accumulator hash
       # @param element [REXML::Element] Element to convert
+      # @param mode [Symbol] Namespace handling mode
       # @return [Hash] Updated hash
-      def element_to_hash(hash, element)
-        add_to_hash(hash, element.name, collapse_element(element))
+      def element_to_hash(hash, element, mode)
+        add_to_hash(hash, format_element_name(element, mode), collapse_element(element, mode))
+      end
+
+      # Format element name using prefix/local and namespace mode
+      #
+      # @api private
+      # @param element [REXML::Element] Element node
+      # @param mode [Symbol] Namespace handling mode
+      # @return [String] formatted element name
+      def format_element_name(element, mode)
+        format_name(element.prefix, element.name, mode)
+      end
+
+      # Format attribute name using prefix/local and namespace mode
+      #
+      # @api private
+      # @param attr [REXML::Attribute] Attribute node
+      # @param mode [Symbol] Namespace handling mode
+      # @return [String] formatted attribute name
+      def format_attr_name(attr, mode)
+        format_name(attr.prefix, attr.name, mode)
+      end
+
+      # Produce a name string for a given [prefix, local] tuple
+      #
+      # @api private
+      # @param prefix [String, nil] Namespace prefix
+      # @param local [String] Local part of the name
+      # @param mode [Symbol] Namespace handling mode
+      # @return [String] formatted name
+      def format_name(prefix, local, mode)
+        (mode == :preserve && prefix && !prefix.empty?) ? "#{prefix}:#{local}" : local
       end
 
       # Collapse an element into a hash with attributes and content
       #
       # @api private
       # @param element [REXML::Element] Element to collapse
+      # @param mode [Symbol] Namespace handling mode
       # @return [Hash] Hash representation
-      def collapse_element(element)
-        node_hash = collect_attributes(element)
+      def collapse_element(element, mode)
+        node_hash = collect_attributes(element, mode)
 
         if element.has_elements?
-          collect_child_elements(element, node_hash)
+          collect_child_elements(element, node_hash, mode)
           add_text_content(node_hash, element) unless whitespace_only?(element)
         elsif node_hash.empty? || !whitespace_only?(element)
           add_text_content(node_hash, element)
@@ -59,9 +93,34 @@ module MultiXml
       #
       # @api private
       # @param element [REXML::Element] Element with attributes
+      # @param mode [Symbol] Namespace handling mode
       # @return [Hash] Hash of attribute name-value pairs
-      def collect_attributes(element)
-        element.attributes.each_with_object({}) { |(name, value), hash| hash[name] = value }
+      def collect_attributes(element, mode)
+        element.attributes.each_attribute.with_object({}) do |attr, hash|
+          if xmlns_decl?(attr)
+            hash[xmlns_decl_key(attr)] = attr.value if mode == :preserve
+          else
+            hash[format_attr_name(attr, mode)] = attr.value
+          end
+        end
+      end
+
+      # Check whether an attribute represents an xmlns declaration
+      #
+      # @api private
+      # @param attr [REXML::Attribute] Attribute to inspect
+      # @return [Boolean] true if xmlns declaration
+      def xmlns_decl?(attr)
+        attr.prefix == "xmlns" || ((attr.prefix.nil? || attr.prefix.empty?) && attr.name == "xmlns")
+      end
+
+      # Build the key for an xmlns declaration under :preserve
+      #
+      # @api private
+      # @param attr [REXML::Attribute] Declaration attribute
+      # @return [String] key such as "xmlns" or "xmlns:atom"
+      def xmlns_decl_key(attr)
+        (attr.prefix == "xmlns") ? "xmlns:#{attr.name}" : "xmlns"
       end
 
       # Collect all child elements into a hash
@@ -69,9 +128,10 @@ module MultiXml
       # @api private
       # @param element [REXML::Element] Parent element
       # @param node_hash [Hash] Hash to populate
+      # @param mode [Symbol] Namespace handling mode
       # @return [void]
-      def collect_child_elements(element, node_hash)
-        element.each_element { |child| element_to_hash(node_hash, child) }
+      def collect_child_elements(element, node_hash, mode)
+        element.each_element { |child| element_to_hash(node_hash, child, mode) }
       end
 
       # Add text content from an element to a hash

@@ -1,3 +1,13 @@
+0.9.0
+-----
+* [Add `:namespaces` option to `MultiXml.parse` for consistent namespace handling across parsers](https://github.com/sferik/multi_xml/issues/44) — two modes produce byte-identical output on every backend:
+  * `:strip` (default) — drop xmlns declarations and prefixes; keeps today's libxml/nokogiri output so most users see no change
+  * `:preserve` — keep source prefixes (e.g. `"atom:rel"`) and surface `xmlns` / `xmlns:*` declarations as attributes
+* Fix REXML keeping attribute prefixes (`"gd:etag"`) while other backends stripped them ([#31](https://github.com/sferik/multi_xml/issues/31))
+* Fix Ox prepending namespace prefixes to element names (`"aws:Item"`) when other backends didn't ([#30](https://github.com/sferik/multi_xml/issues/30))
+* Raise `ArgumentError` on an unknown `:namespaces` mode
+* `undasherize_keys` now runs only in `:strip` mode so prefixed keys aren't rewritten under `:preserve`
+
 0.8.1
 -----
 * [Fix array unwrapping when elements contain nil](https://github.com/sferik/multi_xml/commit/09a875d832c45e2b567889398f45361ec9e36685)
