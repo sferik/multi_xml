@@ -55,13 +55,12 @@ module MultiXml
   # Uses untyped key because hash["type"] returns xmlValue, and Hash#[] with non-String returns nil
   TYPE_CONVERTERS: Hash[untyped, Proc | Method]
 
-  LOADED_PARSER_CHECKS: Hash[Symbol, Symbol]
-
   self.@parser: Module
 
   extend Helpers
 
   module ParserResolution
+    LOADED_PARSER_CHECKS: Hash[Symbol, Symbol]
   end
 
   module ParseSupport

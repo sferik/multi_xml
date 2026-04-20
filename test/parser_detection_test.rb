@@ -20,32 +20,68 @@ class FindLoadedParserTest < Minitest::Test
   cover "MultiXml*"
   include ParserStateReset
 
+  PARSER_CONSTANTS = %i[Ox LibXML Nokogiri Oga].freeze
+
   def test_returns_best_available_parser_when_defined
-    assert_equal best_available_parser, MultiXml.send(:find_loaded_parser)
+    with_parser_constants(:Ox, :LibXML, :Nokogiri, :Oga) do
+      assert_equal :ox, MultiXml.send(:find_loaded_parser)
+    end
   end
 
   def test_returns_nokogiri_when_ox_and_libxml_not_defined
-    with_hidden_consts(:Ox, :LibXML) { assert_equal :nokogiri, MultiXml.send(:find_loaded_parser) }
+    with_parser_constants(:Nokogiri, :Oga) do
+      assert_equal :nokogiri, MultiXml.send(:find_loaded_parser)
+    end
   end
 
   def test_returns_oga_when_only_oga_defined
-    with_hidden_consts(:Ox, :LibXML, :Nokogiri) { assert_equal :oga, MultiXml.send(:find_loaded_parser) }
+    with_parser_constants(:Oga) do
+      assert_equal :oga, MultiXml.send(:find_loaded_parser)
+    end
   end
 
   def test_returns_nil_when_no_parsers_defined
-    with_hidden_consts(:Ox, :LibXML, :Nokogiri, :Oga) { assert_nil MultiXml.send(:find_loaded_parser) }
+    with_parser_constants do
+      assert_nil MultiXml.send(:find_loaded_parser)
+    end
+  end
+
+  def test_ignores_parser_constants_nested_under_multixml
+    with_parser_constants do
+      MultiXml.const_set(:Ox, Module.new)
+
+      assert_nil MultiXml.send(:find_loaded_parser)
+    ensure
+      MultiXml.send(:remove_const, :Ox) if MultiXml.const_defined?(:Ox, false)
+    end
   end
 
   private
 
-  def with_hidden_consts(*const_names)
-    # Only hide constants that are actually defined
-    existing = const_names.select { |name| Object.const_defined?(name) }
-    saved = existing.to_h { |name| [name, Object.send(:remove_const, name)] }
+  def with_parser_constants(*defined_names)
+    saved = remove_object_consts(PARSER_CONSTANTS)
+    define_object_consts(defined_names)
     MultiXml.send(:remove_instance_variable, :@parser) if MultiXml.instance_variable_defined?(:@parser)
     yield
   ensure
-    saved&.each { |name, value| Object.const_set(name, value) }
+    remove_object_consts(PARSER_CONSTANTS)
+    restore_object_consts(saved)
+  end
+
+  def remove_object_consts(names)
+    names.filter_map do |name|
+      next unless Object.const_defined?(name)
+
+      [name, Object.send(:remove_const, name)]
+    end.to_h
+  end
+
+  def define_object_consts(names)
+    names.each { |name| Object.const_set(name, Module.new) }
+  end
+
+  def restore_object_consts(saved)
+    saved.each { |name, value| Object.const_set(name, value) }
   end
 end
 
