@@ -1,6 +1,7 @@
 *.gem
 *~
 .bundle
+.mutant
 .rvmrc
 .yardoc
 Gemfile.lock
