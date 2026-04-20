@@ -21,7 +21,8 @@ type MultiXml::xmlHash = Hash[String, MultiXml::xmlValue]
 
 # Interface for parser modules
 interface MultiXml::_Parser
-  def parse: (StringIO io, ?namespaces: Symbol) -> MultiXml::xmlHash?
+  def parse: ((IO | StringIO) io) -> MultiXml::xmlHash?
+           | ((IO | StringIO) io, ?namespaces: Symbol) -> MultiXml::xmlHash?
   def parse_error: () -> singleton(Exception)
 end
 
@@ -59,6 +60,12 @@ module MultiXml
   self.@parser: Module
 
   extend Helpers
+
+  module ParserResolution
+  end
+
+  module ParseSupport
+  end
 
   # Public API: Get the current XML parser module
   def self.parser: () -> Module
@@ -103,13 +110,19 @@ module MultiXml
 
   # Parse with error handling and key normalization
   # xml_parser implements _Parser interface; original_input uses respond_to? duck typing
-  def self.parse_with_error_handling: (StringIO io, untyped original_input, untyped xml_parser, Symbol namespaces) -> xmlHash
+  def self.parse_with_error_handling: ((IO | StringIO) io, untyped original_input, untyped xml_parser, Symbol namespaces) -> xmlHash
+
+  # Dispatch to parsers that may or may not accept `namespaces:`
+  def self.parse_with_namespaces_compatibility: ((IO | StringIO) io, untyped xml_parser, Symbol namespaces) -> xmlHash?
 
   # Validate the :namespaces option value
   def self.validate_namespaces_mode: (untyped mode) -> Symbol
 
   # Resolve which parser this parse call should use, honoring the :parser option
   def self.resolve_parse_parser: (Hash[Symbol, untyped] options) -> Module
+
+  # Check whether a parser accepts the `namespaces:` keyword
+  def self.parser_supports_namespaces_keyword?: (untyped xml_parser) -> bool
 
   # Apply typecasting and key-symbolization as configured
   def self.apply_postprocessing: (xmlHash result, Hash[Symbol, untyped] options) -> xmlHash
