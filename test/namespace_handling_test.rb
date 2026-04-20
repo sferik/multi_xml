@@ -45,6 +45,27 @@ module NamespaceHandlingMatrix
     </root>
   XML
 
+  STRIP_FEED = {
+    "feed" => {
+      "base" => "https://kosapi.fit.cvut.cz/api/3",
+      "lang" => "cs",
+      "link" => {"rel" => "next", "href" => "courses?offset=10&limit=10"},
+      "startIndex" => "0"
+    }
+  }.freeze
+
+  PRESERVE_FEED = {
+    "feed" => {
+      "xmlns" => FEED_NS,
+      "xmlns:atom" => ATOM_NS,
+      "xmlns:osearch" => OSEARCH_NS,
+      "xml:base" => "https://kosapi.fit.cvut.cz/api/3",
+      "xml:lang" => "cs",
+      "link" => {"atom:rel" => "next", "href" => "courses?offset=10&limit=10"},
+      "osearch:startIndex" => "0"
+    }
+  }.freeze
+
   # ------------------------------------------------------------------
   # :strip mode (default)
   # ------------------------------------------------------------------
@@ -102,28 +123,11 @@ module NamespaceHandlingMatrix
   # merged into one element's hash). The `xml:` reserved-prefix attrs are
   # also stripped to match the behavior libxml/nokogiri exhibit today.
   def strip_feed
-    {
-      "feed" => {
-        "base" => "https://kosapi.fit.cvut.cz/api/3",
-        "lang" => "cs",
-        "link" => {"rel" => "next", "href" => "courses?offset=10&limit=10"},
-        "startIndex" => "0"
-      }
-    }
+    STRIP_FEED
   end
 
-  def preserve_feed # rubocop:disable Metrics/MethodLength
-    {
-      "feed" => {
-        "xmlns" => FEED_NS,
-        "xmlns:atom" => ATOM_NS,
-        "xmlns:osearch" => OSEARCH_NS,
-        "xml:base" => "https://kosapi.fit.cvut.cz/api/3",
-        "xml:lang" => "cs",
-        "link" => {"atom:rel" => "next", "href" => "courses?offset=10&limit=10"},
-        "osearch:startIndex" => "0"
-      }
-    }
+  def preserve_feed
+    PRESERVE_FEED
   end
 end
 

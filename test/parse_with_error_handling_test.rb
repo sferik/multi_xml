@@ -162,6 +162,33 @@ class FailingParser
   end
 end
 
+class ClosingFailingParser
+  class ParseFailed < StandardError; end
+
+  def self.parse(io, **)
+    io.close if io.respond_to?(:close)
+    raise ParseFailed, "Parse failed"
+  end
+
+  def self.parse_error
+    ParseFailed
+  end
+end
+
+UnreadableIo = Struct.new(:xml) do
+  def read
+    raise IOError, "not opened for reading"
+  end
+
+  def rewind
+    raise IOError, "not opened for reading"
+  end
+
+  def to_s
+    xml
+  end
+end
+
 # Tests for ParseWithErrorHandlingNilReturnTest
 class ParseWithErrorHandlingNilReturnTest < Minitest::Test
   cover "MultiXml*"
@@ -222,6 +249,19 @@ class ParseWithErrorHandlingNilReturnTest < Minitest::Test
     end
   end
 
+  def test_parse_error_uses_string_buffer_when_io_was_closed
+    MultiXml.parser = ClosingFailingParser
+    io = StringIO.new("<bad/>")
+
+    begin
+      MultiXml.parse(io)
+
+      flunk "Expected ParseError"
+    rescue MultiXml::ParseError => e
+      assert_equal "<bad/>", e.xml
+    end
+  end
+
   def test_parse_error_rewinds_io_before_reading
     # The FailingParser raises an error during parse, so original_input
     # still needs to be readable for error message
@@ -236,6 +276,12 @@ class ParseWithErrorHandlingNilReturnTest < Minitest::Test
       # Should have rewound and read full content
       assert_equal "<bad></wrong>", e.xml
     end
+  end
+
+  def test_extract_xml_for_error_falls_back_to_to_s_when_io_is_unreadable
+    io = UnreadableIo.new("<bad/>")
+
+    assert_equal "<bad/>", MultiXml.send(:extract_xml_for_error, io)
   end
 end
 
