@@ -142,8 +142,20 @@ NAMESPACE_PARSERS = {
   "nokogiri_sax" => "nokogiri"
 }.freeze
 
+require_parser = lambda do |name|
+  next require(name) unless name == "oga"
+
+  original_verbose = $VERBOSE
+  $VERBOSE = nil
+  begin
+    require name
+  ensure
+    $VERBOSE = original_verbose
+  end
+end
+
 NAMESPACE_PARSERS.each do |parser_name, require_name|
-  require require_name
+  require_parser.call(require_name)
 
   klass = Class.new(Minitest::Test) do
     include NamespaceHandlingMatrix
@@ -169,5 +181,5 @@ NAMESPACE_PARSERS.each do |parser_name, require_name|
   test_class_name = parser_name.split("_").map(&:capitalize).join
   Object.const_set("#{test_class_name}NamespaceTest", klass)
 rescue LoadError
-  puts "Namespace tests not run for #{parser_name} due to a LoadError"
+  next
 end

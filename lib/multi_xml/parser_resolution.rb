@@ -65,7 +65,7 @@ module MultiXml
     # @return [Symbol, nil] Parser name or nil if none loaded
     def find_loaded_parser
       LOADED_PARSER_CHECKS.each do |const_name, parser_name|
-        return parser_name if const_defined?(const_name)
+        return parser_name if Object.const_defined?(const_name)
       end
       nil
     end
