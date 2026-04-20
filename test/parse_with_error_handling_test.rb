@@ -140,7 +140,7 @@ end
 
 # Create a mock parser that returns nil
 class NilReturningParser
-  def self.parse(_io)
+  def self.parse(_io, **)
     nil
   end
 
@@ -153,7 +153,7 @@ end
 class FailingParser
   class ParseFailed < StandardError; end
 
-  def self.parse(_io)
+  def self.parse(_io, **)
     raise ParseFailed, "Parse failed"
   end
 

@@ -46,6 +46,14 @@ module MultiXml
   #   FALSE_BOOLEAN_VALUES.include?("0") #=> true
   FALSE_BOOLEAN_VALUES = Set.new(%w[0 false]).freeze
 
+  # Supported values for the :namespaces parse option
+  #
+  # @api public
+  # @return [Array<Symbol>] the valid namespace handling modes
+  # @example Parse with namespace preservation
+  #   MultiXml.parse(xml, namespaces: :preserve)
+  NAMESPACE_MODES = %i[strip preserve].freeze
+
   # Default parsing options
   #
   # @api public
@@ -55,7 +63,8 @@ module MultiXml
   DEFAULT_OPTIONS = {
     typecast_xml_value: true,
     disallowed_types: DISALLOWED_TYPES,
-    symbolize_keys: false
+    symbolize_keys: false,
+    namespaces: :strip
   }.freeze
 
   # Parser libraries in preference order (fastest first)

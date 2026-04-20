@@ -1,12 +1,21 @@
 module MultiXml
+  # Namespace for all supported XML parser backends
+  #
+  # Each parser (Nokogiri, LibXML, Ox, Oga, REXML, plus SAX variants) is
+  # defined as a module under this namespace and exposes a common `parse`
+  # and `parse_error` interface.
+  #
+  # @api private
   module Parsers
     # Shared DOM traversal logic for converting XML nodes to hashes
     #
     # Used by Nokogiri, LibXML, and Oga parsers.
     # Including modules must implement:
     # - each_child(node) { |child| ... }
-    # - each_attr(node) { |attr| ... }
-    # - node_name(node) -> String
+    # - each_element_attr(node) { |attr| ... } (non-namespace-decl attrs only)
+    # - each_namespace_decl(node) { |prefix_or_nil, uri| ... }
+    # - element_parts(node) -> [prefix_or_nil, local_name]
+    # - attr_parts(attr)    -> [prefix_or_nil, local_name]
     #
     # @api private
     module DomParser
@@ -15,12 +24,14 @@ module MultiXml
       # @api private
       # @param node [Object] XML node to convert
       # @param hash [Hash] Accumulator hash for results
+      # @param mode [Symbol] Namespace handling mode (:strip, :preserve)
       # @return [Hash] Hash representation of the node
-      def node_to_hash(node, hash = {})
+      def node_to_hash(node, hash = {}, mode: :strip)
         node_hash = {TEXT_CONTENT_KEY => +""}
-        add_value(hash, node_name(node), node_hash)
-        collect_children(node, node_hash)
-        collect_attributes(node, node_hash)
+        add_value(hash, format_element_name(node, mode), node_hash)
+        collect_children(node, node_hash, mode)
+        collect_namespace_decls(node, node_hash, mode)
+        collect_attributes(node, node_hash, mode)
         strip_whitespace_content(node_hash)
         hash
       end
@@ -48,11 +59,12 @@ module MultiXml
       # @api private
       # @param node [Object] Parent node
       # @param node_hash [Hash] Hash to populate
+      # @param mode [Symbol] Namespace handling mode
       # @return [void]
-      def collect_children(node, node_hash)
+      def collect_children(node, node_hash, mode)
         each_child(node) do |child|
           if child.element?
-            node_to_hash(child, node_hash)
+            node_to_hash(child, node_hash, mode: mode)
           elsif text_or_cdata?(child)
             node_hash[TEXT_CONTENT_KEY] << child.content
           end
@@ -68,18 +80,73 @@ module MultiXml
         node.text? || node.cdata?
       end
 
+      # Collect xmlns declarations into the hash under :preserve mode
+      #
+      # Declarations are unique per prefix on a given element, so no
+      # collision handling is needed here.
+      #
+      # @api private
+      # @param node [Object] Node with potential xmlns declarations
+      # @param node_hash [Hash] Hash to populate
+      # @param mode [Symbol] Namespace handling mode
+      # @return [void]
+      def collect_namespace_decls(node, node_hash, mode)
+        return unless mode == :preserve
+
+        each_namespace_decl(node) do |prefix, uri|
+          node_hash[prefix ? "xmlns:#{prefix}" : "xmlns"] = uri
+        end
+      end
+
       # Collect all attributes from a node
+      #
+      # Attributes arrive after child elements. When an attribute collides
+      # with a child of the same name, the attribute is placed first in the
+      # resulting array (e.g. `<user name="A"><name>B</name></user>` →
+      # `["A", "B"]`). See `test/attribute_tests.rb`.
       #
       # @api private
       # @param node [Object] Node with attributes
       # @param node_hash [Hash] Hash to populate
+      # @param mode [Symbol] Namespace handling mode
       # @return [void]
-      def collect_attributes(node, node_hash)
-        each_attr(node) do |attr|
-          name = node_name(attr)
+      def collect_attributes(node, node_hash, mode)
+        each_element_attr(node) do |attr|
+          name = format_attr_name(attr, mode)
           existing = node_hash[name]
           node_hash[name] = existing ? [attr.value, existing] : attr.value
         end
+      end
+
+      # Format an element's name according to the namespace mode
+      #
+      # @api private
+      # @param node [Object] Element node
+      # @param mode [Symbol] Namespace handling mode
+      # @return [String] formatted element name
+      def format_element_name(node, mode)
+        format_name(*element_parts(node), mode)
+      end
+
+      # Format an attribute's name according to the namespace mode
+      #
+      # @api private
+      # @param attr [Object] Attribute node
+      # @param mode [Symbol] Namespace handling mode
+      # @return [String] formatted attribute name
+      def format_attr_name(attr, mode)
+        format_name(*attr_parts(attr), mode)
+      end
+
+      # Produce a name string for a given [prefix, local] tuple
+      #
+      # @api private
+      # @param prefix [String, nil] Namespace prefix (nil for default / unprefixed)
+      # @param local [String] Local part of the name
+      # @param mode [Symbol] Namespace handling mode
+      # @return [String] formatted name
+      def format_name(prefix, local, mode)
+        (mode == :preserve && prefix) ? "#{prefix}:#{local}" : local
       end
 
       # Remove empty or whitespace-only text content

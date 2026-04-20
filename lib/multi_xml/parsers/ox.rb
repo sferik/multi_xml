@@ -18,72 +18,89 @@ module MultiXml
       #
       # @api private
       # @param io [IO] IO-like object containing XML
+      # @param namespaces [Symbol] Namespace handling mode
       # @return [Hash] Parsed XML as a hash
-      def parse(io)
-        handler = Handler.new
+      def parse(io, namespaces: :strip)
+        handler = Handler.new(namespaces)
         ::Ox.sax_parse(handler, io, convert_special: true, skip: :skip_return)
         handler.result
       end
 
-      # SAX event handler that builds a hash tree while parsing
+      # SAX event handler that builds a hash tree while parsing.
+      #
+      # Ox's SAX callbacks expose element and attribute names in prefixed
+      # form (e.g. "atom:feed"). Under :preserve we keep the source form
+      # verbatim; under :strip we drop the prefix and filter xmlns
+      # declarations out of the attribute stream.
       #
       # @api private
       class Handler
         # Create a new SAX handler
         #
+        # @api private
+        # @param mode [Symbol] Namespace handling mode
         # @return [Handler] new handler instance
-        def initialize
-          @stack = []
+        def initialize(mode)
+          @mode = mode
+          @stack = [{}]
         end
 
         # Get the parsed result
         #
-        # @return [Hash, nil] the root hash or nil if empty
+        # @api private
+        # @return [Hash] the parsed hash
         def result = @stack.first
 
         # Handle start of an element
         #
-        # @param name [Symbol] Element name
+        # @api private
+        # @param name [Symbol, String] Element name
         # @return [void]
         def start_element(name)
-          @stack << {} if @stack.empty?
           child = {}
-          add_value(name.to_s, child)
+          add_value(current, format_name(name.to_s), child)
           @stack << child
         end
 
+        # Handle an attribute
+        #
+        # Ignored outside an element (e.g. attributes on the XML declaration
+        # such as `<?xml version="1.0"?>`, which fire before any `start_element`).
+        #
+        # @api private
+        # @param name [Symbol, String] Attribute name
+        # @param value [String] Attribute value
+        # @return [void]
+        def attr(name, value)
+          return if @stack.size < 2
+
+          name = name.to_s
+          return if xmlns_decl?(name) && @mode != :preserve
+
+          add_value(current, format_name(name), value)
+        end
+
+        # Handle text content (also aliased as `cdata`)
+        #
+        # @api private
+        # @param value [String] Text content
+        # @return [void]
+        def text(value) = add_value(current, TEXT_CONTENT_KEY, value)
+        alias_method :cdata, :text
+
         # Handle end of an element
         #
-        # @param _name [Symbol] Element name (unused)
+        # @api private
+        # @param _name [Symbol, String] Element name (unused)
         # @return [void]
         def end_element(_name)
           strip_whitespace_content if current.key?(TEXT_CONTENT_KEY)
           @stack.pop
         end
 
-        # Handle an attribute
-        #
-        # @param name [Symbol] Attribute name
-        # @param value [String] Attribute value
-        # @return [void]
-        def attr(name, value)
-          add_value(name.to_s, value) unless @stack.empty?
-        end
-
-        # Handle text content
-        #
-        # @param value [String] Text content
-        # @return [void]
-        def text(value) = add_value(TEXT_CONTENT_KEY, value)
-
-        # Handle CDATA content
-        #
-        # @param value [String] CDATA content
-        # @return [void]
-        def cdata(value) = add_value(TEXT_CONTENT_KEY, value)
-
         # Handle parse errors
         #
+        # @api private
         # @param message [String] Error message
         # @param line [Integer] Line number
         # @param column [Integer] Column number
@@ -95,23 +112,45 @@ module MultiXml
 
         private
 
-        # Get the current element hash
+        # Current element hash on top of the stack
         #
+        # @api private
         # @return [Hash] current hash being built
         def current = @stack.last
 
-        # Add a value to the current hash, merging with existing if needed
+        # Format a prefixed-or-local name according to the namespace mode
         #
+        # @api private
+        # @param name [String] Prefixed or local name
+        # @return [String] formatted name
+        def format_name(name)
+          (@mode == :preserve) ? name : name.split(":", 2).last
+        end
+
+        # Check whether an attribute name is an xmlns declaration
+        #
+        # @api private
+        # @param name [String] Attribute name
+        # @return [Boolean] true if xmlns or xmlns:*
+        def xmlns_decl?(name)
+          name == "xmlns" || name.start_with?("xmlns:")
+        end
+
+        # Add a value to a hash, folding into an array on collision
+        #
+        # @api private
+        # @param hash [Hash] Target hash
         # @param key [String] Key to add
         # @param value [Object] Value to add
         # @return [void]
-        def add_value(key, value)
-          existing = current[key]
-          current[key] = existing ? merge_values(existing, value) : value
+        def add_value(hash, key, value)
+          existing = hash[key]
+          hash[key] = existing ? merge_values(existing, value) : value
         end
 
-        # Merge a value with an existing value, creating array if needed
+        # Merge a value with an existing value, creating an array if needed
         #
+        # @api private
         # @param existing [Object] Existing value
         # @param value [Object] Value to append
         # @return [Array] array with both values
@@ -119,8 +158,9 @@ module MultiXml
           existing.is_a?(Array) ? existing << value : [existing, value]
         end
 
-        # Remove empty or whitespace-only text content
+        # Remove empty or whitespace-only text content from the current hash
         #
+        # @api private
         # @return [void]
         def strip_whitespace_content
           content = current[TEXT_CONTENT_KEY]
