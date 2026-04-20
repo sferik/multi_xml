@@ -136,7 +136,23 @@ module MultiXml
       # @return [void]
       def add_attr_to_current(key, value)
         existing = current[key]
-        current[key] = existing ? [value, existing] : value
+        current[key] = case existing
+        when nil then value
+        when Array then insert_attribute_before_children(existing, value)
+        when Hash then [value, existing]
+        else [existing, value]
+        end
+      end
+
+      # Insert a later attribute before any child-element entries
+      #
+      # @api private
+      # @param values [Array] Existing colliding values
+      # @param value [String] Attribute value to insert
+      # @return [Array] Updated value list
+      def insert_attribute_before_children(values, value)
+        child_index = values.index { |entry| entry.is_a?(Hash) } || values.length
+        values.dup.insert(child_index, value)
       end
 
       # Remove empty or whitespace-only text content from the current hash
