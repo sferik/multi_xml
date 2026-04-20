@@ -2,22 +2,28 @@ require "cgi/escape"
 
 module MultiXml
   module Parsers
-    # Shared SAX handler logic for building hash trees from XML events
+    # Shared SAX handler logic for building hash trees from XML events.
     #
-    # This module provides the core stack-based parsing logic used by both
-    # NokogiriSax and LibxmlSax parsers. Including classes must implement
-    # the callback methods that their respective SAX libraries expect.
+    # Provides a stack machine used by both NokogiriSax and LibxmlSax
+    # handlers. Parser-specific subclasses translate their native callbacks
+    # into calls on this entrypoint:
+    #
+    # - handle_start_element_ns(local, prefix, attr_tuples, ns_decls)
+    #     where attr_tuples = [[attr_prefix_or_nil, local, value], ...]
+    #           ns_decls    = [[prefix_or_nil, uri], ...]
     #
     # @api private
     module SaxHandler
       # Initialize the handler state
       #
       # @api private
+      # @param mode [Symbol] Namespace handling mode
       # @return [void]
-      def initialize_handler
+      def initialize_handler(mode)
+        @mode = mode
         @result = {}
         @stack = [@result]
-        @pending_attrs = []
+        @pending = []
       end
 
       # Get the parsed result
@@ -28,31 +34,34 @@ module MultiXml
 
       private
 
-      # Get the current element hash
+      # Get the current element hash on top of the stack
       #
       # @api private
       # @return [Hash] current hash being built
       def current = @stack.last
 
-      # Handle start of an element by pushing onto the stack
+      # Entry point for namespace-aware start events
       #
       # @api private
-      # @param name [String] Element name
-      # @param attrs [Hash, Array] Element attributes
+      # @param local [String] Local element name
+      # @param prefix [String, nil] Element namespace prefix
+      # @param attr_tuples [Array] Attributes as [prefix, local, value]
+      # @param ns_decls [Array] xmlns declarations as [prefix, uri] pairs
       # @return [void]
-      def handle_start_element(name, attrs)
+      def handle_start_element_ns(local, prefix, attr_tuples, ns_decls)
         child = {TEXT_CONTENT_KEY => +""}
-        add_child_to_current(name, child)
+        add_child_to_current(format_name(prefix, local), child)
         @stack << child
-        @pending_attrs << normalize_attrs(attrs)
+
+        @pending << build_pending_attrs(ns_decls, attr_tuples)
       end
 
-      # Handle end of an element by applying attributes and popping the stack
+      # Apply attributes and pop the current element from the stack
       #
       # @api private
       # @return [void]
       def handle_end_element
-        apply_attributes(@pending_attrs.pop)
+        @pending.pop.each { |key, value| add_attr_to_current(key, value) }
         strip_whitespace_content
         @stack.pop
       end
@@ -66,7 +75,40 @@ module MultiXml
         current[TEXT_CONTENT_KEY] << text
       end
 
-      # Add a child hash to the current element
+      # Build the list of attributes to apply at element-end
+      #
+      # @api private
+      # @param ns_decls [Array] xmlns declarations
+      # @param attr_tuples [Array] Attribute [prefix, local, value] tuples
+      # @return [Array<Array>] list of [key, value] pairs
+      def build_pending_attrs(ns_decls, attr_tuples)
+        preserved_ns_decls(ns_decls) + attr_tuples.map do |prefix, local, value|
+          [format_name(prefix, local), CGI.unescapeHTML(value)]
+        end
+      end
+
+      # Transform xmlns declarations into attribute pairs for :preserve mode
+      #
+      # @api private
+      # @param ns_decls [Array] Declarations as [prefix, uri]
+      # @return [Array<Array>] [xmlns key, uri] pairs (empty outside :preserve)
+      def preserved_ns_decls(ns_decls)
+        return [] unless @mode == :preserve
+
+        ns_decls.map { |prefix, uri| [prefix ? "xmlns:#{prefix}" : "xmlns", uri] }
+      end
+
+      # Produce a name string for a [prefix, local] tuple
+      #
+      # @api private
+      # @param prefix [String, nil] Namespace prefix
+      # @param local [String] Local part of the name
+      # @return [String] formatted name
+      def format_name(prefix, local)
+        (@mode == :preserve && prefix) ? "#{prefix}:#{local}" : local
+      end
+
+      # Add a child element to the current hash, folding on collision
       #
       # @api private
       # @param name [String] Child element name
@@ -81,29 +123,23 @@ module MultiXml
         end
       end
 
-      # Normalize attributes to a hash
+      # Add an attribute value to the current hash (attr wins on collision)
+      #
+      # Attributes are applied at end_element, after children have already
+      # populated the hash. When an attribute collides with a child of the
+      # same local name, the attribute is placed first in the resulting
+      # array (matching DomParser / REXML behavior and existing tests).
       #
       # @api private
-      # @param attrs [Hash, Array] Attributes as hash or array of pairs
-      # @return [Hash] Normalized attributes hash
-      def normalize_attrs(attrs)
-        attrs.is_a?(Hash) ? attrs : attrs.to_h
-      end
-
-      # Apply pending attributes to the current element
-      #
-      # @api private
-      # @param attrs [Hash] Attributes to apply
+      # @param key [String] Attribute key
+      # @param value [String] Attribute value
       # @return [void]
-      def apply_attributes(attrs)
-        attrs.each do |name, value|
-          unescaped = CGI.unescapeHTML(value)
-          existing = current[name]
-          current[name] = existing ? [unescaped, existing] : unescaped
-        end
+      def add_attr_to_current(key, value)
+        existing = current[key]
+        current[key] = existing ? [value, existing] : value
       end
 
-      # Remove empty or whitespace-only text content
+      # Remove empty or whitespace-only text content from the current hash
       #
       # @api private
       # @return [void]
