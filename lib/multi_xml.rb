@@ -7,6 +7,8 @@ require_relative "multi_xml/constants"
 require_relative "multi_xml/errors"
 require_relative "multi_xml/file_like"
 require_relative "multi_xml/helpers"
+require_relative "multi_xml/parser_resolution"
+require_relative "multi_xml/parse_support"
 
 # A generic swappable back-end for parsing XML
 #
@@ -24,6 +26,8 @@ require_relative "multi_xml/helpers"
 module MultiXml
   class << self
     include Helpers
+    include ParserResolution
+    include ParseSupport
 
     # Get the current XML parser module
     #
@@ -43,7 +47,8 @@ module MultiXml
     # @api public
     # @param new_parser [Symbol, String, Module] Parser specification
     #   - Symbol/String: :libxml, :nokogiri, :ox, :rexml, :oga
-    #   - Module: Custom parser implementing parse(io) and parse_error
+    #   - Module: Custom parser implementing parse(io) or
+    #             parse(io, namespaces: ...) and parse_error
     # @return [Module] the newly configured parser module
     # @example Set parser by symbol
     #   MultiXml.parser = :nokogiri
@@ -62,6 +67,7 @@ module MultiXml
     # @option options [Boolean] :symbolize_keys Convert keys to symbols (default: false)
     # @option options [Array<String>] :disallowed_types Types to reject (default: ['yaml', 'symbol'])
     # @option options [Boolean] :typecast_xml_value Apply type conversions (default: true)
+    # @option options [Symbol] :namespaces Namespace handling mode (:strip or :preserve)
     # @return [Hash] Parsed XML as nested hash
     # @raise [ParseError] if XML is malformed
     # @raise [DisallowedTypeError] if XML contains a disallowed type attribute
@@ -73,175 +79,12 @@ module MultiXml
     #   #=> {root: {name: "John"}}
     def parse(xml, options = {})
       options = DEFAULT_OPTIONS.merge(options)
+      namespaces = validate_namespaces_mode(options.fetch(:namespaces))
       io = normalize_input(xml)
       return {} if io.eof?
 
-      result = parse_with_error_handling(io, xml, resolve_parse_parser(options), validate_namespaces_mode(options.fetch(:namespaces)))
+      result = parse_with_error_handling(io, xml, resolve_parse_parser(options), namespaces)
       apply_postprocessing(result, options)
-    end
-
-    private
-
-    # Resolve a parser specification to a module
-    #
-    # @api private
-    # @param spec [Symbol, String, Class, Module] Parser specification
-    # @return [Module] Resolved parser module
-    # @raise [RuntimeError] if spec is invalid
-    def resolve_parser(spec)
-      case spec
-      when String, Symbol then load_parser(spec)
-      when Module then spec
-      else raise "Invalid parser specification: expected Symbol, String, or Module"
-      end
-    end
-
-    # Load a parser by name
-    #
-    # @api private
-    # @param name [Symbol, String] Parser name
-    # @return [Module] Loaded parser module
-    def load_parser(name)
-      name = name.to_s.downcase
-      require "multi_xml/parsers/#{name}"
-      Parsers.const_get(camelize(name))
-    end
-
-    # Convert underscored string to CamelCase
-    #
-    # @api private
-    # @param name [String] Underscored string
-    # @return [String] CamelCased string
-    def camelize(name)
-      name.split("_").map(&:capitalize).join
-    end
-
-    # Detect the best available parser
-    #
-    # @api private
-    # @return [Symbol] Parser name
-    # @raise [NoParserError] if no parser is available
-    def detect_parser
-      find_loaded_parser || find_available_parser || raise_no_parser_error
-    end
-
-    # Parser constant names mapped to their symbols, in preference order
-    #
-    # @api private
-    LOADED_PARSER_CHECKS = {
-      Ox: :ox,
-      LibXML: :libxml,
-      Nokogiri: :nokogiri,
-      Oga: :oga
-    }.freeze
-    private_constant :LOADED_PARSER_CHECKS
-
-    # Find an already-loaded parser library
-    #
-    # @api private
-    # @return [Symbol, nil] Parser name or nil if none loaded
-    def find_loaded_parser
-      LOADED_PARSER_CHECKS.each do |const_name, parser_name|
-        return parser_name if const_defined?(const_name)
-      end
-      nil
-    end
-
-    # Try to load and find an available parser
-    #
-    # @api private
-    # @return [Symbol, nil] Parser name or nil if none available
-    def find_available_parser
-      PARSER_PREFERENCE.each do |library, parser_name|
-        return parser_name if try_require(library)
-      end
-      nil
-    end
-
-    # Attempt to require a library
-    #
-    # @api private
-    # @param library [String] Library to require
-    # @return [Boolean] true if successful, false if LoadError
-    def try_require(library)
-      require library
-      true
-    rescue LoadError
-      false
-    end
-
-    # Raise an error indicating no parser is available
-    #
-    # @api private
-    # @return [void]
-    # @raise [NoParserError] always
-    def raise_no_parser_error
-      raise NoParserError, <<~MSG.chomp
-        No XML parser detected. Install one of: ox, nokogiri, libxml-ruby, or oga.
-        See https://github.com/sferik/multi_xml for more information.
-      MSG
-    end
-
-    # Normalize input to an IO-like object
-    #
-    # @api private
-    # @param xml [String, IO] Input to normalize
-    # @return [IO] IO-like object
-    def normalize_input(xml)
-      return xml if xml.respond_to?(:read)
-
-      StringIO.new(xml.to_s.strip)
-    end
-
-    # Parse XML with error handling and key normalization
-    #
-    # @api private
-    # @param io [IO] IO-like object containing XML
-    # @param original_input [String, IO] Original input for error reporting
-    # @param xml_parser [Module] Parser to use
-    # @param namespaces [Symbol] Namespace handling mode
-    # @return [Hash] Parsed XML (undasherized only when mode is :strip)
-    # @raise [ParseError] if XML is malformed
-    def parse_with_error_handling(io, original_input, xml_parser, namespaces)
-      result = xml_parser.parse(io, namespaces: namespaces) || {}
-      (namespaces == :strip) ? undasherize_keys(result) : result
-    rescue xml_parser.parse_error => e
-      xml_string = original_input.respond_to?(:read) ? original_input.tap(&:rewind).read : original_input.to_s
-      raise(ParseError.new(e, xml: xml_string, cause: e))
-    end
-
-    # Validate the :namespaces mode option
-    #
-    # @api private
-    # @param mode [Symbol] Namespace handling mode to validate
-    # @return [Symbol] the validated mode
-    # @raise [ArgumentError] if mode is not a recognized value
-    def validate_namespaces_mode(mode)
-      return mode if NAMESPACE_MODES.include?(mode)
-
-      expected_modes = "[#{NAMESPACE_MODES.map(&:inspect).join(", ")}]"
-      raise ArgumentError, "invalid :namespaces mode #{mode.inspect}; expected one of #{expected_modes}"
-    end
-
-    # Pick the parser to use for this call, honoring the :parser option
-    #
-    # @api private
-    # @param options [Hash] Parsing options
-    # @return [Module] Resolved parser module
-    def resolve_parse_parser(options)
-      options[:parser] ? resolve_parser(options.fetch(:parser)) : parser
-    end
-
-    # Apply typecasting and key-symbolization as configured
-    #
-    # @api private
-    # @param result [Hash] Parsed hash
-    # @param options [Hash] Parsing options
-    # @return [Hash] Post-processed hash
-    def apply_postprocessing(result, options)
-      result = typecast_xml_value(result, options.fetch(:disallowed_types)) if options.fetch(:typecast_xml_value)
-      result = symbolize_keys(result) if options.fetch(:symbolize_keys)
-      result
     end
   end
 end
