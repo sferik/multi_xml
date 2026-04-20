@@ -45,6 +45,10 @@ module NamespaceHandlingMatrix
     </root>
   XML
 
+  ATTR_COLLISION_XML = <<~XML.freeze
+    <root xmlns:a="urn:a" xmlns:b="urn:b" a:id="111" b:id="222"/>
+  XML
+
   STRIP_FEED = {
     "feed" => {
       "base" => "https://kosapi.fit.cvut.cz/api/3",
@@ -84,6 +88,12 @@ module NamespaceHandlingMatrix
     assert_equal({"root" => {"id" => %w[111 222]}}, result)
   end
 
+  def test_strip_attribute_collision_folds_into_array
+    result = MultiXml.parse(ATTR_COLLISION_XML, namespaces: :strip)
+
+    assert_equal({"root" => {"id" => %w[111 222]}}, result)
+  end
+
   # ------------------------------------------------------------------
   # :preserve mode
   # ------------------------------------------------------------------
@@ -96,6 +106,19 @@ module NamespaceHandlingMatrix
 
   def test_preserve_collision_keeps_prefixes_distinct
     result = MultiXml.parse(COLLISION_XML, namespaces: :preserve)
+
+    assert_equal({
+      "root" => {
+        "xmlns:a" => "urn:a",
+        "xmlns:b" => "urn:b",
+        "a:id" => "111",
+        "b:id" => "222"
+      }
+    }, result)
+  end
+
+  def test_preserve_attribute_collision_keeps_prefixes_distinct
+    result = MultiXml.parse(ATTR_COLLISION_XML, namespaces: :preserve)
 
     assert_equal({
       "root" => {

@@ -77,7 +77,7 @@ module MultiXml
           name = name.to_s
           return if xmlns_decl?(name) && @mode != :preserve
 
-          add_value(current, format_name(name), value)
+          add_attribute_value(current, format_name(name), value)
         end
 
         # Handle text content (also aliased as `cdata`)
@@ -156,6 +156,34 @@ module MultiXml
         # @return [Array] array with both values
         def merge_values(existing, value)
           existing.is_a?(Array) ? existing << value : [existing, value]
+        end
+
+        # Add an attribute value while keeping document order on collisions
+        #
+        # @api private
+        # @param hash [Hash] Target hash
+        # @param key [String] Attribute key
+        # @param value [String] Attribute value
+        # @return [void]
+        def add_attribute_value(hash, key, value)
+          existing = hash[key]
+          hash[key] = case existing
+          when nil then value
+          when Array then insert_attribute_before_children(existing, value)
+          when Hash then [value, existing]
+          else [existing, value]
+          end
+        end
+
+        # Insert a later attribute before any child-element entries
+        #
+        # @api private
+        # @param values [Array] Existing colliding values
+        # @param value [String] Attribute value to insert
+        # @return [Array] Updated value list
+        def insert_attribute_before_children(values, value)
+          child_index = values.index { |entry| entry.is_a?(Hash) } || values.length
+          values.dup.insert(child_index, value)
         end
 
         # Remove empty or whitespace-only text content from the current hash
