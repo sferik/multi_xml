@@ -2,8 +2,8 @@ require "test_helper"
 
 # Tests typecast_array behavior including unwrapping single elements
 class TypecastArrayTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_with_single_element_returns_first
     assert_equal({"key" => "value"}, typecast_array([{"key" => "value"}], []))
@@ -58,7 +58,7 @@ class TypecastArrayTest < Minitest::Test
   def test_with_custom_disallowed_types
     input = [{"type" => "integer", "__content__" => "42"}]
 
-    assert_raises(MultiXml::DisallowedTypeError) do
+    assert_raises(MultiXML::DisallowedTypeError) do
       typecast_array(input, ["integer"])
     end
   end

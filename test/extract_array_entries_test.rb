@@ -3,8 +3,8 @@ require_relative "test_subclasses"
 
 # Tests extract_array_entries for type="array" handling
 class ExtractArrayEntriesTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_with_array_value
     assert_equal %w[Alice Bob], extract_array_entries({"type" => "array", "user" => %w[Alice Bob]}, [])

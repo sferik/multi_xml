@@ -2,8 +2,8 @@ require "test_helper"
 
 # Tests key transformation helpers
 class KeyTransformTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_undasherize_keys_with_array
     input = [{"first-name" => "John"}, {"last-name" => "Doe"}]

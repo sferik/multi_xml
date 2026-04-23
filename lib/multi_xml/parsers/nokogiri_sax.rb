@@ -2,7 +2,7 @@ require "nokogiri"
 require "stringio"
 require_relative "sax_handler"
 
-module MultiXml
+module MultiXML
   module Parsers
     # SAX-based parser using Nokogiri (faster for large documents)
     #

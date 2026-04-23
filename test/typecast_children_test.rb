@@ -2,8 +2,8 @@ require "test_helper"
 
 # Tests typecast_children behavior with StringIO file handling
 class TypecastChildrenTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_unwraps_stringio_file
     file = StringIO.new("content")

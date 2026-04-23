@@ -1,4 +1,4 @@
-module MultiXml
+module MultiXML
   # Namespace for all supported XML parser backends
   #
   # Each parser (Nokogiri, LibXML, Ox, Oga, REXML, plus SAX variants) is

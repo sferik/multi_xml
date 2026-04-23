@@ -1,4 +1,4 @@
-module MultiXml
+module MultiXML
   # Methods for transforming parsed XML hash structures
   #
   # These helper methods handle key transformation and type casting
@@ -193,7 +193,7 @@ module MultiXml
     def transform_keys(data, &block)
       case data
       when Hash then data.each_with_object(
-        {} #: Hash[Symbol, MultiXml::xmlValue] # rubocop:disable Layout/LeadingCommentSpace
+        {} #: Hash[Symbol, MultiXML::xmlValue] # rubocop:disable Layout/LeadingCommentSpace
       ) { |(key, value), acc| acc[yield(key)] = transform_keys(value, &block) }
       when Array then data.map { |item| transform_keys(item, &block) }
       else data

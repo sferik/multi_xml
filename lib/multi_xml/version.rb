@@ -1,5 +1,5 @@
-module MultiXml
-  # The current version of MultiXml
+module MultiXML
+  # The current version of MultiXML
   #
   # @api public
   # @return [Gem::Version] the gem version

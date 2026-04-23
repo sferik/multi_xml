@@ -3,8 +3,8 @@ require_relative "test_subclasses"
 
 # Tests empty_value? checking for nil/empty values
 class EmptyValueTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_true_for_empty_hash
     assert empty_value?({}, nil)

@@ -98,10 +98,10 @@ class PositionalNamespacesParser
 end
 
 class NamespacesOptionTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
     RecordingNamespacesParser.reset!
     LegacyNamespacesParser.reset!
     KeyrestNamespacesParser.reset!
@@ -109,14 +109,14 @@ class NamespacesOptionTest < Minitest::Test
 
   def teardown
     if @original_parser
-      MultiXml.instance_variable_set(:@parser, @original_parser)
-    elsif MultiXml.instance_variable_defined?(:@parser)
-      MultiXml.send(:remove_instance_variable, :@parser)
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
     end
   end
 
   def test_parse_passes_preserve_mode_through_without_undasherizing_keys
-    result = MultiXml.parse("<root/>", parser: RecordingNamespacesParser, namespaces: :preserve, typecast_xml_value: false)
+    result = MultiXML.parse("<root/>", parser: RecordingNamespacesParser, namespaces: :preserve, typecast_xml_value: false)
 
     assert_equal({"root" => {"my-key" => "value"}}, result)
     assert_equal :preserve, RecordingNamespacesParser.last_namespaces
@@ -125,7 +125,7 @@ class NamespacesOptionTest < Minitest::Test
 
   def test_parse_rejects_invalid_string_namespaces_mode_before_parser_runs
     error = assert_raises(ArgumentError) do
-      MultiXml.parse("<root/>", parser: RecordingNamespacesParser, namespaces: "bogus", typecast_xml_value: false)
+      MultiXML.parse("<root/>", parser: RecordingNamespacesParser, namespaces: "bogus", typecast_xml_value: false)
     end
 
     assert_equal 'invalid :namespaces mode "bogus"; expected one of [:strip, :preserve]', error.message
@@ -133,7 +133,7 @@ class NamespacesOptionTest < Minitest::Test
 
   def test_parse_does_not_invoke_parser_for_invalid_string_namespaces_mode
     assert_raises(ArgumentError) do
-      MultiXml.parse("<root/>", parser: RecordingNamespacesParser, namespaces: "bogus", typecast_xml_value: false)
+      MultiXML.parse("<root/>", parser: RecordingNamespacesParser, namespaces: "bogus", typecast_xml_value: false)
     end
 
     assert_equal 0, RecordingNamespacesParser.calls
@@ -142,14 +142,14 @@ class NamespacesOptionTest < Minitest::Test
 
   def test_parse_rejects_invalid_namespaces_mode_for_empty_input
     error = assert_raises(ArgumentError) do
-      MultiXml.parse("", namespaces: :bogus)
+      MultiXML.parse("", namespaces: :bogus)
     end
 
     assert_equal "invalid :namespaces mode :bogus; expected one of [:strip, :preserve]", error.message
   end
 
   def test_parse_supports_legacy_custom_parser_without_namespaces_keyword
-    result = MultiXml.parse("<root/>", parser: LegacyNamespacesParser, namespaces: :preserve, typecast_xml_value: false)
+    result = MultiXML.parse("<root/>", parser: LegacyNamespacesParser, namespaces: :preserve, typecast_xml_value: false)
 
     assert_equal({"root" => {"legacy-key" => "value"}}, result)
     assert_equal 1, LegacyNamespacesParser.calls
@@ -158,7 +158,7 @@ class NamespacesOptionTest < Minitest::Test
   def test_parse_with_namespaces_compatibility_passes_original_io_to_legacy_parser
     io = StringIO.new("<root/>")
 
-    MultiXml.send(:parse_with_namespaces_compatibility, io, LegacyNamespacesParser, :preserve)
+    MultiXML.send(:parse_with_namespaces_compatibility, io, LegacyNamespacesParser, :preserve)
 
     assert_same io, LegacyNamespacesParser.last_io
   end
@@ -166,28 +166,28 @@ class NamespacesOptionTest < Minitest::Test
   def test_parse_with_namespaces_compatibility_passes_namespaces_to_keywordrest_parser
     io = StringIO.new("<root/>")
 
-    MultiXml.send(:parse_with_namespaces_compatibility, io, KeyrestNamespacesParser, :preserve)
+    MultiXML.send(:parse_with_namespaces_compatibility, io, KeyrestNamespacesParser, :preserve)
 
     assert_equal({namespaces: :preserve}, KeyrestNamespacesParser.last_kwargs)
   end
 
   def test_parser_supports_namespaces_keyword_detects_legacy_parser
-    refute MultiXml.send(:parser_supports_namespaces_keyword?, LegacyNamespacesParser)
+    refute MultiXML.send(:parser_supports_namespaces_keyword?, LegacyNamespacesParser)
   end
 
   def test_parser_supports_namespaces_keyword_detects_optional_namespaces_keyword
-    assert MultiXml.send(:parser_supports_namespaces_keyword?, OptionalNamespacesParser)
+    assert MultiXML.send(:parser_supports_namespaces_keyword?, OptionalNamespacesParser)
   end
 
   def test_parser_supports_namespaces_keyword_detects_keyrest
-    assert MultiXml.send(:parser_supports_namespaces_keyword?, KeyrestNamespacesParser)
+    assert MultiXML.send(:parser_supports_namespaces_keyword?, KeyrestNamespacesParser)
   end
 
   def test_parser_supports_namespaces_keyword_rejects_unrelated_keyword
-    refute MultiXml.send(:parser_supports_namespaces_keyword?, UnrelatedKeywordParser)
+    refute MultiXML.send(:parser_supports_namespaces_keyword?, UnrelatedKeywordParser)
   end
 
   def test_parser_supports_namespaces_keyword_rejects_positional_namespaces_argument
-    refute MultiXml.send(:parser_supports_namespaces_keyword?, PositionalNamespacesParser)
+    refute MultiXML.send(:parser_supports_namespaces_keyword?, PositionalNamespacesParser)
   end
 end

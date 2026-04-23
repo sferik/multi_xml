@@ -2,7 +2,7 @@
 module ParserFileArrayTests
   def test_file_type_returns_stringio
     xml = '<tag type="file" name="data.txt" content_type="text/plain">ZGF0YQ==</tag>'
-    result = MultiXml.parse(xml)["tag"]
+    result = MultiXML.parse(xml)["tag"]
 
     assert_kind_of StringIO, result
     assert_equal "data", result.string
@@ -12,7 +12,7 @@ module ParserFileArrayTests
 
   def test_file_type_with_missing_name_and_content_type
     xml = '<tag type="file">ZGF0YQ==</tag>'
-    result = MultiXml.parse(xml)["tag"]
+    result = MultiXML.parse(xml)["tag"]
 
     assert_kind_of StringIO, result
     assert_equal "data", result.string
@@ -22,7 +22,7 @@ module ParserFileArrayTests
 
   def test_array_type_returns_array
     xml = '<users type="array"><user>Erik Berlin</user><user>Wynn Netherland</user></users>'
-    result = MultiXml.parse(xml)["users"]
+    result = MultiXML.parse(xml)["users"]
 
     assert_kind_of Array, result
     assert_equal ["Erik Berlin", "Wynn Netherland"], result
@@ -30,7 +30,7 @@ module ParserFileArrayTests
 
   def test_array_type_with_other_attributes_returns_array
     xml = '<users type="array" foo="bar"><user>Erik Berlin</user><user>Wynn Netherland</user></users>'
-    result = MultiXml.parse(xml)["users"]
+    result = MultiXML.parse(xml)["users"]
 
     assert_kind_of Array, result
     assert_equal ["Erik Berlin", "Wynn Netherland"], result
@@ -38,7 +38,7 @@ module ParserFileArrayTests
 
   def test_array_type_with_single_item_returns_array
     xml = '<users type="array"><user>Erik Berlin</user></users>'
-    result = MultiXml.parse(xml)["users"]
+    result = MultiXML.parse(xml)["users"]
 
     assert_kind_of Array, result
     assert_equal ["Erik Berlin"], result

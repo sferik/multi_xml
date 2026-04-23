@@ -2,16 +2,16 @@ require "test_helper"
 
 # Tests unwrap_if_simple value merging behavior
 class UnwrapIfSimpleTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_merges_value_when_multiple_keys
     hash = {"attr1" => "val1", "attr2" => "val2"}
     value = "converted"
     result = unwrap_if_simple(hash, value)
 
-    assert_equal({"attr1" => "val1", "attr2" => "val2", MultiXml::TEXT_CONTENT_KEY => "converted"}, result)
-    assert_equal "converted", result[MultiXml::TEXT_CONTENT_KEY]
+    assert_equal({"attr1" => "val1", "attr2" => "val2", MultiXML::TEXT_CONTENT_KEY => "converted"}, result)
+    assert_equal "converted", result[MultiXML::TEXT_CONTENT_KEY]
   end
 
   def test_returns_value_when_single_key
@@ -27,7 +27,7 @@ class UnwrapIfSimpleTest < Minitest::Test
     value = "important_content"
     result = unwrap_if_simple(hash, value)
 
-    assert_includes result.keys, MultiXml::TEXT_CONTENT_KEY
-    assert_equal "important_content", result[MultiXml::TEXT_CONTENT_KEY]
+    assert_includes result.keys, MultiXML::TEXT_CONTENT_KEY
+    assert_equal "important_content", result[MultiXML::TEXT_CONTENT_KEY]
   end
 end

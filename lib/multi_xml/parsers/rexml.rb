@@ -1,6 +1,6 @@
 require "rexml/document"
 
-module MultiXml
+module MultiXML
   module Parsers
     # XML parser using Ruby's built-in REXML library
     #

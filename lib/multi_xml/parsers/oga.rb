@@ -1,7 +1,7 @@
 require "oga"
 require_relative "dom_parser"
 
-module MultiXml
+module MultiXML
   module Parsers
     # XML parser using the Oga library
     #

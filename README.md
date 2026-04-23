@@ -14,25 +14,25 @@ A generic swappable back-end for XML parsing
 ```ruby
 require 'multi_xml'
 
-MultiXml.parser = :ox
-MultiXml.parser = MultiXml::Parsers::Ox # Same as above
-MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Ox
+MultiXML.parser = :ox
+MultiXML.parser = MultiXML::Parsers::Ox # Same as above
+MultiXML.parse('<tag>This is the contents</tag>') # Parsed using Ox
 
-MultiXml.parser = :libxml
-MultiXml.parser = MultiXml::Parsers::Libxml # Same as above
-MultiXml.parse('<tag>This is the contents</tag>') # Parsed using LibXML
+MultiXML.parser = :libxml
+MultiXML.parser = MultiXML::Parsers::Libxml # Same as above
+MultiXML.parse('<tag>This is the contents</tag>') # Parsed using LibXML
 
-MultiXml.parser = :nokogiri
-MultiXml.parser = MultiXml::Parsers::Nokogiri # Same as above
-MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
+MultiXML.parser = :nokogiri
+MultiXML.parser = MultiXML::Parsers::Nokogiri # Same as above
+MultiXML.parse('<tag>This is the contents</tag>') # Parsed using Nokogiri
 
-MultiXml.parser = :rexml
-MultiXml.parser = MultiXml::Parsers::Rexml # Same as above
-MultiXml.parse('<tag>This is the contents</tag>') # Parsed using REXML
+MultiXML.parser = :rexml
+MultiXML.parser = MultiXML::Parsers::Rexml # Same as above
+MultiXML.parse('<tag>This is the contents</tag>') # Parsed using REXML
 
-MultiXml.parser = :oga
-MultiXml.parser = MultiXml::Parsers::Oga # Same as above
-MultiXml.parse('<tag>This is the contents</tag>') # Parsed using Oga
+MultiXML.parser = :oga
+MultiXML.parser = MultiXML::Parsers::Oga # Same as above
+MultiXML.parse('<tag>This is the contents</tag>') # Parsed using Oga
 ```
 The `parser` setter takes either a symbol or a class (to allow for custom XML
 parsers) that responds to `.parse` at the class level.
