@@ -8,6 +8,7 @@ require_relative "multi_xml/constants"
 require_relative "multi_xml/errors"
 require_relative "multi_xml/file_like"
 require_relative "multi_xml/helpers"
+require_relative "multi_xml/options"
 require_relative "multi_xml/options_normalization"
 require_relative "multi_xml/parser_resolution"
 require_relative "multi_xml/parse_support"
@@ -26,6 +27,8 @@ require_relative "multi_xml/parse_support"
 # @example Set the parser
 #   MultiXML.parser = :nokogiri
 module MultiXML
+  extend Options
+
   # Tracks which deprecation warnings have already been emitted so each
   # one fires at most once per process. Stored as a Set rather than a
   # Hash so presence checks have unambiguous semantics for mutation tests.
@@ -113,7 +116,9 @@ module MultiXML
     #   MultiXML.parse('<root><name>John</name></root>', symbolize_names: true)
     #   #=> {root: {name: "John"}}
     def parse(xml, options = {})
-      options = DEFAULT_OPTIONS.merge(OptionsNormalization.normalize_symbolize_option(options))
+      call_site = OptionsNormalization.normalize_symbolize_option(options)
+      global = OptionsNormalization.normalize_symbolize_option(parse_options(call_site))
+      options = DEFAULT_OPTIONS.merge(global, call_site)
       namespaces = validate_namespaces_mode(options.fetch(:namespaces))
       io = normalize_input(xml)
       return {} if io.eof?
