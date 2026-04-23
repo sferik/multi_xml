@@ -7,14 +7,13 @@ module MultiXML
     #
     # @api private
     module Libxml
+      extend MultiXML::Parser
       include DomParser
       extend self
 
-      # Get the parse error class for this parser
-      #
+      # Exception class raised on LibXML parse failure
       # @api private
-      # @return [Class] LibXML::XML::Error
-      def parse_error = ::LibXML::XML::Error
+      ParseError = ::LibXML::XML::Error
 
       # Parse XML from an IO object
       #

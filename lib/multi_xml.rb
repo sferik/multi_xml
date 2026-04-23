@@ -10,6 +10,7 @@ require_relative "multi_xml/file_like"
 require_relative "multi_xml/helpers"
 require_relative "multi_xml/options"
 require_relative "multi_xml/options_normalization"
+require_relative "multi_xml/parser"
 require_relative "multi_xml/parser_resolution"
 require_relative "multi_xml/parse_support"
 

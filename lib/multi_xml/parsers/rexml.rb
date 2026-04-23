@@ -6,13 +6,12 @@ module MultiXML
     #
     # @api private
     module Rexml
+      extend MultiXML::Parser
       extend self
 
-      # Get the parse error class for this parser
-      #
+      # Exception class raised on REXML parse failure
       # @api private
-      # @return [Class] REXML::ParseException
-      def parse_error = ::REXML::ParseException
+      ParseError = ::REXML::ParseException
 
       # Parse XML from an IO object
       #
