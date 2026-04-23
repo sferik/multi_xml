@@ -37,8 +37,8 @@ class WithParserTest < Minitest::Test
   def test_restores_parser_when_block_raises
     MultiXML.parser = :rexml
 
-    assert_raises(RuntimeError) do
-      MultiXML.with_parser(:nokogiri) { raise "boom" }
+    assert_raises(StandardError) do
+      MultiXML.with_parser(:nokogiri) { raise StandardError, "boom" }
     end
     assert_equal "MultiXML::Parsers::Rexml", MultiXML.parser.name
   end

@@ -10,13 +10,18 @@ module MultiXML
     # @api private
     # @param spec [Symbol, String, Class, Module] Parser specification
     # @return [Module] Resolved parser module
-    # @raise [RuntimeError] if spec is invalid
+    # @raise [ParserLoadError] if spec is invalid, the parser file
+    #   can't be required, or the resolved parser doesn't satisfy
+    #   the parser contract
     def resolve_parser(spec)
-      case spec
+      parser = case spec
       when String, Symbol then load_parser(spec)
       when Module then spec
-      else raise "Invalid parser specification: expected Symbol, String, or Module"
+      else raise ParserLoadError, "expected parser to be a Symbol, String, or Module, got #{spec.inspect}"
       end
+      validate_parser!(parser)
+    rescue ::LoadError => e
+      raise ParserLoadError.build(e)
     end
 
     # Load a parser by name
@@ -28,6 +33,26 @@ module MultiXML
       name = name.to_s.downcase
       require "multi_xml/parsers/#{name}"
       Parsers.const_get(camelize(name))
+    end
+
+    # Validate that a parser satisfies the documented contract
+    #
+    # Custom parsers are accepted as modules/classes, so fail fast
+    # during parser resolution rather than later on the first parse
+    # call. A parser must respond to ``.parse`` and must either
+    # define a ``ParseError`` constant or respond to ``.parse_error``.
+    #
+    # @api private
+    # @param parser [Module] parser class or module
+    # @return [Module] the validated parser
+    # @raise [ParserLoadError] when the parser is missing a required method
+    def validate_parser!(parser)
+      raise ParserLoadError, "Parser #{parser} must respond to .parse" unless parser.respond_to?(:parse)
+      unless parser.const_defined?(:ParseError, false) || parser.respond_to?(:parse_error)
+        raise ParserLoadError, "Parser #{parser} must define a ParseError constant or a .parse_error method"
+      end
+
+      parser
     end
 
     # Convert underscored string to CamelCase

@@ -94,8 +94,8 @@ class MultiXmlPerParseParserTest < Minitest::Test
   end
 
   def test_raises_error_for_invalid_per_parse_parser
-    error = assert_raises(RuntimeError) { MultiXML.parse("<user/>", parser: 123) }
-    assert_match(/Invalid parser specification/, error.message)
+    error = assert_raises(MultiXML::ParserLoadError) { MultiXML.parse("<user/>", parser: 123) }
+    assert_match(/expected parser to be a Symbol, String, or Module/, error.message)
   end
 
   def test_wraps_parser_errors_correctly_with_per_parse_parser

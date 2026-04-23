@@ -19,11 +19,11 @@ class ResolveParserTest < Minitest::Test
   end
 
   def test_resolve_parser_raises_for_invalid_spec
-    error = assert_raises(RuntimeError) do
+    error = assert_raises(MultiXML::ParserLoadError) do
       MultiXML.send(:resolve_parser, 123)
     end
 
-    assert_match(/Invalid parser specification/, error.message)
+    assert_match(/expected parser to be a Symbol, String, or Module/, error.message)
   end
 end
 
@@ -45,19 +45,19 @@ class ResolveParserDetailedTest < Minitest::Test
   end
 
   def test_resolve_parser_raises_for_integer
-    error = assert_raises(RuntimeError) do
+    error = assert_raises(MultiXML::ParserLoadError) do
       MultiXML.send(:resolve_parser, 123)
     end
 
-    assert_match(/Invalid parser/, error.message)
+    assert_match(/expected parser to be/, error.message)
   end
 
   def test_resolve_parser_raises_for_nil
-    error = assert_raises(RuntimeError) do
+    error = assert_raises(MultiXML::ParserLoadError) do
       MultiXML.send(:resolve_parser, nil)
     end
 
-    assert_match(/Invalid parser/, error.message)
+    assert_match(/expected parser to be/, error.message)
   end
 end
 
