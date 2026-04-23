@@ -87,6 +87,9 @@ module MultiXML
   # Uses untyped for options because values vary by key (:parser, :symbolize_keys, :disallowed_types, :typecast_xml_value)
   def self.parse: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
 
+  # Deprecated alias for `parse`
+  def self.load: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
+
   private
 
   # Resolve a parser specification (Symbol, String, or Module) to a parser
@@ -136,6 +139,9 @@ module MultiXML
 
   # Apply typecasting and key-symbolization as configured
   def self.apply_postprocessing: (xmlHash result, Hash[Symbol, untyped] options) -> xmlHash
+
+  # Define a deprecated alias that delegates to a new method name
+  def self.deprecate_alias: (Symbol name, Symbol replacement) -> Symbol
 
   module Helpers
     # Recursively convert all hash keys to symbols
