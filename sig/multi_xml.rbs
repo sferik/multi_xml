@@ -90,6 +90,8 @@ module MultiXML
   def self.parse: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
 
   def self.parse_iso_week_datetime: (String string) -> Time
+  # Public API: Execute a block with a temporarily-swapped parser
+  def self.with_parser: [T] (Symbol | String | Module new_parser) { () -> T } -> T
   # Deprecated alias for `parse`
   def self.load: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
   private
