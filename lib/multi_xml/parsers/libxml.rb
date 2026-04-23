@@ -1,7 +1,7 @@
 require "libxml-ruby"
 require_relative "dom_parser"
 
-module MultiXml
+module MultiXML
   module Parsers
     # XML parser using the LibXML library
     #

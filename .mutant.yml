@@ -13,4 +13,4 @@ requires:
 
 matcher:
   subjects:
-    - MultiXml*
+    - MultiXML*

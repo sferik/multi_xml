@@ -75,21 +75,21 @@ module NamespaceHandlingMatrix
   # ------------------------------------------------------------------
 
   def test_strip_is_default
-    assert_equal strip_feed, MultiXml.parse(FEED_XML)
+    assert_equal strip_feed, MultiXML.parse(FEED_XML)
   end
 
   def test_strip_feed
-    assert_equal strip_feed, MultiXml.parse(FEED_XML, namespaces: :strip)
+    assert_equal strip_feed, MultiXML.parse(FEED_XML, namespaces: :strip)
   end
 
   def test_strip_collision_folds_into_array
-    result = MultiXml.parse(COLLISION_XML, namespaces: :strip)
+    result = MultiXML.parse(COLLISION_XML, namespaces: :strip)
 
     assert_equal({"root" => {"id" => %w[111 222]}}, result)
   end
 
   def test_strip_attribute_collision_folds_into_array
-    result = MultiXml.parse(ATTR_COLLISION_XML, namespaces: :strip)
+    result = MultiXML.parse(ATTR_COLLISION_XML, namespaces: :strip)
 
     assert_equal({"root" => {"id" => %w[111 222]}}, result)
   end
@@ -99,13 +99,13 @@ module NamespaceHandlingMatrix
   # ------------------------------------------------------------------
 
   def test_preserve_feed
-    result = MultiXml.parse(FEED_XML, namespaces: :preserve)
+    result = MultiXML.parse(FEED_XML, namespaces: :preserve)
 
     assert_equal preserve_feed, result
   end
 
   def test_preserve_collision_keeps_prefixes_distinct
-    result = MultiXml.parse(COLLISION_XML, namespaces: :preserve)
+    result = MultiXML.parse(COLLISION_XML, namespaces: :preserve)
 
     assert_equal({
       "root" => {
@@ -118,7 +118,7 @@ module NamespaceHandlingMatrix
   end
 
   def test_preserve_attribute_collision_keeps_prefixes_distinct
-    result = MultiXml.parse(ATTR_COLLISION_XML, namespaces: :preserve)
+    result = MultiXML.parse(ATTR_COLLISION_XML, namespaces: :preserve)
 
     assert_equal({
       "root" => {
@@ -136,7 +136,7 @@ module NamespaceHandlingMatrix
 
   def test_unknown_namespaces_mode_raises
     assert_raises(ArgumentError) do
-      MultiXml.parse("<r/>", namespaces: :bogus)
+      MultiXML.parse("<r/>", namespaces: :bogus)
     end
   end
 
@@ -186,17 +186,17 @@ NAMESPACE_PARSERS.each do |parser_name, require_name|
     const_set(:PARSER, parser_name)
 
     def setup
-      @original_parser = MultiXml.instance_variable_get(:@parser)
-      MultiXml.parser = self.class::PARSER
+      @original_parser = MultiXML.instance_variable_get(:@parser)
+      MultiXML.parser = self.class::PARSER
     rescue LoadError
       skip "Parser #{self.class::PARSER} couldn't be loaded"
     end
 
     def teardown
       if @original_parser
-        MultiXml.instance_variable_set(:@parser, @original_parser)
-      elsif MultiXml.instance_variable_defined?(:@parser)
-        MultiXml.send(:remove_instance_variable, :@parser)
+        MultiXML.instance_variable_set(:@parser, @original_parser)
+      elsif MultiXML.instance_variable_defined?(:@parser)
+        MultiXML.send(:remove_instance_variable, :@parser)
       end
     end
   end

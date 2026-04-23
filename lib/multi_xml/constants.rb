@@ -1,10 +1,10 @@
-module MultiXml
+module MultiXML
   # Hash key for storing text content within element hashes
   #
   # @api public
   # @return [String] the key "__content__" used for text content
   # @example Accessing text content
-  #   result = MultiXml.parse('<name>John</name>')
+  #   result = MultiXML.parse('<name>John</name>')
   #   result["name"] #=> "John" (simplified, but internally uses __content__)
   TEXT_CONTENT_KEY = "__content__".freeze
 
@@ -51,7 +51,7 @@ module MultiXml
   # @api public
   # @return [Array<Symbol>] the valid namespace handling modes
   # @example Parse with namespace preservation
-  #   MultiXml.parse(xml, namespaces: :preserve)
+  #   MultiXML.parse(xml, namespaces: :preserve)
   NAMESPACE_MODES = %i[strip preserve].freeze
 
   # Default parsing options

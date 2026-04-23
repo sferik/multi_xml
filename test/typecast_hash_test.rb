@@ -2,11 +2,11 @@ require "test_helper"
 
 # Tests typecast_hash type attribute handling
 class TypecastHashTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_raises_disallowed_type_error_with_type
-    error = assert_raises(MultiXml::DisallowedTypeError) do
+    error = assert_raises(MultiXML::DisallowedTypeError) do
       typecast_hash({"type" => "yaml"}, ["yaml"])
     end
 

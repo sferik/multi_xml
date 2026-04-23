@@ -1,4 +1,4 @@
-module MultiXml
+module MultiXML
   # Internal helpers for resolving and loading parser backends
   #
   # @api private

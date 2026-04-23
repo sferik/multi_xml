@@ -2,55 +2,55 @@ require "test_helper"
 
 # Tests for ParseWithErrorHandlingTest
 class ParseWithErrorHandlingTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
     if @original_parser
-      MultiXml.instance_variable_set(:@parser, @original_parser)
-    elsif MultiXml.instance_variable_defined?(:@parser)
-      MultiXml.send(:remove_instance_variable, :@parser)
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
     end
   end
 
   def test_parse_with_io_input_captures_xml_in_error
-    MultiXml.parser = :nokogiri
+    MultiXML.parser = :nokogiri
     io = StringIO.new("<open></close>")
 
     begin
-      MultiXml.parse(io)
-    rescue MultiXml::ParseError => e
+      MultiXML.parse(io)
+    rescue MultiXML::ParseError => e
       assert_equal "<open></close>", e.xml
     end
   end
 
   def test_parse_error_message_from_parser
-    MultiXml.parser = :nokogiri
+    MultiXML.parser = :nokogiri
 
     begin
-      MultiXml.parse("<open></close>")
-    rescue MultiXml::ParseError => e
+      MultiXML.parse("<open></close>")
+    rescue MultiXML::ParseError => e
       refute_nil e.message
       refute_empty e.message
     end
   end
 
   def test_parse_error_cause_is_parser_error
-    MultiXml.parser = :nokogiri
+    MultiXML.parser = :nokogiri
 
     begin
-      MultiXml.parse("<open></close>")
-    rescue MultiXml::ParseError => e
+      MultiXML.parse("<open></close>")
+    rescue MultiXML::ParseError => e
       assert_kind_of Exception, e.cause
     end
   end
 
   def test_parse_returns_empty_hash_when_parser_returns_nil
-    MultiXml.parser = best_available_parser
-    result = MultiXml.parse("<root/>")
+    MultiXML.parser = best_available_parser
+    result = MultiXML.parse("<root/>")
 
     assert_kind_of Hash, result
   end
@@ -58,80 +58,84 @@ end
 
 # Tests for ParseWithErrorHandlingDetailedTest
 class ParseWithErrorHandlingDetailedTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
-    MultiXml.parser = :nokogiri
+    @original_parser = MultiXML.instance_variable_get(:@parser)
+    MultiXML.parser = :nokogiri
   end
 
   def teardown
-    return unless @original_parser
-
-    MultiXml.instance_variable_set(:@parser, @original_parser)
+    if @original_parser
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
+    end
   end
 
   def test_parse_wraps_parser_error_with_xml
     io = StringIO.new("<bad></wrong>")
 
     begin
-      MultiXml.parse(io)
+      MultiXML.parse(io)
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       assert_equal "<bad></wrong>", e.xml
     end
   end
 
   def test_parse_wraps_parser_error_with_message
-    MultiXml.parse("<bad></wrong>")
+    MultiXML.parse("<bad></wrong>")
 
     flunk "Expected ParseError"
-  rescue MultiXml::ParseError => e
+  rescue MultiXML::ParseError => e
     refute_nil e.message
   end
 
   def test_parse_wraps_parser_error_with_cause
-    MultiXml.parse("<bad></wrong>")
+    MultiXML.parse("<bad></wrong>")
 
     flunk "Expected ParseError"
-  rescue MultiXml::ParseError => e
+  rescue MultiXML::ParseError => e
     refute_nil e.cause
   end
 end
 
 # Tests for ParseWithErrorHandlingNilTest
 class ParseWithErrorHandlingNilTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
-    return unless @original_parser
-
-    MultiXml.instance_variable_set(:@parser, @original_parser)
+    if @original_parser
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
+    end
   end
 
   def test_parse_with_error_handling_handles_nil_parser_result
     # When parser returns nil, should get empty hash not nil
-    MultiXml.parser = best_available_parser
-    result = MultiXml.parse("<empty/>")
+    MultiXML.parser = best_available_parser
+    result = MultiXML.parse("<empty/>")
 
     # Result should be a hash, not nil
     assert_kind_of Hash, result
   end
 
   def test_parse_error_with_io_uses_rewind
-    MultiXml.parser = :nokogiri
+    MultiXML.parser = :nokogiri
     io = StringIO.new("<bad></wrong>")
 
     begin
-      MultiXml.parse(io)
+      MultiXML.parse(io)
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       # io should have been rewound and read
       assert_equal "<bad></wrong>", e.xml
     end
@@ -191,32 +195,34 @@ end
 
 # Tests for ParseWithErrorHandlingNilReturnTest
 class ParseWithErrorHandlingNilReturnTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
-    return unless @original_parser
-
-    MultiXml.instance_variable_set(:@parser, @original_parser)
+    if @original_parser
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
+    end
   end
 
   def test_parse_returns_empty_hash_when_parser_returns_nil
     # When parser returns nil, without || {} we'd get nil passed to undasherize_keys
-    MultiXml.parser = NilReturningParser
+    MultiXML.parser = NilReturningParser
     # Disable typecast to see raw result from parse_with_error_handling
-    result = MultiXml.parse("<test/>", typecast_xml_value: false)
+    result = MultiXML.parse("<test/>", typecast_xml_value: false)
 
     # Must be empty hash, not nil
     assert_empty(result)
   end
 
   def test_parse_returns_empty_hash_not_nil_when_parser_returns_nil
-    MultiXml.parser = NilReturningParser
+    MultiXML.parser = NilReturningParser
     # Disable typecast to see raw result
-    result = MultiXml.parse("<test/>", typecast_xml_value: false)
+    result = MultiXML.parse("<test/>", typecast_xml_value: false)
 
     # Specifically test it's {} not nil
     refute_nil result
@@ -225,39 +231,39 @@ class ParseWithErrorHandlingNilReturnTest < Minitest::Test
 
   def test_parse_error_uses_to_s_on_string_input
     # Strings respond to both, but we're testing the to_s path
-    MultiXml.parser = FailingParser
+    MultiXML.parser = FailingParser
 
     begin
-      MultiXml.parse("<bad/>")
+      MultiXML.parse("<bad/>")
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       assert_equal "<bad/>", e.xml
     end
   end
 
   def test_parse_error_with_io_that_responds_to_read
-    MultiXml.parser = FailingParser
+    MultiXML.parser = FailingParser
     io = StringIO.new("<bad/>")
 
     begin
-      MultiXml.parse(io)
+      MultiXML.parse(io)
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       assert_equal "<bad/>", e.xml
     end
   end
 
   def test_parse_error_uses_string_buffer_when_io_was_closed
-    MultiXml.parser = ClosingFailingParser
+    MultiXML.parser = ClosingFailingParser
     io = StringIO.new("<bad/>")
 
     begin
-      MultiXml.parse(io)
+      MultiXML.parse(io)
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       assert_equal "<bad/>", e.xml
     end
   end
@@ -265,14 +271,14 @@ class ParseWithErrorHandlingNilReturnTest < Minitest::Test
   def test_parse_error_rewinds_io_before_reading
     # The FailingParser raises an error during parse, so original_input
     # still needs to be readable for error message
-    MultiXml.parser = :nokogiri
+    MultiXML.parser = :nokogiri
     io = StringIO.new("<bad></wrong>")
 
     begin
-      MultiXml.parse(io)
+      MultiXML.parse(io)
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       # Should have rewound and read full content
       assert_equal "<bad></wrong>", e.xml
     end
@@ -281,32 +287,34 @@ class ParseWithErrorHandlingNilReturnTest < Minitest::Test
   def test_extract_xml_for_error_falls_back_to_to_s_when_io_is_unreadable
     io = UnreadableIo.new("<bad/>")
 
-    assert_equal "<bad/>", MultiXml.send(:extract_xml_for_error, io)
+    assert_equal "<bad/>", MultiXML.send(:extract_xml_for_error, io)
   end
 end
 
 # Tests parse error message handling
 class ParseWithErrorHandlingMessageTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
-    return unless @original_parser
-
-    MultiXml.instance_variable_set(:@parser, @original_parser)
+    if @original_parser
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
+    end
   end
 
   def test_parse_error_message_is_original_exception_message
-    MultiXml.parser = FailingParser
+    MultiXML.parser = FailingParser
 
     begin
-      MultiXml.parse("<bad/>")
+      MultiXML.parse("<bad/>")
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       # Message must be the string "Parse failed", not nil or the exception object
       assert_equal "Parse failed", e.message
       assert_instance_of String, e.message
@@ -316,13 +324,13 @@ class ParseWithErrorHandlingMessageTest < Minitest::Test
   def test_parse_error_message_is_not_exception_object_to_s
     # If e is passed instead of e.message, the message would be e.to_s
     # which includes class name like "#<FailingParser::ParseFailed..."
-    MultiXml.parser = FailingParser
+    MultiXML.parser = FailingParser
 
     begin
-      MultiXml.parse("<bad/>")
+      MultiXML.parse("<bad/>")
 
       flunk "Expected ParseError"
-    rescue MultiXml::ParseError => e
+    rescue MultiXML::ParseError => e
       # Should be exactly "Parse failed", not the exception's inspect/to_s
       refute_match(/FailingParser/, e.message)
       refute_match(/#</, e.message)
@@ -332,16 +340,18 @@ end
 
 # Tests parse error to_s behavior
 class ParseWithErrorHandlingToSTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
-    return unless @original_parser
-
-    MultiXml.instance_variable_set(:@parser, @original_parser)
+    if @original_parser
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
+    end
   end
 
   def test_parse_error_xml_uses_to_s_not_to_str
@@ -367,11 +377,11 @@ class ParseWithErrorHandlingToSTest < Minitest::Test
   end
 
   def parse_error_xml(input)
-    MultiXml.parser = FailingParser
-    MultiXml.parse(input)
+    MultiXML.parser = FailingParser
+    MultiXML.parse(input)
 
     flunk "Expected ParseError"
-  rescue MultiXml::ParseError => e
+  rescue MultiXML::ParseError => e
     e.xml
   end
 end

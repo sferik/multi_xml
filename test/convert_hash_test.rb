@@ -2,8 +2,8 @@ require "test_helper"
 
 # Tests convert_hash behavior for various type attributes
 class ConvertHashTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_with_array_type
     hash = {"type" => "array", "item" => %w[a b]}
@@ -35,7 +35,7 @@ class ConvertHashTest < Minitest::Test
   def test_passes_disallowed_types_to_typecast_children
     hash = {"child" => {"type" => "yaml", "__content__" => "test"}}
 
-    assert_raises(MultiXml::DisallowedTypeError) do
+    assert_raises(MultiXML::DisallowedTypeError) do
       convert_hash(hash, nil, ["yaml"])
     end
   end
@@ -43,13 +43,13 @@ class ConvertHashTest < Minitest::Test
   def test_passes_disallowed_types_to_extract_array
     hash = {"type" => "array", "item" => [{"type" => "yaml", "__content__" => "test"}]}
 
-    assert_raises(MultiXml::DisallowedTypeError) do
+    assert_raises(MultiXML::DisallowedTypeError) do
       convert_hash(hash, "array", ["yaml"])
     end
   end
 
   def test_with_text_content_key_uses_convert_text_content
-    hash = {MultiXml::TEXT_CONTENT_KEY => "42", "type" => "integer"}
+    hash = {MultiXML::TEXT_CONTENT_KEY => "42", "type" => "integer"}
     result = convert_hash(hash, "integer", [])
 
     assert_equal 42, result
@@ -100,7 +100,7 @@ class ConvertHashTest < Minitest::Test
   def test_passes_disallowed_types_through_all_paths
     hash = {"nested" => {"type" => "symbol", "__content__" => "test"}}
 
-    assert_raises(MultiXml::DisallowedTypeError) do
+    assert_raises(MultiXML::DisallowedTypeError) do
       convert_hash(hash, nil, ["symbol"])
     end
   end

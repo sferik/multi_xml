@@ -2,7 +2,7 @@ require_relative "lib/multi_xml/version"
 
 Gem::Specification.new do |spec|
   spec.name = "multi_xml"
-  spec.version = MultiXml::VERSION
+  spec.version = MultiXML::VERSION
   spec.authors = ["Erik Berlin"]
   spec.email = ["sferik@gmail.com"]
 

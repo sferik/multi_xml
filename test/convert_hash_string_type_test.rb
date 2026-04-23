@@ -2,8 +2,8 @@ require "test_helper"
 
 # Tests convert_hash string type behavior
 class ConvertHashStringTypeTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_returns_empty_string_for_string_type_without_nil_true
     assert_equal "", convert_hash({"type" => "string"}, "string", [])

@@ -1,8 +1,8 @@
-# Type signatures for MultiXml
+# Type signatures for MultiXML
 
 # Recursive type alias for parsed XML values
 # XML parsing produces nested structures of hashes, arrays, and primitive values
-type MultiXml::xmlValue = String
+type MultiXML::xmlValue = String
                         | Integer
                         | Float
                         | bool
@@ -12,21 +12,21 @@ type MultiXml::xmlValue = String
                         | BigDecimal
                         | StringIO
                         | nil
-                        | Array[MultiXml::xmlValue]
-                        | Hash[String, MultiXml::xmlValue]
-                        | Hash[Symbol, MultiXml::xmlValue]
+                        | Array[MultiXML::xmlValue]
+                        | Hash[String, MultiXML::xmlValue]
+                        | Hash[Symbol, MultiXML::xmlValue]
 
 # Type for hash with string keys used internally during parsing
-type MultiXml::xmlHash = Hash[String, MultiXml::xmlValue]
+type MultiXML::xmlHash = Hash[String, MultiXML::xmlValue]
 
 # Interface for parser modules
-interface MultiXml::_Parser
-  def parse: ((IO | StringIO) io) -> MultiXml::xmlHash?
-           | ((IO | StringIO) io, ?namespaces: Symbol) -> MultiXml::xmlHash?
+interface MultiXML::_Parser
+  def parse: ((IO | StringIO) io) -> MultiXML::xmlHash?
+           | ((IO | StringIO) io, ?namespaces: Symbol) -> MultiXML::xmlHash?
   def parse_error: () -> singleton(Exception)
 end
 
-module MultiXml
+module MultiXML
   VERSION: Gem::Version
 
   TEXT_CONTENT_KEY: String
@@ -55,9 +55,17 @@ module MultiXml
   # Uses untyped key because hash["type"] returns xmlValue, and Hash#[] with non-String returns nil
   TYPE_CONVERTERS: Hash[untyped, Proc | Method]
 
+  DEPRECATION_WARNINGS_SHOWN: Set[Symbol]
+
   self.@parser: Module
 
   extend Helpers
+
+  module Concurrency
+    MUTEXES: Hash[Symbol, Thread::Mutex]
+
+    def self.synchronize: [T] (Symbol name) { () -> T } -> T
+  end
 
   module ParserResolution
     LOADED_PARSER_CHECKS: Hash[Symbol, Symbol]
@@ -65,6 +73,9 @@ module MultiXml
 
   module ParseSupport
   end
+
+  # Emit a deprecation warning at most once per process
+  def self.warn_deprecation_once: (Symbol key, String message) -> void
 
   # Public API: Get the current XML parser module
   def self.parser: () -> Module
@@ -241,4 +252,13 @@ module MultiXml
   # Parsers module - parser implementations depend on optional external gems
   module Parsers
   end
+end
+
+# Backward-compatible alias for the legacy MultiXml constant name
+module MultiXml
+  def self.method_missing: (Symbol name, *untyped args, **untyped kwargs) ?{ (*untyped) -> untyped } -> untyped
+
+  def self.respond_to_missing?: ((Symbol | String) name, bool include_private) -> bool
+
+  def self.const_missing: (Symbol name) -> untyped
 end

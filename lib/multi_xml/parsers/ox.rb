@@ -1,6 +1,6 @@
 require "ox"
 
-module MultiXml
+module MultiXML
   module Parsers
     # XML parser using the Ox library (fastest pure-Ruby parser)
     #

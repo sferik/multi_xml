@@ -3,7 +3,7 @@ require "stringio"
 require_relative "sax_handler"
 require_relative "libxml"
 
-module MultiXml
+module MultiXML
   module Parsers
     # SAX-based parser using LibXML (faster for large documents)
     #

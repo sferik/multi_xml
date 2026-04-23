@@ -3,6 +3,7 @@ require "date"
 require "stringio"
 require "time"
 require "yaml"
+require_relative "multi_xml/concurrency"
 require_relative "multi_xml/constants"
 require_relative "multi_xml/errors"
 require_relative "multi_xml/file_like"
@@ -12,18 +13,44 @@ require_relative "multi_xml/parse_support"
 
 # A generic swappable back-end for parsing XML
 #
-# MultiXml provides a unified interface for XML parsing across different
+# MultiXML provides a unified interface for XML parsing across different
 # parser libraries. It automatically selects the best available parser
 # (Ox, LibXML, Nokogiri, Oga, or REXML) and converts XML to Ruby hashes.
 #
 # @api public
 # @example Parse XML
-#   MultiXml.parse('<root><name>John</name></root>')
+#   MultiXML.parse('<root><name>John</name></root>')
 #   #=> {"root"=>{"name"=>"John"}}
 #
 # @example Set the parser
-#   MultiXml.parser = :nokogiri
-module MultiXml
+#   MultiXML.parser = :nokogiri
+module MultiXML
+  # Tracks which deprecation warnings have already been emitted so each
+  # one fires at most once per process. Stored as a Set rather than a
+  # Hash so presence checks have unambiguous semantics for mutation tests.
+  DEPRECATION_WARNINGS_SHOWN = Set.new
+  private_constant :DEPRECATION_WARNINGS_SHOWN
+
+  # Emit a deprecation warning at most once per process for the given key
+  #
+  # The warning is tagged with the :deprecated category so callers can
+  # silence the whole set with Warning[:deprecated] = false or surface
+  # it via ruby -W:deprecated — the standard Ruby idiom for library
+  # deprecations since 2.7.
+  #
+  # @api private
+  # @param key [Symbol] identifier for the deprecation (typically the method name)
+  # @param message [String] warning message to emit on first call
+  # @return [void]
+  def self.warn_deprecation_once(key, message)
+    Concurrency.synchronize(:deprecation_warnings) do
+      return if DEPRECATION_WARNINGS_SHOWN.include?(key)
+
+      Kernel.warn(message, category: :deprecated)
+      DEPRECATION_WARNINGS_SHOWN.add(key)
+    end
+  end
+
   class << self
     include Helpers
     include ParserResolution
@@ -37,7 +64,7 @@ module MultiXml
     # @api public
     # @return [Module] the current parser module
     # @example Get current parser
-    #   MultiXml.parser #=> MultiXml::Parsers::Ox
+    #   MultiXML.parser #=> MultiXML::Parsers::Ox
     def parser
       @parser ||= resolve_parser(detect_parser)
     end
@@ -51,9 +78,9 @@ module MultiXml
     #             parse(io, namespaces: ...) and parse_error
     # @return [Module] the newly configured parser module
     # @example Set parser by symbol
-    #   MultiXml.parser = :nokogiri
+    #   MultiXML.parser = :nokogiri
     # @example Set parser by module
-    #   MultiXml.parser = MyCustomParser
+    #   MultiXML.parser = MyCustomParser
     def parser=(new_parser)
       @parser = resolve_parser(new_parser)
     end
@@ -72,10 +99,10 @@ module MultiXml
     # @raise [ParseError] if XML is malformed
     # @raise [DisallowedTypeError] if XML contains a disallowed type attribute
     # @example Parse simple XML
-    #   MultiXml.parse('<root><name>John</name></root>')
+    #   MultiXML.parse('<root><name>John</name></root>')
     #   #=> {"root"=>{"name"=>"John"}}
     # @example Parse with symbolized keys
-    #   MultiXml.parse('<root><name>John</name></root>', symbolize_keys: true)
+    #   MultiXML.parse('<root><name>John</name></root>', symbolize_keys: true)
     #   #=> {root: {name: "John"}}
     def parse(xml, options = {})
       options = DEFAULT_OPTIONS.merge(options)
@@ -85,6 +112,70 @@ module MultiXml
 
       result = parse_with_error_handling(io, xml, resolve_parse_parser(options), namespaces)
       apply_postprocessing(result, options)
+    end
+  end
+end
+
+# Backward-compatible alias for the legacy MultiXml constant name
+#
+# Downstream code that still writes MultiXml.parse(...) or
+# rescue MultiXml::ParseError continues to work, but emits a one-time
+# deprecation warning pointing at MultiXML. The module forwards every
+# method call to {MultiXML} via {.method_missing} and resolves constant
+# access via {.const_missing}, so both dotted calls and :: constant
+# lookups (including rescue clauses) route through the canonical module.
+#
+# @api public
+# @deprecated Use {MultiXML} (all-caps) instead. Will be removed in v1.0.
+module MultiXml
+  class << self
+    # Forward method calls to {MultiXML}, emitting a one-time warning
+    #
+    # @api public
+    # @return [Object] the delegated call's return value
+    # @example
+    #   MultiXml.parse("<a>1</a>")  # delegates to MultiXML.parse
+    # rubocop:disable Naming/BlockForwarding, Style/ArgumentsForwarding
+    def method_missing(name, *args, **kwargs, &block)
+      ::MultiXML.warn_deprecation_once(:multi_xml_constant,
+        "The MultiXml constant is deprecated and will be removed in v1.0. Use MultiXML instead.")
+      if ::MultiXML.respond_to?(name)
+        ::MultiXML.public_send(name, *args, **kwargs, &block)
+      else
+        super
+      end
+    end
+    # rubocop:enable Naming/BlockForwarding, Style/ArgumentsForwarding
+
+    # Respond to any method {MultiXML} responds to
+    #
+    # @api public
+    # @param name [Symbol] method name
+    # @param include_private [Boolean] include private methods
+    # @return [Boolean] true if {MultiXML} responds to the method
+    # @example
+    #   MultiXml.respond_to?(:parse)  #=> true
+    def respond_to_missing?(name, include_private)
+      ::MultiXML.respond_to?(name, include_private)
+    end
+
+    # Resolve missing constants to their {MultiXML} counterparts
+    #
+    # The lookup is performed with ``inherit: false`` so a stray
+    # top-level ``::ParseError`` constant in the host process (Racc
+    # defines one when Nokogiri is loaded) is correctly ignored. Enables
+    # rescue MultiXml::ParseError and MultiXml::Parsers::Ox to keep
+    # working during the deprecation cycle.
+    #
+    # @api public
+    # @param name [Symbol] constant name
+    # @return [Object] the resolved constant from {MultiXML}
+    # @example
+    #   MultiXml::Parsers::Ox  # returns MultiXML::Parsers::Ox
+    def const_missing(name)
+      ::MultiXML.warn_deprecation_once(:multi_xml_constant,
+        "The MultiXml constant is deprecated and will be removed in v1.0. Use MultiXML instead.")
+      ::MultiXML.const_get(name, false)
     end
   end
 end

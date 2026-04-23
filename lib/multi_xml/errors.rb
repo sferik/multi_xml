@@ -1,4 +1,4 @@
-module MultiXml
+module MultiXML
   # Raised when XML parsing fails
   #
   # Preserves the original XML and underlying cause for debugging.
@@ -6,8 +6,8 @@ module MultiXml
   # @api public
   # @example Catching a parse error
   #   begin
-  #     MultiXml.parse('<invalid>')
-  #   rescue MultiXml::ParseError => e
+  #     MultiXML.parse('<invalid>')
+  #   rescue MultiXML::ParseError => e
   #     puts e.xml   # The malformed XML
   #     puts e.cause # The underlying parser exception
   #   end
@@ -46,14 +46,14 @@ module MultiXml
 
   # Raised when no XML parser library is available
   #
-  # This error is raised when MultiXml cannot find any supported XML parser.
+  # This error is raised when MultiXML cannot find any supported XML parser.
   # Install one of: ox, nokogiri, libxml-ruby, or oga.
   #
   # @api public
   # @example Catching the error
   #   begin
-  #     MultiXml.parse('<root/>')
-  #   rescue MultiXml::NoParserError => e
+  #     MultiXML.parse('<root/>')
+  #   rescue MultiXML::NoParserError => e
   #     puts "Please install an XML parser gem"
   #   end
   class NoParserError < StandardError; end
@@ -65,8 +65,8 @@ module MultiXml
   # @api public
   # @example Catching a disallowed type error
   #   begin
-  #     MultiXml.parse('<data type="yaml">--- :key</data>')
-  #   rescue MultiXml::DisallowedTypeError => e
+  #     MultiXML.parse('<data type="yaml">--- :key</data>')
+  #   rescue MultiXML::DisallowedTypeError => e
   #     puts e.type #=> "yaml"
   #   end
   class DisallowedTypeError < StandardError

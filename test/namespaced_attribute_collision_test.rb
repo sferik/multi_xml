@@ -16,7 +16,7 @@ rescue LoadError
 end
 
 class DomParserCollisionHelper
-  include MultiXml::Parsers::DomParser
+  include MultiXML::Parsers::DomParser
 
   def each_child(_node)
   end
@@ -37,7 +37,7 @@ class DomParserCollisionHelper
 end
 
 class SaxHandlerCollisionHelper
-  include MultiXml::Parsers::SaxHandler
+  include MultiXML::Parsers::SaxHandler
 
   def initialize
     initialize_handler(:strip)
@@ -57,7 +57,7 @@ class SaxHandlerCollisionHelper
 end
 
 class NamespacedAttributeCollisionTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   CHILD = {"__content__" => "child"}.freeze
 
@@ -110,39 +110,39 @@ class NamespacedAttributeCollisionTest < Minitest::Test
   end
 
   def test_libxml_sax_attribute_names_ignores_xmlns_declarations
-    skip_unless_defined("libxml-ruby", MultiXml::Parsers.const_defined?(:LibxmlSax))
+    skip_unless_defined("libxml-ruby", MultiXML::Parsers.const_defined?(:LibxmlSax))
     tag = '<root xmlns:a="urn:a" xmlns="urn:root" a:id="111" id="222">'
 
-    assert_equal %w[a:id id], MultiXml::Parsers::LibxmlSax.send(:attribute_names, tag)
+    assert_equal %w[a:id id], MultiXML::Parsers::LibxmlSax.send(:attribute_names, tag)
   end
 
   def test_libxml_sax_detects_stripped_attribute_collision
-    skip_unless_defined("libxml-ruby", MultiXml::Parsers.const_defined?(:LibxmlSax))
+    skip_unless_defined("libxml-ruby", MultiXML::Parsers.const_defined?(:LibxmlSax))
     xml = '<root xmlns:a="urn:a" xmlns:b="urn:b" a:id="111" b:id="222"/>'
 
-    assert MultiXml::Parsers::LibxmlSax.send(:stripped_attribute_collision?, xml)
+    assert MultiXML::Parsers::LibxmlSax.send(:stripped_attribute_collision?, xml)
   end
 
   def test_libxml_sax_ignores_non_colliding_stripped_attributes
-    skip_unless_defined("libxml-ruby", MultiXml::Parsers.const_defined?(:LibxmlSax))
+    skip_unless_defined("libxml-ruby", MultiXML::Parsers.const_defined?(:LibxmlSax))
     xml = '<root xmlns:a="urn:a" a:id="111" a:name="two"/>'
 
-    refute MultiXml::Parsers::LibxmlSax.send(:stripped_attribute_collision?, xml)
+    refute MultiXML::Parsers::LibxmlSax.send(:stripped_attribute_collision?, xml)
   end
 
   def test_libxml_sax_parse_falls_back_to_dom_parser_for_stripped_attribute_collisions
-    skip_unless_defined("libxml-ruby", MultiXml::Parsers.const_defined?(:LibxmlSax))
+    skip_unless_defined("libxml-ruby", MultiXML::Parsers.const_defined?(:LibxmlSax))
     xml = '<root xmlns:a="urn:a" xmlns:b="urn:b" a:id="111" b:id="222"/>'
     expected = {"root" => {"id" => %w[111 222]}}
 
-    MultiXml::Parsers::Libxml.stub(:parse, expected) do
-      assert_equal expected, MultiXml::Parsers::LibxmlSax.parse(StringIO.new(xml), namespaces: :strip)
+    MultiXML::Parsers::Libxml.stub(:parse, expected) do
+      assert_equal expected, MultiXML::Parsers::LibxmlSax.parse(StringIO.new(xml), namespaces: :strip)
     end
   end
 
   def test_ox_handler_attr_appends_after_existing_attribute
-    skip_unless_defined("ox", MultiXml::Parsers.const_defined?(:Ox))
-    handler = MultiXml::Parsers::Ox::Handler.new(:strip)
+    skip_unless_defined("ox", MultiXML::Parsers.const_defined?(:Ox))
+    handler = MultiXML::Parsers::Ox::Handler.new(:strip)
 
     handler.start_element(:root)
     handler.attr("a:id", "111")
@@ -153,9 +153,9 @@ class NamespacedAttributeCollisionTest < Minitest::Test
   end
 
   def test_ox_handler_add_attribute_value_inserts_before_child_hash
-    skip_unless_defined("ox", MultiXml::Parsers.const_defined?(:Ox))
+    skip_unless_defined("ox", MultiXML::Parsers.const_defined?(:Ox))
     hash = {"id" => CHILD}
-    handler = MultiXml::Parsers::Ox::Handler.new(:strip)
+    handler = MultiXML::Parsers::Ox::Handler.new(:strip)
 
     handler.send(:add_attribute_value, hash, "id", "111")
 
@@ -163,9 +163,9 @@ class NamespacedAttributeCollisionTest < Minitest::Test
   end
 
   def test_ox_handler_add_attribute_value_appends_with_existing_attribute_array
-    skip_unless_defined("ox", MultiXml::Parsers.const_defined?(:Ox))
+    skip_unless_defined("ox", MultiXML::Parsers.const_defined?(:Ox))
     hash = {"id" => ["111"]}
-    handler = MultiXml::Parsers::Ox::Handler.new(:strip)
+    handler = MultiXML::Parsers::Ox::Handler.new(:strip)
 
     handler.send(:add_attribute_value, hash, "id", "222")
 
@@ -175,7 +175,7 @@ class NamespacedAttributeCollisionTest < Minitest::Test
   def test_rexml_add_attribute_value_inserts_before_child_hash
     hash = {"id" => CHILD}
 
-    MultiXml::Parsers::Rexml.send(:add_attribute_value, hash, "id", "111")
+    MultiXML::Parsers::Rexml.send(:add_attribute_value, hash, "id", "111")
 
     assert_equal({"id" => ["111", CHILD]}, hash)
   end
@@ -183,7 +183,7 @@ class NamespacedAttributeCollisionTest < Minitest::Test
   def test_rexml_add_attribute_value_appends_with_existing_attribute_array
     hash = {"id" => ["111"]}
 
-    MultiXml::Parsers::Rexml.send(:add_attribute_value, hash, "id", "222")
+    MultiXML::Parsers::Rexml.send(:add_attribute_value, hash, "id", "222")
 
     assert_equal({"id" => %w[111 222]}, hash)
   end

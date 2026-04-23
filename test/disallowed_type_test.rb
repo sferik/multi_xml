@@ -3,8 +3,8 @@ require_relative "test_subclasses"
 
 # Tests disallowed_type? checking
 class DisallowedTypeTest < Minitest::Test
-  cover "MultiXml*"
-  include MultiXml::Helpers
+  cover "MultiXML*"
+  include MultiXML::Helpers
 
   def test_returns_true_for_disallowed
     assert disallowed_type?("yaml", %w[yaml symbol])

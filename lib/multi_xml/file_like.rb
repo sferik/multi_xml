@@ -1,4 +1,4 @@
-module MultiXml
+module MultiXML
   # Mixin that provides file-like metadata to StringIO objects
   #
   # Used when parsing base64-encoded file content from XML.

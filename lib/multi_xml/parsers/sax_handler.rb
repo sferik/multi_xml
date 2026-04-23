@@ -1,6 +1,6 @@
 require "cgi/escape"
 
-module MultiXml
+module MultiXML
   module Parsers
     # Shared SAX handler logic for building hash trees from XML events.
     #

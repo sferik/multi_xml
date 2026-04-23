@@ -3,114 +3,114 @@ require "support/mock_decoder"
 
 # Tests setting and retrieving the global XML parser backend
 class MultiXmlParserConfigTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
     if @original_parser
-      MultiXml.instance_variable_set(:@parser, @original_parser)
-    elsif MultiXml.instance_variable_defined?(:@parser)
-      MultiXml.send(:remove_instance_variable, :@parser)
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
     end
   end
 
   def test_picks_a_default_parser
-    parser = MultiXml.parser
+    parser = MultiXML.parser
 
     assert_kind_of Module, parser
     assert_respond_to parser, :parse
   end
 
   def test_defaults_to_the_best_available_gem
-    MultiXml.send(:remove_instance_variable, :@parser) if MultiXml.instance_variable_defined?(:@parser)
-    expected = (windows? || jruby?) ? "MultiXml::Parsers::Nokogiri" : "MultiXml::Parsers::Ox"
+    MultiXML.send(:remove_instance_variable, :@parser) if MultiXML.instance_variable_defined?(:@parser)
+    expected = (windows? || jruby?) ? "MultiXML::Parsers::Nokogiri" : "MultiXML::Parsers::Ox"
 
-    assert_equal expected, MultiXml.parser.name
+    assert_equal expected, MultiXML.parser.name
   end
 
   def test_is_settable_via_a_symbol
-    MultiXml.parser = :rexml
+    MultiXML.parser = :rexml
 
-    assert_equal "MultiXml::Parsers::Rexml", MultiXml.parser.name
+    assert_equal "MultiXML::Parsers::Rexml", MultiXML.parser.name
   end
 
   def test_is_settable_via_a_class
-    MultiXml.parser = MockDecoder
+    MultiXML.parser = MockDecoder
 
-    assert_equal "MockDecoder", MultiXml.parser.name
+    assert_equal "MockDecoder", MultiXML.parser.name
   end
 end
 
 # Tests overriding the parser on a per-call basis via the :parser option
 class MultiXmlPerParseParserTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
     if @original_parser
-      MultiXml.instance_variable_set(:@parser, @original_parser)
-    elsif MultiXml.instance_variable_defined?(:@parser)
-      MultiXml.send(:remove_instance_variable, :@parser)
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
     end
   end
 
   def test_allows_per_parse_parser_via_symbol
-    MultiXml.parser = :rexml
+    MultiXML.parser = :rexml
 
-    assert_equal({"user" => "Erik"}, MultiXml.parse("<user>Erik</user>", parser: :nokogiri))
+    assert_equal({"user" => "Erik"}, MultiXML.parse("<user>Erik</user>", parser: :nokogiri))
   end
 
   def test_allows_per_parse_parser_via_string
-    MultiXml.parser = :rexml
+    MultiXML.parser = :rexml
 
-    assert_equal({"user" => "Erik"}, MultiXml.parse("<user>Erik</user>", parser: "nokogiri"))
+    assert_equal({"user" => "Erik"}, MultiXML.parse("<user>Erik</user>", parser: "nokogiri"))
   end
 
   def test_allows_per_parse_parser_via_class
-    MultiXml.parser = :rexml
+    MultiXML.parser = :rexml
     require "multi_xml/parsers/nokogiri"
 
-    assert_equal({"user" => "Erik"}, MultiXml.parse("<user>Erik</user>", parser: MultiXml::Parsers::Nokogiri))
+    assert_equal({"user" => "Erik"}, MultiXML.parse("<user>Erik</user>", parser: MultiXML::Parsers::Nokogiri))
   end
 
   def test_does_not_change_class_level_parser_when_using_per_parse_parser
-    MultiXml.parser = :rexml
-    MultiXml.parse("<user>Erik</user>", parser: :nokogiri)
+    MultiXML.parser = :rexml
+    MultiXML.parse("<user>Erik</user>", parser: :nokogiri)
 
-    assert_equal "MultiXml::Parsers::Rexml", MultiXml.parser.name
+    assert_equal "MultiXML::Parsers::Rexml", MultiXML.parser.name
   end
 
   def test_uses_class_level_parser_when_parser_option_is_not_provided
-    MultiXml.parser = :nokogiri
-    result = MultiXml.parse("<user>Erik</user>")
+    MultiXML.parser = :nokogiri
+    result = MultiXML.parse("<user>Erik</user>")
 
     assert_equal({"user" => "Erik"}, result)
   end
 
   def test_raises_error_for_invalid_per_parse_parser
-    error = assert_raises(RuntimeError) { MultiXml.parse("<user/>", parser: 123) }
+    error = assert_raises(RuntimeError) { MultiXML.parse("<user/>", parser: 123) }
     assert_match(/Invalid parser specification/, error.message)
   end
 
   def test_wraps_parser_errors_correctly_with_per_parse_parser
-    assert_raises(MultiXml::ParseError) { MultiXml.parse("<open></close>", parser: :nokogiri) }
+    assert_raises(MultiXML::ParseError) { MultiXML.parse("<open></close>", parser: :nokogiri) }
   end
 
   def test_options_parser_key_is_truthy_when_present
-    result = MultiXml.parse("<root>test</root>", parser: :nokogiri)
+    result = MultiXML.parse("<root>test</root>", parser: :nokogiri)
 
     assert_equal({"root" => "test"}, result)
   end
 
   def test_options_without_parser_uses_default
-    MultiXml.parser = :rexml
-    result = MultiXml.parse("<root>test</root>")
+    MultiXML.parser = :rexml
+    result = MultiXML.parse("<root>test</root>")
 
     assert_equal({"root" => "test"}, result)
   end
@@ -118,69 +118,69 @@ end
 
 # Tests automatic type conversion based on XML type attributes (float, binary, datetime, etc.)
 class MultiXmlTypecastTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
     if @original_parser
-      MultiXml.instance_variable_set(:@parser, @original_parser)
-    elsif MultiXml.instance_variable_defined?(:@parser)
-      MultiXml.send(:remove_instance_variable, :@parser)
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
     end
   end
 
   def test_float_type_returns_float
-    MultiXml.parser = best_available_parser
-    result = MultiXml.parse('<tag type="float">3.14</tag>')["tag"]
+    MultiXML.parser = best_available_parser
+    result = MultiXML.parse('<tag type="float">3.14</tag>')["tag"]
 
     assert_kind_of Float, result
     assert_in_delta(3.14, result)
   end
 
   def test_string_type_with_content_returns_string
-    MultiXml.parser = best_available_parser
-    result = MultiXml.parse('<tag type="string">hello</tag>')["tag"]
+    MultiXML.parser = best_available_parser
+    result = MultiXML.parse('<tag type="string">hello</tag>')["tag"]
 
     assert_kind_of String, result
     assert_equal "hello", result
   end
 
   def test_binary_type_with_base64_encoding_decodes_content
-    MultiXml.parser = best_available_parser
-    result = MultiXml.parse('<tag type="binary" encoding="base64">ZGF0YQ==</tag>')["tag"]
+    MultiXML.parser = best_available_parser
+    result = MultiXML.parse('<tag type="binary" encoding="base64">ZGF0YQ==</tag>')["tag"]
 
     assert_equal "data", result
   end
 
   def test_binary_type_without_encoding_returns_raw_content
-    MultiXml.parser = best_available_parser
-    result = MultiXml.parse('<tag type="binary">raw data</tag>')["tag"]
+    MultiXML.parser = best_available_parser
+    result = MultiXML.parse('<tag type="binary">raw data</tag>')["tag"]
 
     assert_equal "raw data", result
   end
 
   def test_datetime_fallback_to_datetime_class
-    MultiXml.parser = best_available_parser
-    result = MultiXml.parse('<tag type="datetime">1970-01-01T00:00:00+00:00</tag>')["tag"]
+    MultiXML.parser = best_available_parser
+    result = MultiXML.parse('<tag type="datetime">1970-01-01T00:00:00+00:00</tag>')["tag"]
 
     assert_kind_of Time, result
   end
 
   def test_invalid_yaml_returns_original_string
-    MultiXml.parser = best_available_parser
+    MultiXML.parser = best_available_parser
     xml = '<tag type="yaml">{ invalid yaml content</tag>'
-    result = MultiXml.parse(xml, disallowed_types: [])["tag"]
+    result = MultiXML.parse(xml, disallowed_types: [])["tag"]
 
     assert_equal "{ invalid yaml content", result
   end
 
   def test_three_sibling_elements_creates_array
-    MultiXml.parser = best_available_parser
+    MultiXML.parser = best_available_parser
     xml = "<users><user>A</user><user>B</user><user>C</user></users>"
-    result = MultiXml.parse(xml)["users"]["user"]
+    result = MultiXML.parse(xml)["users"]["user"]
 
     assert_kind_of Array, result
     assert_equal %w[A B C], result
@@ -189,23 +189,23 @@ end
 
 # Tests for empty input handling
 class MultiXmlEmptyInputTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def test_parse_empty_string_returns_empty_hash
-    result = MultiXml.parse("")
+    result = MultiXML.parse("")
 
     assert_empty(result)
   end
 
   def test_parse_empty_xml_returns_empty_hash_not_nil
-    result = MultiXml.parse("   ")
+    result = MultiXML.parse("   ")
 
     assert_empty(result)
     refute_nil result
   end
 
   def test_parse_empty_input_early_returns
-    result = MultiXml.parse("")
+    result = MultiXML.parse("")
 
     assert_empty(result)
   end
@@ -213,23 +213,23 @@ end
 
 # Tests conversion of dashed XML element names to underscored Ruby hash keys
 class MultiXmlKeyTransformTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
-    MultiXml.parser = best_available_parser
+    @original_parser = MultiXML.instance_variable_get(:@parser)
+    MultiXML.parser = best_available_parser
   end
 
   def teardown
     if @original_parser
-      MultiXml.instance_variable_set(:@parser, @original_parser)
-    elsif MultiXml.instance_variable_defined?(:@parser)
-      MultiXml.send(:remove_instance_variable, :@parser)
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
     end
   end
 
   def test_parse_with_error_handling_undasherizes_keys
-    result = MultiXml.parse("<root><my-key>value</my-key></root>")
+    result = MultiXML.parse("<root><my-key>value</my-key></root>")
 
     assert_equal({"root" => {"my_key" => "value"}}, result)
     refute result["root"].key?("my-key")
@@ -239,24 +239,24 @@ end
 
 # Tests that malformed XML raises ParseError with a meaningful message
 class MultiXmlParseErrorTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def setup
-    @original_parser = MultiXml.instance_variable_get(:@parser)
+    @original_parser = MultiXML.instance_variable_get(:@parser)
   end
 
   def teardown
     if @original_parser
-      MultiXml.instance_variable_set(:@parser, @original_parser)
-    elsif MultiXml.instance_variable_defined?(:@parser)
-      MultiXml.send(:remove_instance_variable, :@parser)
+      MultiXML.instance_variable_set(:@parser, @original_parser)
+    elsif MultiXML.instance_variable_defined?(:@parser)
+      MultiXML.send(:remove_instance_variable, :@parser)
     end
   end
 
   def test_parse_error_message_is_string
-    MultiXml.parser = :nokogiri
-    error = assert_raises(MultiXml::ParseError) do
-      MultiXml.parse("<open></close>")
+    MultiXML.parser = :nokogiri
+    error = assert_raises(MultiXML::ParseError) do
+      MultiXML.parse("<open></close>")
     end
 
     assert_kind_of String, error.message
@@ -266,31 +266,31 @@ end
 
 # Tests for parser loading
 class MultiXmlParserLoadingTest < Minitest::Test
-  cover "MultiXml*"
+  cover "MultiXML*"
 
   def test_load_parser_with_mixed_case_name
-    parser = MultiXml.send(:load_parser, "Nokogiri")
+    parser = MultiXML.send(:load_parser, "Nokogiri")
 
-    assert_equal "MultiXml::Parsers::Nokogiri", parser.name
+    assert_equal "MultiXML::Parsers::Nokogiri", parser.name
   end
 
   def test_load_parser_with_symbol
-    parser = MultiXml.send(:load_parser, :NOKOGIRI)
+    parser = MultiXML.send(:load_parser, :NOKOGIRI)
 
-    assert_equal "MultiXml::Parsers::Nokogiri", parser.name
+    assert_equal "MultiXML::Parsers::Nokogiri", parser.name
   end
 
   def test_find_loaded_parser_uses_object_const_defined
-    result = MultiXml.send(:find_loaded_parser)
+    result = MultiXML.send(:find_loaded_parser)
 
     assert_find_loaded_parser_result(result)
   end
 
   def test_resolve_parser_with_class
     require "multi_xml/parsers/nokogiri"
-    parser = MultiXml.send(:resolve_parser, MultiXml::Parsers::Nokogiri)
+    parser = MultiXML.send(:resolve_parser, MultiXML::Parsers::Nokogiri)
 
-    assert_equal MultiXml::Parsers::Nokogiri, parser
+    assert_equal MultiXML::Parsers::Nokogiri, parser
   end
 
   private
