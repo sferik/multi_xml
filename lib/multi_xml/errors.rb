@@ -58,6 +58,60 @@ module MultiXML
   #   end
   class NoParserError < StandardError; end
 
+  # Raised when a parser cannot be loaded or is not recognized
+  #
+  # Covers three failure modes in one typed error, so callers can catch
+  # all "I couldn't even get to parsing" problems with one rescue:
+  #   - Invalid spec type (not a Symbol, String, or Module)
+  #   - LoadError from requiring the parser file
+  #   - A custom parser that doesn't satisfy the contract
+  #     (no .parse method or no parse_error method / ParseError constant)
+  #
+  # Matches the role of {MultiJSON::AdapterError}.
+  #
+  # @api public
+  # @example Catching a load error
+  #   begin
+  #     MultiXML.parser = :bogus
+  #   rescue MultiXML::ParserLoadError => e
+  #     puts e.message
+  #   end
+  class ParserLoadError < ArgumentError
+    # Create a new ParserLoadError
+    #
+    # @api public
+    # @param message [String, nil] error message
+    # @param cause [Exception, nil] the original exception
+    # @return [ParserLoadError] new error instance
+    # @example
+    #   ParserLoadError.new("Unknown parser", cause: original_error)
+    def initialize(message = nil, cause: nil)
+      super(message)
+      set_backtrace(cause.backtrace) if cause
+    end
+
+    # Build a ParserLoadError from an original exception
+    #
+    # The original exception's class name is included in the message so
+    # a downstream consumer reading just the ParserLoadError can tell
+    # whether the underlying failure was a ``LoadError``, an
+    # ``ArgumentError`` from the spec validator, or some other class
+    # without having to look at ``error.cause`` separately.
+    #
+    # @api public
+    # @param original_exception [Exception] the original load error
+    # @return [ParserLoadError] new error with formatted message
+    # @example
+    #   ParserLoadError.build(LoadError.new("cannot load such file"))
+    def self.build(original_exception)
+      new(
+        "Did not recognize your parser specification " \
+        "(#{original_exception.class}: #{original_exception.message}).",
+        cause: original_exception
+      )
+    end
+  end
+
   # Raised when an XML type attribute is in the disallowed list
   #
   # By default, 'yaml' and 'symbol' types are disallowed for security reasons.

@@ -22,5 +22,8 @@ target :lib do
     # The fiber-local Fiber[] reader returns untyped — intentional
     # for with_parser's previous_override save/restore.
     hash[D::Ruby::FallbackAny] = :hint
+    # set_backtrace has three overloads and Steep can't pick one when
+    # given an `(Array[String] | nil)` union from `cause.backtrace`.
+    hash[D::Ruby::UnresolvedOverloading] = :hint
   end
 end

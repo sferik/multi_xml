@@ -111,6 +111,9 @@ module MultiXML
   # Resolve a parser specification (Symbol, String, or Module) to a parser
   def self.resolve_parser: (Symbol | String | Module spec) -> Module
 
+  # Validate that a parser satisfies the contract
+  def self.validate_parser!: (Module parser) -> Module
+
   # Load a parser module by name
   def self.load_parser: (Symbol | String name) -> Module
 
@@ -266,6 +269,12 @@ module MultiXML
   end
 
   class NoParserError < StandardError
+  end
+
+  class ParserLoadError < ArgumentError
+    def initialize: (?(String | nil) message, ?cause: Exception?) -> void
+
+    def self.build: (Exception original_exception) -> ParserLoadError
   end
 
   class DisallowedTypeError < StandardError
