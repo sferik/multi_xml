@@ -88,8 +88,33 @@ module MultiXML
   PARSE_DATETIME = lambda do |string|
     Time.parse(string).utc
   rescue ArgumentError
-    DateTime.parse(string).to_time.utc
+    begin
+      DateTime.parse(string).to_time.utc
+    rescue ArgumentError, NoMethodError
+      MultiXML.send(:parse_iso_week_datetime, string)
+    end
   end
+
+  # Regex matching ISO week dates like YYYY-Www or YYYY-Www-d.
+  #
+  # @api private
+  ISO_WEEK_DATE = /\A(?<year>\d{4})-W(?<week>\d{2})(?:-(?<day>\d))?\z/
+  private_constant :ISO_WEEK_DATE
+
+  # Parse YYYY-Www[-d] ISO week dates into a UTC Time
+  #
+  # @api private
+  # @param string [String] ISO week date string
+  # @return [Time] UTC midnight for the given ISO week date
+  # @raise [ArgumentError] if the string is not a supported ISO week date
+  def self.parse_iso_week_datetime(string)
+    match = ISO_WEEK_DATE.match(string)
+    raise ArgumentError, "invalid date" unless match
+
+    date = Date.commercial(Integer(match[:year]), Integer(match[:week]), Integer(match[:day] || "1"))
+    Time.utc(date.year, date.month, date.day)
+  end
+  private_class_method :parse_iso_week_datetime
 
   # Creates a file-like StringIO from base64-encoded content
   #

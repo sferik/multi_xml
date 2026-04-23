@@ -116,6 +116,8 @@ module MultiXML
   end
 end
 
+require_relative "multi_xml/deprecated"
+
 # Backward-compatible alias for the legacy MultiXml constant name
 #
 # Downstream code that still writes MultiXml.parse(...) or

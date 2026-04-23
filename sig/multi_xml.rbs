@@ -46,6 +46,8 @@ module MultiXML
 
   PARSE_DATETIME: ^(String) -> Time
 
+  ISO_WEEK_DATE: Regexp
+
   # Lambda for creating file-like StringIO from base64 content
   # Uses untyped for content because unpack1 returns various types
   # Uses untyped for entity because hash values are xmlValue but we access specific String keys
@@ -87,6 +89,9 @@ module MultiXML
   # Uses untyped for options because values vary by key (:parser, :symbolize_keys, :disallowed_types, :typecast_xml_value)
   def self.parse: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
 
+  def self.parse_iso_week_datetime: (String string) -> Time
+  # Deprecated alias for `parse`
+  def self.load: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
   private
 
   # Resolve a parser specification (Symbol, String, or Module) to a parser
@@ -136,6 +141,9 @@ module MultiXML
 
   # Apply typecasting and key-symbolization as configured
   def self.apply_postprocessing: (xmlHash result, Hash[Symbol, untyped] options) -> xmlHash
+
+  # Define a deprecated alias that delegates to a new method name
+  def self.deprecate_alias: (Symbol name, Symbol replacement) -> Symbol
 
   module Helpers
     # Recursively convert all hash keys to symbols

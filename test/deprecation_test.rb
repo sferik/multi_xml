@@ -59,6 +59,24 @@ class DeprecationTest < Minitest::Test
     assert_equal(1, @warnings.count { |w| w.start_with?("message ") })
   end
 
+  def test_load_delegates_to_parse
+    result = MultiXML.load("<a>1</a>")
+
+    assert_equal({"a" => "1"}, result)
+    assert(@warnings.any? { |w| w.include?("MultiXML.load is deprecated") })
+  end
+
+  def test_load_warning_is_emitted_only_once_per_process
+    MultiXML.load("<a>1</a>")
+    first_count = @warnings.count { |w| w.include?("MultiXML.load is deprecated") }
+
+    MultiXML.load("<a>1</a>")
+    second_count = @warnings.count { |w| w.include?("MultiXML.load is deprecated") }
+
+    assert_equal 1, first_count
+    assert_equal 1, second_count
+  end
+
   # The sleep gives concurrent threads a real chance of racing past the
   # include? check before either calls add, exposing an unsynchronized
   # warn_deprecation_once.
