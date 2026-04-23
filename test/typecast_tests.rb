@@ -15,11 +15,11 @@ module ParserTypecastTests
     assert_equal({"type" => "string", "description" => {"__content__" => "Test"}}, setting)
   end
 
-  def test_symbolize_keys_option
+  def test_symbolize_names_option
     xml = '<users><user name="Erik Berlin"/><user><name>Wynn Netherland</name></user></users>'
     expected = {users: {user: [{name: "Erik Berlin"}, {name: "Wynn Netherland"}]}}
 
-    assert_equal expected, MultiXML.parse(xml, symbolize_keys: true)
+    assert_equal expected, MultiXML.parse(xml, symbolize_names: true)
   end
 
   def test_boolean_true_returns_true

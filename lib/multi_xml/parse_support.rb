@@ -89,7 +89,7 @@ module MultiXML
     # @return [Hash] Post-processed hash
     def apply_postprocessing(result, options)
       result = typecast_xml_value(result, options.fetch(:disallowed_types)) if options.fetch(:typecast_xml_value)
-      result = symbolize_keys(result) if options.fetch(:symbolize_keys)
+      result = symbolize_keys(result) if options.fetch(:symbolize_names)
       result
     end
   end

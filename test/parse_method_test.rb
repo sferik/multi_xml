@@ -49,8 +49,8 @@ class ParseMethodTest < Minitest::Test
     assert_equal({"type" => "integer", "__content__" => "5"}, result["n"])
   end
 
-  def test_applies_symbolize_keys
-    result = MultiXML.parse("<root><name>test</name></root>", symbolize_keys: true)
+  def test_applies_symbolize_names
+    result = MultiXML.parse("<root><name>test</name></root>", symbolize_names: true)
 
     assert_equal({root: {name: "test"}}, result)
   end
