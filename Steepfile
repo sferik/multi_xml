@@ -18,5 +18,9 @@ target :lib do
   library "bigdecimal"
   library "stringio"
 
-  configure_code_diagnostics(D::Ruby.strict)
+  configure_code_diagnostics(D::Ruby.strict) do |hash|
+    # The fiber-local Fiber[] reader returns untyped — intentional
+    # for with_parser's previous_override save/restore.
+    hash[D::Ruby::FallbackAny] = :hint
+  end
 end

@@ -87,6 +87,9 @@ module MultiXML
   # Uses untyped for options because values vary by key (:parser, :symbolize_keys, :disallowed_types, :typecast_xml_value)
   def self.parse: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
 
+  # Public API: Execute a block with a temporarily-swapped parser
+  def self.with_parser: [T] (Symbol | String | Module new_parser) { () -> T } -> T
+
   # Deprecated alias for `parse`
   def self.load: (String | StringIO xml, ?Hash[Symbol, untyped] options) -> xmlHash
 

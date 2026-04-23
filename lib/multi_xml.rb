@@ -64,9 +64,16 @@ module MultiXML
     #
     # @api public
     # @return [Module] the current parser module
+    # Honors a fiber-local override set by {.with_parser} so concurrent
+    # blocks observe their own parser without clobbering the process-wide
+    # default. Falls back to the process default when no override is set.
+    #
     # @example Get current parser
     #   MultiXML.parser #=> MultiXML::Parsers::Ox
     def parser
+      override = Fiber[:multi_xml_parser]
+      return override if override
+
       @parser ||= resolve_parser(detect_parser)
     end
 
@@ -114,6 +121,27 @@ module MultiXML
       result = parse_with_error_handling(io, xml, resolve_parse_parser(options), namespaces)
       apply_postprocessing(result, options)
     end
+  end
+
+  # Execute a block with a temporarily-swapped parser
+  #
+  # The override is stored in fiber-local storage so concurrent fibers
+  # and threads each see their own parser without racing on a shared
+  # module variable; nested calls save and restore the previous
+  # fiber-local value. Matches {MultiJSON.with_adapter}.
+  #
+  # @api public
+  # @param new_parser [Symbol, String, Module] parser to use
+  # @yield block to execute with the temporary parser
+  # @return [Object] result of the block
+  # @example
+  #   MultiXML.with_parser(:rexml) { MultiXML.parse("<a>1</a>") }
+  def self.with_parser(new_parser)
+    previous_override = Fiber[:multi_xml_parser]
+    Fiber[:multi_xml_parser] = resolve_parser(new_parser)
+    yield
+  ensure
+    Fiber[:multi_xml_parser] = previous_override
   end
 end
 
