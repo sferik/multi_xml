@@ -8,6 +8,7 @@ require_relative "multi_xml/constants"
 require_relative "multi_xml/errors"
 require_relative "multi_xml/file_like"
 require_relative "multi_xml/helpers"
+require_relative "multi_xml/options_normalization"
 require_relative "multi_xml/parser_resolution"
 require_relative "multi_xml/parse_support"
 
@@ -91,7 +92,7 @@ module MultiXML
     # @param xml [String, IO] XML content as a string or IO-like object
     # @param options [Hash] Parsing options
     # @option options [Symbol, String, Module] :parser Parser to use for this call
-    # @option options [Boolean] :symbolize_keys Convert keys to symbols (default: false)
+    # @option options [Boolean] :symbolize_names Convert keys to symbols (default: false)
     # @option options [Array<String>] :disallowed_types Types to reject (default: ['yaml', 'symbol'])
     # @option options [Boolean] :typecast_xml_value Apply type conversions (default: true)
     # @option options [Symbol] :namespaces Namespace handling mode (:strip or :preserve)
@@ -101,11 +102,11 @@ module MultiXML
     # @example Parse simple XML
     #   MultiXML.parse('<root><name>John</name></root>')
     #   #=> {"root"=>{"name"=>"John"}}
-    # @example Parse with symbolized keys
-    #   MultiXML.parse('<root><name>John</name></root>', symbolize_keys: true)
+    # @example Parse with symbolized names
+    #   MultiXML.parse('<root><name>John</name></root>', symbolize_names: true)
     #   #=> {root: {name: "John"}}
     def parse(xml, options = {})
-      options = DEFAULT_OPTIONS.merge(options)
+      options = DEFAULT_OPTIONS.merge(OptionsNormalization.normalize_symbolize_option(options))
       namespaces = validate_namespaces_mode(options.fetch(:namespaces))
       io = normalize_input(xml)
       return {} if io.eof?

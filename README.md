@@ -15,8 +15,8 @@ fastest available XML parser. Here's how to use it:
 ```ruby
 require "multi_xml"
 
-MultiXML.parse("<tag>contents</tag>")                        #=> {"tag" => "contents"}
-MultiXML.parse("<tag>contents</tag>", symbolize_keys: true)  #=> {tag: "contents"}
+MultiXML.parse("<tag>contents</tag>")                         #=> {"tag" => "contents"}
+MultiXML.parse("<tag>contents</tag>", symbolize_names: true)  #=> {tag: "contents"}
 ```
 
 `MultiXML.parse` returns `{}` for empty and whitespace-only inputs instead of
@@ -44,6 +44,7 @@ now emit a one-time deprecation warning; they will be removed in 1.0.
 | ----------------------------- | ------------------------------- |
 | `MultiXml` (constant)         | `MultiXML` (all-caps)           |
 | `MultiXML.load(xml)`          | `MultiXML.parse(xml)`           |
+| `symbolize_keys:` option      | `symbolize_names:` option       |
 
 The `MultiXml` constant (CamelCase) continues to work as a thin
 delegator; every method call, constant lookup, and rescue clause

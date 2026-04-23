@@ -2,6 +2,7 @@
 -----
 * Rename `MultiXml` constant to `MultiXML` (all caps), matching the style of `MultiJSON`. The old `MultiXml` constant continues to work but emits a one-time deprecation warning on first use and will be removed in v1.0.
 * Add `MultiXML.load` as a deprecated alias for `MultiXML.parse`, matching the style of `MultiJSON.load` → `MultiJSON.parse`. Will be removed in v1.0.
+* Rename the `:symbolize_keys` option to `:symbolize_names`, matching Ruby stdlib's `JSON.parse` and MultiJSON. The old option continues to work but emits a one-time deprecation warning; it will be removed in v1.0.
 * [Add `:namespaces` option to `MultiXML.parse` for consistent namespace handling across parsers](https://github.com/sferik/multi_xml/issues/44) — two modes produce byte-identical output on every backend:
   * `:strip` (default) — drop xmlns declarations and prefixes; keeps today's libxml/nokogiri output so most users see no change
   * `:preserve` — keep source prefixes (e.g. `"atom:rel"`) and surface `xmlns` / `xmlns:*` declarations as attributes

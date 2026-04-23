@@ -142,6 +142,11 @@ module MultiXML
   # Apply typecasting and key-symbolization as configured
   def self.apply_postprocessing: (xmlHash result, Hash[Symbol, untyped] options) -> xmlHash
 
+  module OptionsNormalization
+    # Translate the deprecated :symbolize_keys option to :symbolize_names
+    def self.normalize_symbolize_option: (Hash[Symbol, untyped] options) -> Hash[Symbol, untyped]
+  end
+
   # Define a deprecated alias that delegates to a new method name
   def self.deprecate_alias: (Symbol name, Symbol replacement) -> Symbol
 

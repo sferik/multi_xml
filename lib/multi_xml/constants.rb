@@ -1,3 +1,4 @@
+# Shared constants and converter lambdas used across parser backends.
 module MultiXML
   # Hash key for storing text content within element hashes
   #
@@ -59,11 +60,11 @@ module MultiXML
   # @api public
   # @return [Hash] default options for parse method
   # @example View defaults
-  #   DEFAULT_OPTIONS[:symbolize_keys] #=> false
+  #   DEFAULT_OPTIONS[:symbolize_names] #=> false
   DEFAULT_OPTIONS = {
     typecast_xml_value: true,
     disallowed_types: DISALLOWED_TYPES,
-    symbolize_keys: false,
+    symbolize_names: false,
     namespaces: :strip
   }.freeze
 

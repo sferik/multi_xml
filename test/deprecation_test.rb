@@ -1,9 +1,8 @@
 require "test_helper"
 require "support/deprecation_helpers"
 
-# Tests the deprecation surface: old MultiXml constant access, including
-# method delegation and constant lookup. Each path must emit a one-time
-# deprecation warning and delegate correctly to MultiXML.
+# Tests the deprecation surface for renamed constants and methods:
+# MultiXml → MultiXML, load → parse.
 class DeprecationTest < Minitest::Test
   include DeprecationHelpers
 

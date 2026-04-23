@@ -29,14 +29,14 @@ class ParseOptionsTest < Minitest::Test
     assert_equal({"type" => "integer", "__content__" => "42"}, result["tag"])
   end
 
-  def test_parse_with_symbolize_keys_true
-    result = MultiXML.parse("<root><name>John</name></root>", symbolize_keys: true)
+  def test_parse_with_symbolize_names_true
+    result = MultiXML.parse("<root><name>John</name></root>", symbolize_names: true)
 
     assert_equal({root: {name: "John"}}, result)
   end
 
-  def test_parse_with_symbolize_keys_false
-    result = MultiXML.parse("<root><name>John</name></root>", symbolize_keys: false)
+  def test_parse_with_symbolize_names_false
+    result = MultiXML.parse("<root><name>John</name></root>", symbolize_names: false)
 
     assert_equal({"root" => {"name" => "John"}}, result)
   end
@@ -136,7 +136,7 @@ class ParseOptionsAccessTest < Minitest::Test
     MultiXML.parser = best_available_parser
 
     # options without :parser key should work (use class-level parser)
-    result = MultiXML.parse("<test>value</test>", symbolize_keys: false)
+    result = MultiXML.parse("<test>value</test>", symbolize_names: false)
 
     assert_equal({"test" => "value"}, result)
   end
@@ -169,11 +169,11 @@ class ParseOptionsAccessTest < Minitest::Test
     assert_equal({"type" => "integer", "__content__" => "42"}, result_without["n"])
   end
 
-  def test_parse_accesses_symbolize_keys_option_correctly
+  def test_parse_accesses_symbolize_names_option_correctly
     MultiXML.parser = best_available_parser
 
-    result_with = MultiXML.parse("<root><name>v</name></root>", symbolize_keys: true)
-    result_without = MultiXML.parse("<root><name>v</name></root>", symbolize_keys: false)
+    result_with = MultiXML.parse("<root><name>v</name></root>", symbolize_names: true)
+    result_without = MultiXML.parse("<root><name>v</name></root>", symbolize_names: false)
 
     assert_equal({root: {name: "v"}}, result_with)
     assert_equal({"root" => {"name" => "v"}}, result_without)
