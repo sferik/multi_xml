@@ -6,13 +6,13 @@ module MultiXML
     #
     # @api private
     module Ox
+      extend MultiXML::Parser
+
       module_function
 
-      # Get the parse error class for this parser
-      #
+      # Exception class raised on Ox parse failure
       # @api private
-      # @return [Class] Ox::ParseError
-      def parse_error = ::Ox::ParseError
+      ParseError = ::Ox::ParseError
 
       # Parse XML from an IO object
       #

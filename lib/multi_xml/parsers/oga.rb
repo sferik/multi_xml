@@ -7,14 +7,13 @@ module MultiXML
     #
     # @api private
     module Oga
+      extend MultiXML::Parser
       include DomParser
       extend self
 
-      # Get the parse error class for this parser
-      #
+      # Exception class raised on Oga parse failure
       # @api private
-      # @return [Class] LL::ParserError
-      def parse_error = LL::ParserError
+      ParseError = LL::ParserError
 
       # Parse XML from an IO object
       #

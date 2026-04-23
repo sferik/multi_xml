@@ -7,14 +7,13 @@ module MultiXML
     #
     # @api private
     module Nokogiri
+      extend MultiXML::Parser
       include DomParser
       extend self
 
-      # Get the parse error class for this parser
-      #
+      # Exception class raised on Nokogiri parse failure
       # @api private
-      # @return [Class] Nokogiri::XML::SyntaxError
-      def parse_error = ::Nokogiri::XML::SyntaxError
+      ParseError = ::Nokogiri::XML::SyntaxError
 
       # Parse XML from an IO object
       #

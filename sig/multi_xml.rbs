@@ -81,6 +81,10 @@ module MultiXML
     def parse_options: (*untyped args) -> Hash[Symbol, untyped]
   end
 
+  module Parser
+    def parse_error: () -> Class
+  end
+
   module ParserResolution
     LOADED_PARSER_CHECKS: Hash[Symbol, Symbol]
   end

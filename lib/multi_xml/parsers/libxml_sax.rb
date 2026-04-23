@@ -9,13 +9,13 @@ module MultiXML
     #
     # @api private
     module LibxmlSax
+      extend MultiXML::Parser
+
       module_function
 
-      # Get the parse error class for this parser
-      #
+      # Exception class raised on LibXML parse failure
       # @api private
-      # @return [Class] LibXML::XML::Error
-      def parse_error = ::LibXML::XML::Error
+      ParseError = ::LibXML::XML::Error
 
       # Parse XML from a string or IO object
       #
