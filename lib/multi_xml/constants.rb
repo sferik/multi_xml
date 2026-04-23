@@ -140,26 +140,19 @@ module MultiXML
   # @example Using a converter
   #   TYPE_CONVERTERS["integer"].call("42") #=> 42
   TYPE_CONVERTERS = {
-    # Primitive types
-    "symbol" => :to_sym.to_proc,
+    "symbol" => ->(s) { s.to_sym },
     "string" => :to_s.to_proc,
     "integer" => :to_i.to_proc,
     "float" => :to_f.to_proc,
     "double" => :to_f.to_proc,
     "decimal" => ->(s) { BigDecimal(s) },
     "boolean" => ->(s) { !FALSE_BOOLEAN_VALUES.include?(s.strip) },
-
-    # Date and time types
     "date" => Date.method(:parse),
     "datetime" => PARSE_DATETIME,
     "dateTime" => PARSE_DATETIME,
-
-    # Binary types
     "base64Binary" => ->(s) { s.unpack1("m") },
     "binary" => ->(s, entity) { (entity["encoding"] == "base64") ? s.unpack1("m") : s },
     "file" => FILE_CONVERTER,
-
-    # Structured types
     "yaml" => lambda do |string|
       YAML.safe_load(string, permitted_classes: [Symbol, Date, Time])
     rescue ArgumentError, Psych::SyntaxError

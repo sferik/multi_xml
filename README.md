@@ -103,6 +103,8 @@ implementations:
 - Ruby 3.3
 - Ruby 3.4
 - Ruby 4.0
+- [JRuby][jruby] 10.0 (targets Ruby 3.4 compatibility)
+- [TruffleRuby][truffleruby] 33.0 (native and JVM)
 
 If something doesn't work in one of these implementations, it's a bug.
 
@@ -138,6 +140,7 @@ Copyright (c) 2010-2026 Erik Berlin. See [LICENSE][license] for details.
 
 [docs]: https://github.com/sferik/multi_xml/actions/workflows/docs.yml
 [gem]: https://rubygems.org/gems/multi_xml
+[jruby]: http://www.jruby.org/
 [libxml-ruby]: https://github.com/xml4r/libxml-ruby
 [license]: LICENSE.md
 [linter]: https://github.com/sferik/multi_xml/actions/workflows/linter.yml
@@ -149,4 +152,5 @@ Copyright (c) 2010-2026 Erik Berlin. See [LICENSE][license] for details.
 [rexml]: https://github.com/ruby/rexml
 [semver]: http://semver.org/
 [tests]: https://github.com/sferik/multi_xml/actions/workflows/tests.yml
+[truffleruby]: https://www.graalvm.org/ruby/
 [typecheck]: https://github.com/sferik/multi_xml/actions/workflows/typecheck.yml

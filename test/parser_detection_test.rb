@@ -24,7 +24,9 @@ class FindLoadedParserTest < Minitest::Test
 
   def test_returns_best_available_parser_when_defined
     with_parser_constants(:Ox, :LibXML, :Nokogiri, :Oga) do
-      assert_equal :ox, MultiXML.send(:find_loaded_parser)
+      expected = truffleruby? ? :libxml : :ox
+
+      assert_equal expected, MultiXML.send(:find_loaded_parser)
     end
   end
 
@@ -37,6 +39,14 @@ class FindLoadedParserTest < Minitest::Test
   def test_returns_oga_when_only_oga_defined
     with_parser_constants(:Oga) do
       assert_equal :oga, MultiXML.send(:find_loaded_parser)
+    end
+  end
+
+  def test_skips_parsers_flagged_for_the_current_platform
+    with_parser_constants(:Ox, :Nokogiri) do
+      MultiXML.stub(:skip_on_platform?, ->(name) { name == :ox }) do
+        assert_equal :nokogiri, MultiXML.send(:find_loaded_parser)
+      end
     end
   end
 
@@ -107,6 +117,14 @@ class FindAvailableParserTest < Minitest::Test
     # Use nokogiri as fallback since it's available on all platforms
     with_parser_preference([["nonexistent_parser_gem", :nonexistent], ["nokogiri", :nokogiri]]) do
       assert_equal :nokogiri, MultiXML.send(:find_available_parser)
+    end
+  end
+
+  def test_skips_parsers_flagged_for_the_current_platform
+    with_parser_preference([["ox", :ox], ["nokogiri", :nokogiri]]) do
+      MultiXML.stub(:skip_on_platform?, ->(name) { name == :ox }) do
+        assert_equal :nokogiri, MultiXML.send(:find_available_parser)
+      end
     end
   end
 

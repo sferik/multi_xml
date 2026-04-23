@@ -14,3 +14,8 @@ requires:
 matcher:
   subjects:
     - MultiXML*
+  ignore:
+    # Platform-specific code path: only triggers on TruffleRuby. Mutant
+    # runs on MRI, so any mutation that touches the RUBY_ENGINE check
+    # produces the same observable behavior as the original.
+    - MultiXML::ParserResolution#skip_on_platform?

@@ -26,7 +26,7 @@ class MultiXmlParserConfigTest < Minitest::Test
 
   def test_defaults_to_the_best_available_gem
     MultiXML.send(:remove_instance_variable, :@parser) if MultiXML.instance_variable_defined?(:@parser)
-    expected = (windows? || jruby?) ? "MultiXML::Parsers::Nokogiri" : "MultiXML::Parsers::Ox"
+    expected = "MultiXML::Parsers::#{best_available_parser.to_s.capitalize}"
 
     assert_equal expected, MultiXML.parser.name
   end
@@ -301,7 +301,7 @@ class MultiXmlParserLoadingTest < Minitest::Test
   end
 
   def expected_loaded_parser
-    return :ox if defined?(Ox)
+    return :ox if defined?(Ox) && !truffleruby?
     return :libxml if defined?(LibXML)
     return :nokogiri if defined?(Nokogiri)
 

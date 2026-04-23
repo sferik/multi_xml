@@ -17,6 +17,13 @@ SAX_PARSERS = {
 
 # Generate test classes for each parser
 DOM_PARSERS.merge(SAX_PARSERS).each do |parser_name, (require_name, class_name, test_module)|
+  # Ox loads on TruffleRuby but its SAX callbacks miscompile, so the
+  # produced hash is empty and every typecast/disallowed-type assertion
+  # collapses. Skip the integration class entirely there; explicit
+  # ``MultiXML.parser = :ox`` on a runtime where Ox actually works
+  # still goes through the normal code path.
+  next if parser_name == "Ox" && truffleruby?
+
   # Suppress parse-time warnings from oga gem
   if require_name == "oga"
     original_verbose = $VERBOSE

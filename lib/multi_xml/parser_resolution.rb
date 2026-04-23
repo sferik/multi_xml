@@ -65,6 +65,7 @@ module MultiXML
     # @return [Symbol, nil] Parser name or nil if none loaded
     def find_loaded_parser
       LOADED_PARSER_CHECKS.each do |const_name, parser_name|
+        next if skip_on_platform?(parser_name)
         return parser_name if Object.const_defined?(const_name)
       end
       nil
@@ -76,9 +77,25 @@ module MultiXML
     # @return [Symbol, nil] Parser name or nil if none available
     def find_available_parser
       PARSER_PREFERENCE.each do |library, parser_name|
+        next if skip_on_platform?(parser_name)
         return parser_name if try_require(library)
       end
       nil
+    end
+
+    # Whether a parser should be skipped during auto-detection
+    #
+    # Ox loads on TruffleRuby but its SAX callbacks misbehave under the
+    # native interpreter, so type-attributed XML parses to an empty hash
+    # and the disallowed-type check is silently bypassed. Skip it during
+    # auto-detection so MultiXML falls through to a working backend.
+    # Callers that pass ``parser: :ox`` explicitly still get Ox.
+    #
+    # @api private
+    # @param parser_name [Symbol] parser symbol from preference list
+    # @return [Boolean] true when this parser must be skipped
+    def skip_on_platform?(parser_name)
+      parser_name == :ox && RUBY_ENGINE == "truffleruby"
     end
 
     # Attempt to require a library
