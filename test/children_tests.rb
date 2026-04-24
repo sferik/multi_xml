@@ -1,5 +1,16 @@
 # Tests nested element parsing, sibling arrays, and whitespace handling in hierarchies
 module ParserChildrenTests
+  INLINE_CHILDREN_XML = "<root><p>This alpha text has <em>inline emphasis 1</em> and <strong>strong 1</strong>.</p></root>".freeze
+  INLINE_CHILDREN_EXPECTED = {
+    "root" => {
+      "p" => {
+        "__content__" => "This alpha text has  and .",
+        "em" => {"__content__" => "inline emphasis 1"},
+        "strong" => {"__content__" => "strong 1"}
+      }
+    }
+  }.freeze
+
   def test_children_with_attributes_return_correct_values
     assert_equal "Erik Berlin", MultiXML.parse('<users><user name="Erik Berlin"/></users>')["users"]["user"]["name"]
   end
@@ -47,5 +58,9 @@ module ParserChildrenTests
     result = MultiXML.parse("<root><child>inner</child> text </root>")
 
     assert result.dig("root", "child")
+  end
+
+  def test_inline_children_preserve_combined_text_content
+    assert_equal INLINE_CHILDREN_EXPECTED, MultiXML.parse(INLINE_CHILDREN_XML, typecast_xml_value: false)
   end
 end
