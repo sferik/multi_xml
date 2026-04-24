@@ -78,7 +78,7 @@ to wrap parse failures in `MultiXML::ParseError`. The built-in parsers in
 
 MultiXML tries to have intelligent defaulting. If any supported library is
 already loaded, MultiXML uses it before attempting to load others. When no
-backend is preloaded, MultiXML walks its preference list and uses the first
+backend is preloaded, MultiXML walks its automatic preference list and uses the first
 one that loads successfully:
 
 1. [`ox`][ox]
@@ -87,12 +87,70 @@ one that loads successfully:
 4. [`rexml`][rexml]
 5. [`oga`][oga]
 
-This order is a best-effort historical ranking by typical parse throughput on
-representative workloads, not a guaranteed benchmark. Real-world performance
-depends on the document shape and the Ruby implementation. REXML is a Ruby
-default gem, so it's always available as a last-resort fallback on any
-supported Ruby. If you have a workload where a different backend is faster,
-set it explicitly with `MultiXML.parser = :your_parser`.
+This is the library's built-in default selection order, not a guarantee that
+the list is globally fastest for every workload. Real-world performance depends
+on the document shape and the Ruby implementation, and the benchmark suite
+below also measures SAX backends that are not part of automatic parser
+detection. REXML is a Ruby default gem, so it's always available as a
+last-resort fallback on any supported Ruby. If you have a workload where a
+different backend is faster, set it explicitly with
+`MultiXML.parser = :your_parser`.
+
+## Benchmarking Parsers
+
+This repo includes a benchmark suite that compares every available built-in
+backend across multiple XML shapes and sizes instead of relying on a single
+synthetic document. The workloads cover:
+
+- shallow and wide XML
+- deeply nested XML
+- record batches with repeated siblings
+- attribute-dense elements
+- mixed-content sections
+- namespace-heavy feeds
+- a large catalog-style document
+
+Run the full benchmark with:
+
+```bash
+bundle exec rake benchmark:parsers
+```
+
+You can also run the script directly for shorter runs or Markdown-friendly
+output:
+
+```bash
+bundle exec ruby benchmark.rb --quick
+bundle exec ruby benchmark.rb --format=markdown
+```
+
+The output includes:
+
+- a single best-overall parser based on the equal-weight geometric mean of
+  per-scenario relative throughput
+- an overall ranking table for every parser
+- a scenario matrix showing which parser won each workload
+- an exclusions table when a parser crashes or produces mismatched output on a
+  valid workload
+
+Allocation efficiency is reported as a secondary metric using allocated Ruby
+objects per parse so ties on throughput are easier to interpret.
+
+On the representative workload suite currently checked into this repository,
+the parsers ranked as follows:
+
+| parser        | overall score | alloc score | wins |
+| ------------- | ------------- | ----------- | ---- |
+| `ox`          | `1.000`       | `0.989`     | `9`  |
+| `nokogiri_sax`| `0.706`       | `0.641`     | `0`  |
+| `libxml`      | `0.682`       | `0.699`     | `0`  |
+| `nokogiri`    | `0.573`       | `0.707`     | `0`  |
+| `libxml_sax`  | `0.544`       | `0.391`     | `0`  |
+| `oga`         | `0.142`       | `0.271`     | `0`  |
+| `rexml`       | `0.109`       | `0.198`     | `0`  |
+
+Those numbers should be treated as a reproducible benchmark snapshot for this
+suite, not as a universal promise across all XML documents or Ruby runtimes.
 
 ## Supported Ruby Versions
 

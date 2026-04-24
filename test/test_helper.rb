@@ -25,6 +25,8 @@ require "simplecov"
 
 SimpleCov.start do
   add_filter "/test"
+  add_filter "/benchmark"
+  add_filter "/benchmark.rb"
   # libxml-ruby and ox are :ruby-only gems, so their parser files are
   # unreachable on Windows / JRuby and would drag coverage below 100%.
   if windows? || jruby?
