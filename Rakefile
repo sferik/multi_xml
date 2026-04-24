@@ -1,4 +1,5 @@
 require "bundler/gem_tasks"
+require "shellwords"
 
 # Override release task to skip gem push (handled by GitHub Actions with attestations)
 Rake::Task["release"].clear
@@ -44,6 +45,14 @@ end
 
 desc "Run linters"
 task lint: %i[rubocop standard]
+
+namespace :benchmark do
+  desc "Benchmark available XML parsers across representative workloads"
+  task :parsers do
+    args = ENV["BENCHMARK_ARGS"] ? Shellwords.split(ENV["BENCHMARK_ARGS"]) : []
+    sh Gem.ruby, "benchmark.rb", *args
+  end
+end
 
 # Mutant uses fork() which is not available on Windows or JRuby
 desc "Run mutation testing"
