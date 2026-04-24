@@ -85,7 +85,7 @@ module MultiXML
         # @api private
         # @param value [String] Text content
         # @return [void]
-        def text(value) = add_value(current, TEXT_CONTENT_KEY, value)
+        def text(value) = append_text(current, value)
         alias_method :cdata, :text
 
         # Handle end of an element
@@ -146,6 +146,21 @@ module MultiXML
         def add_value(hash, key, value)
           existing = hash[key]
           hash[key] = existing ? merge_values(existing, value) : value
+        end
+
+        # Append a text fragment to the current node's content
+        #
+        # SAX parsers may deliver element text in multiple callbacks when
+        # inline elements split the text stream. MultiXML represents that
+        # as one concatenated ``__content__`` string, not an array.
+        #
+        # @api private
+        # @param hash [Hash] Target hash
+        # @param value [String] Text fragment
+        # @return [void]
+        def append_text(hash, value)
+          existing = hash[TEXT_CONTENT_KEY]
+          hash[TEXT_CONTENT_KEY] = existing ? "#{existing}#{value}" : value
         end
 
         # Merge a value with an existing value, creating an array if needed
