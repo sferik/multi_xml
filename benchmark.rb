@@ -21,7 +21,8 @@ class MultiXMLBenchmark
     time: 0.15,
     samples: 5,
     format: :plain,
-    validate: true
+    validate: true,
+    verify_preference: false
   }.freeze
 
   class << self
@@ -32,7 +33,9 @@ class MultiXMLBenchmark
 
       results = Runner.new(parsers:, payloads: PayloadCatalog.new.build, options:).run
       Reporter.new(results:, options:).print
-      0
+      return 0 unless options[:verify_preference]
+
+      PreferenceVerifier.new(results).verify ? 0 : 1
     end
   end
 end
@@ -90,6 +93,9 @@ class MultiXMLBenchmark
     def add_validation_options(parser, options)
       parser.on("--no-validate", "Skip cross-parser result validation") do
         options[:validate] = false
+      end
+      parser.on("--verify-preference", "Assert MultiXML::PARSER_PREFERENCE matches benchmark ranking") do
+        options[:verify_preference] = true
       end
     end
 
@@ -643,6 +649,66 @@ class MultiXMLBenchmark
         rows,
         alignments: EXCLUSION_ALIGNMENTS
       )
+    end
+  end
+end
+
+class MultiXMLBenchmark
+  # Asserts MultiXML::PARSER_PREFERENCE matches benchmark throughput ranking.
+  #
+  # Compares only the parsers that both appear in PARSER_PREFERENCE and were
+  # benchmarked on this run, so missing native parsers (e.g. ox on JRuby) are
+  # tolerated rather than treated as failures.
+  class PreferenceVerifier
+    def initialize(results)
+      @results = results
+    end
+
+    def verify
+      return true if expected.empty?
+
+      if observed == expected
+        report_match
+        true
+      else
+        report_mismatch
+        false
+      end
+    end
+
+    private
+
+    attr_reader :results
+
+    def benchmark_ranking
+      @benchmark_ranking ||= MultiXMLBenchmark::Summary
+        .new(results.parsers, results.measurements)
+        .rows
+        .map { |row| row[0].to_sym }
+    end
+
+    def preference_order
+      @preference_order ||= MultiXML::PARSER_PREFERENCE.map { |_lib, parser| parser }
+    end
+
+    def observed
+      @observed ||= benchmark_ranking.select { |parser| preference_order.include?(parser) }
+    end
+
+    def expected
+      @expected ||= preference_order.select { |parser| observed.include?(parser) }
+    end
+
+    def report_match
+      puts
+      puts "PARSER_PREFERENCE matches benchmark ranking: #{expected.join(", ")}"
+    end
+
+    def report_mismatch
+      puts
+      puts "PARSER_PREFERENCE does not match benchmark ranking:"
+      puts "  PARSER_PREFERENCE: #{expected.join(", ")}"
+      puts "  benchmark:         #{observed.join(", ")}"
     end
   end
 end
