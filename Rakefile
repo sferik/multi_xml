@@ -46,12 +46,10 @@ end
 desc "Run linters"
 task lint: %i[rubocop standard]
 
-namespace :benchmark do
-  desc "Benchmark available XML parsers across representative workloads"
-  task :parsers do
-    args = ENV["BENCHMARK_ARGS"] ? Shellwords.split(ENV["BENCHMARK_ARGS"]) : []
-    sh Gem.ruby, "benchmark.rb", *args
-  end
+desc "Benchmark available XML parsers across representative workloads"
+task :benchmark do
+  args = ENV["BENCHMARK_ARGS"] ? Shellwords.split(ENV["BENCHMARK_ARGS"]) : []
+  sh Gem.ruby, "benchmark.rb", *args
 end
 
 # Mutant uses fork() which is not available on Windows or JRuby
