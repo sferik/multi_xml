@@ -84,8 +84,8 @@ one that loads successfully:
 1. [`ox`][ox]
 2. [`libxml-ruby`][libxml-ruby]
 3. [`nokogiri`][nokogiri]
-4. [`rexml`][rexml]
-5. [`oga`][oga]
+4. [`oga`][oga]
+5. [`rexml`][rexml]
 
 This is the library's built-in default selection order, not a guarantee that
 the list is globally fastest for every workload. Real-world performance depends
@@ -136,21 +136,26 @@ The output includes:
 Allocation efficiency is reported as a secondary metric using allocated Ruby
 objects per parse so ties on throughput are easier to interpret.
 
-On the representative workload suite currently checked into this repository,
-the parsers ranked as follows:
+`PARSER_PREFERENCE` drives auto-detection (see "Configuration" above) and is
+ordered fastest-first per the benchmark suite. CI re-runs the benchmark on
+each supported runtime and fails if the observed ranking diverges from this
+table:
 
-| parser        | overall score | alloc score | wins |
-| ------------- | ------------- | ----------- | ---- |
-| `ox`          | `1.000`       | `0.990`     | `9`  |
-| `libxml`      | `0.763`       | `0.693`     | `0`  |
-| `nokogiri_sax`| `0.757`       | `0.651`     | `0`  |
-| `nokogiri`    | `0.639`       | `0.700`     | `0`  |
-| `libxml_sax`  | `0.559`       | `0.402`     | `0`  |
-| `oga`         | `0.168`       | `0.300`     | `0`  |
-| `rexml`       | `0.117`       | `0.226`     | `0`  |
+| rank | CRuby/MRI  | JRuby      | TruffleRuby |
+| ---- | ---------- | ---------- | ----------- |
+| 1    | `ox`       | —          | —           |
+| 2    | `libxml`   | —          | `rexml`     |
+| 3    | `nokogiri` | `nokogiri` | `libxml`    |
+| 4    | `oga`      | —          | `oga`       |
+| 5    | `rexml`    | `rexml`    | `nokogiri`  |
 
-Those numbers should be treated as a reproducible benchmark snapshot for this
-suite, not as a universal promise across all XML documents or Ruby runtimes.
+A dash means the parser isn't usable on that runtime. `ox` has no JRuby
+build and is filtered out of TruffleRuby auto-detection (its SAX callbacks
+miscompile under the JIT after warmup); `libxml-ruby` has no JRuby build;
+`oga` 3.x crashes on JRuby 10 (its precompiled Java backend was built
+against an older JRuby API). TruffleRuby's JIT inverts the FFI-vs-pure-Ruby
+tradeoff for the remaining backends, so `rexml` rises to the top and
+`nokogiri` falls to last.
 
 ## Supported Ruby Versions
 
