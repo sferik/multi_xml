@@ -78,8 +78,8 @@ module MultiXML
     ["ox", :ox],
     ["libxml-ruby", :libxml],
     ["nokogiri", :nokogiri],
-    ["rexml/document", :rexml],
-    ["oga", :oga]
+    ["oga", :oga],
+    ["rexml/document", :rexml]
   ].freeze
 
   # Parses datetime strings, trying Time first then DateTime
