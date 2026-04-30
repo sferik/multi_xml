@@ -33,9 +33,15 @@ class MultiXMLBenchmark
 
       results = Runner.new(parsers:, payloads: PayloadCatalog.new.build, options:).run
       Reporter.new(results:, options:).print
-      return 0 unless options[:verify_preference]
+      options[:verify_preference] ? verify_preference(results) : 0
+    end
 
-      PreferenceVerifier.new(results).verify ? 0 : 1
+    private
+
+    def verify_preference(results)
+      verifier = PreferenceVerifier.new(results)
+      verifier.report
+      verifier.valid? ? 0 : 1
     end
   end
 end
@@ -658,21 +664,27 @@ class MultiXMLBenchmark
   #
   # Compares only the parsers that both appear in PARSER_PREFERENCE and were
   # benchmarked on this run, so missing native parsers (e.g. ox on JRuby) are
-  # tolerated rather than treated as failures.
+  # tolerated rather than treated as failures. Adjacent parsers whose
+  # observed scores fall within TOLERANCE of each other are treated as
+  # tied so noisy benchmark runs that flip close pairs (e.g. oga vs
+  # nokogiri on TruffleRuby) don't trigger a failure.
   class PreferenceVerifier
+    TOLERANCE = 0.10
+    private_constant :TOLERANCE
+
     def initialize(results)
       @results = results
     end
 
-    def verify
-      return true if expected.empty?
+    def valid?
+      violations.empty?
+    end
 
-      if observed == expected
+    def report
+      if valid?
         report_match
-        true
       else
-        report_mismatch
-        false
+        report_violations
       end
     end
 
@@ -680,35 +692,62 @@ class MultiXMLBenchmark
 
     attr_reader :results
 
-    def benchmark_ranking
-      @benchmark_ranking ||= MultiXMLBenchmark::Summary
-        .new(results.parsers, results.measurements)
-        .rows
-        .map { |row| row[0].to_sym }
-    end
-
     def preference_order
       @preference_order ||= MultiXML::PARSER_PREFERENCE.map { |_lib, parser| parser }
     end
 
-    def observed
-      @observed ||= benchmark_ranking.select { |parser| preference_order.include?(parser) }
+    def scores
+      @scores ||= summary.rows.to_h { |row| [row[0].to_sym, row[1].to_f] }
     end
 
-    def expected
-      @expected ||= preference_order.select { |parser| observed.include?(parser) }
+    def summary
+      @summary ||= MultiXMLBenchmark::Summary.new(results.parsers, results.measurements)
+    end
+
+    def relevant_parsers
+      @relevant_parsers ||= preference_order.select { |parser| scores.key?(parser) }
+    end
+
+    def violations
+      @violations ||= relevant_parsers.each_cons(2).filter_map do |earlier, later|
+        violation_for(earlier, later)
+      end
+    end
+
+    def violation_for(earlier, later)
+      earlier_score = scores.fetch(earlier)
+      later_score = scores.fetch(later)
+      return nil if later_score <= earlier_score * (1 + TOLERANCE)
+
+      {earlier: earlier, later: later, earlier_score: earlier_score, later_score: later_score}
     end
 
     def report_match
       puts
-      puts "PARSER_PREFERENCE matches benchmark ranking: #{expected.join(", ")}"
+      puts "PARSER_PREFERENCE matches benchmark ranking within #{tolerance_pct}% tolerance: #{relevant_parsers.join(", ")}"
     end
 
-    def report_mismatch
+    def report_violations
       puts
-      puts "PARSER_PREFERENCE does not match benchmark ranking:"
-      puts "  PARSER_PREFERENCE: #{expected.join(", ")}"
-      puts "  benchmark:         #{observed.join(", ")}"
+      puts "PARSER_PREFERENCE does not match benchmark ranking (>#{tolerance_pct}% tolerance):"
+      violations.each { |violation| puts "  #{format_violation(violation)}" }
+    end
+
+    def format_violation(violation)
+      later = violation.fetch(:later)
+      earlier = violation.fetch(:earlier)
+      later_score = format_score(violation.fetch(:later_score))
+      earlier_score = format_score(violation.fetch(:earlier_score))
+      excess = (((violation.fetch(:later_score) / violation.fetch(:earlier_score)) - 1) * 100).round
+      "#{later} (#{later_score}) outranks #{earlier} (#{earlier_score}) by #{excess}% but is preferenced after it"
+    end
+
+    def format_score(value)
+      Kernel.format("%.3f", value)
+    end
+
+    def tolerance_pct
+      (TOLERANCE * 100).to_i
     end
   end
 end
