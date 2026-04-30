@@ -366,6 +366,20 @@ end
 class MultiXMLBenchmark
   # Runs the benchmark matrix across parsers and XML payloads.
   class Runner
+    # JRuby surfaces parser backend incompatibilities (e.g. Oga's Java
+    # backend against newer JRuby) as java.lang.Error subclasses, which
+    # are outside Ruby's StandardError hierarchy. Catch the broader Java
+    # tree on JRuby so a busted parser is excluded instead of aborting
+    # the run. Java::JavaLang::Throwable resolves lazily under JRuby and
+    # doesn't respond to defined?, so gate on RUBY_ENGINE.
+    RESCUABLE_PARSE_ERRORS = if RUBY_ENGINE == "jruby"
+      require "java"
+      [StandardError, Java::JavaLang::Throwable].freeze
+    else
+      [StandardError].freeze
+    end
+    private_constant :RESCUABLE_PARSE_ERRORS
+
     def initialize(parsers:, payloads:, options:)
       @parsers = parsers
       @payloads = payloads
@@ -421,7 +435,7 @@ class MultiXMLBenchmark
       return nil if actual == expected_output
 
       "output mismatch"
-    rescue => e
+    rescue *RESCUABLE_PARSE_ERRORS => e
       error_summary(e)
     end
 
