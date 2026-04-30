@@ -113,7 +113,7 @@ synthetic document. The workloads cover:
 Run the full benchmark with:
 
 ```bash
-bundle exec rake benchmark:parsers
+bundle exec rake benchmark
 ```
 
 You can also run the script directly for shorter runs or Markdown-friendly
@@ -141,13 +141,13 @@ the parsers ranked as follows:
 
 | parser        | overall score | alloc score | wins |
 | ------------- | ------------- | ----------- | ---- |
-| `ox`          | `1.000`       | `0.989`     | `9`  |
-| `nokogiri_sax`| `0.706`       | `0.641`     | `0`  |
-| `libxml`      | `0.682`       | `0.699`     | `0`  |
-| `nokogiri`    | `0.573`       | `0.707`     | `0`  |
-| `libxml_sax`  | `0.544`       | `0.391`     | `0`  |
-| `oga`         | `0.142`       | `0.271`     | `0`  |
-| `rexml`       | `0.109`       | `0.198`     | `0`  |
+| `ox`          | `1.000`       | `0.990`     | `9`  |
+| `libxml`      | `0.763`       | `0.693`     | `0`  |
+| `nokogiri_sax`| `0.757`       | `0.651`     | `0`  |
+| `nokogiri`    | `0.639`       | `0.700`     | `0`  |
+| `libxml_sax`  | `0.559`       | `0.402`     | `0`  |
+| `oga`         | `0.168`       | `0.300`     | `0`  |
+| `rexml`       | `0.117`       | `0.226`     | `0`  |
 
 Those numbers should be treated as a reproducible benchmark snapshot for this
 suite, not as a universal promise across all XML documents or Ruby runtimes.
