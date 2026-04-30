@@ -70,17 +70,34 @@ module MultiXML
 
   # Parser libraries in preference order (fastest first)
   #
+  # TruffleRuby's JIT favors pure-Ruby parsers and penalizes FFI-bound
+  # ones, so rexml jumps to the head of the list (after ox, which is
+  # filtered out of auto-detection by ParserResolution#skip_on_platform?)
+  # and nokogiri falls to last.
+  #
   # @api public
   # @return [Array<Array>] pairs of [require_path, parser_symbol]
   # @example View parser order
   #   PARSER_PREFERENCE.first #=> ["ox", :ox]
-  PARSER_PREFERENCE = [
-    ["ox", :ox],
-    ["libxml-ruby", :libxml],
-    ["nokogiri", :nokogiri],
-    ["oga", :oga],
-    ["rexml/document", :rexml]
-  ].freeze
+  # :nocov:
+  PARSER_PREFERENCE = if RUBY_ENGINE == "truffleruby"
+    [
+      ["ox", :ox],
+      ["rexml/document", :rexml],
+      ["libxml-ruby", :libxml],
+      ["oga", :oga],
+      ["nokogiri", :nokogiri]
+    ].freeze
+  else
+    [
+      ["ox", :ox],
+      ["libxml-ruby", :libxml],
+      ["nokogiri", :nokogiri],
+      ["oga", :oga],
+      ["rexml/document", :rexml]
+    ].freeze
+  end
+  # :nocov:
 
   # Parses datetime strings, trying Time first then DateTime
   #

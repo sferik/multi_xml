@@ -1,6 +1,7 @@
 0.9.0
 -----
 * Reorder `PARSER_PREFERENCE` so `oga` is tried before `rexml`, matching the throughput ranking in the bundled benchmark suite. Affects auto-detection only when neither `ox`, `libxml-ruby`, nor `nokogiri` is available; explicitly selecting a parser is unchanged.
+* Use a TruffleRuby-specific `PARSER_PREFERENCE` ordering (`rexml`, `libxml`, `oga`, `nokogiri`) since TruffleRuby's JIT favors pure-Ruby parsers and penalizes FFI-bound ones. On other engines the default ordering is unchanged.
 * Rename `MultiXml` constant to `MultiXML` (all caps), matching the style of `MultiJSON`. The old `MultiXml` constant continues to work but emits a one-time deprecation warning on first use and will be removed in v1.0.
 * Add `MultiXML.load` as a deprecated alias for `MultiXML.parse`, matching the style of `MultiJSON.load` → `MultiJSON.parse`. Will be removed in v1.0.
 * Rename the `:symbolize_keys` option to `:symbolize_names`, matching Ruby stdlib's `JSON.parse` and MultiJSON. The old option continues to work but emits a one-time deprecation warning; it will be removed in v1.0.

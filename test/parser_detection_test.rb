@@ -104,7 +104,9 @@ class FindAvailableParserTest < Minitest::Test
   end
 
   def test_returns_first_loadable_parser
-    assert_equal best_available_parser, MultiXML.send(:find_available_parser)
+    with_parser_preference([["rexml/document", :rexml], ["nokogiri", :nokogiri]]) do
+      assert_equal :rexml, MultiXML.send(:find_available_parser)
+    end
   end
 
   def test_returns_nil_when_no_parsers_available
