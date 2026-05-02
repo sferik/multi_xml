@@ -7,7 +7,7 @@ module MultiXML
   # @api public
   # @example Extending a StringIO
   #   io = StringIO.new("file content")
-  #   io.extend(MultiXml::FileLike)
+  #   io.extend(MultiXML::FileLike)
   #   io.original_filename = "document.pdf"
   #   io.content_type = "application/pdf"
   module FileLike

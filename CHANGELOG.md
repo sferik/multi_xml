@@ -1,7 +1,9 @@
 0.9.0
 -----
-* Reorder `PARSER_PREFERENCE` so `oga` is tried before `rexml`, matching the throughput ranking in the bundled benchmark suite. Affects auto-detection only when neither `ox`, `libxml-ruby`, nor `nokogiri` is available; explicitly selecting a parser is unchanged.
-* Use a TruffleRuby-specific `PARSER_PREFERENCE` ordering (`rexml`, `libxml`, `oga`, `nokogiri`) since TruffleRuby's JIT favors pure-Ruby parsers and penalizes FFI-bound ones. On other engines the default ordering is unchanged.
+* Add `MultiXML.with_parser` for fiber-local scoped parser overrides, matching `MultiJSON.with_adapter`. The override lives in `Fiber[:multi_xml_parser]`, so concurrent fibers and threads each see their own parser without racing on a shared module variable; nested calls save and restore the previous value.
+* Add `MultiXML.parse_options` / `MultiXML.parse_options=` for process-wide default options, matching `MultiJSON.parse_options`. Accepts a `Hash` or a callable (`Proc`/`lambda`); a callable receives the call-site hash as its sole positional argument so defaults can be computed per-call. Defaults merge between `DEFAULT_OPTIONS` and call-site overrides.
+* Introduce `MultiXML::Parser` base module — built-in parsers declare their backend exception class via a `ParseError` constant, matching the `MultiJSON::Adapter` convention. Custom parsers can either extend `MultiXML::Parser` and define `ParseError` or keep defining a `.parse_error` method directly; both styles are accepted.
+* Add `MultiXML::ParserLoadError`, raised when the parser spec is invalid, requiring the parser file raises `LoadError`, or the resolved parser doesn't satisfy the contract (must respond to `.parse` and define either a `ParseError` constant or a `.parse_error` method). Inherits from `ArgumentError` and carries the original exception's class name in its message, matching `MultiJSON::AdapterError`.
 * Rename `MultiXml` constant to `MultiXML` (all caps), matching the style of `MultiJSON`. The old `MultiXml` constant continues to work but emits a one-time deprecation warning on first use and will be removed in v1.0.
 * Add `MultiXML.load` as a deprecated alias for `MultiXML.parse`, matching the style of `MultiJSON.load` → `MultiJSON.parse`. Will be removed in v1.0.
 * Rename the `:symbolize_keys` option to `:symbolize_names`, matching Ruby stdlib's `JSON.parse` and MultiJSON. The old option continues to work but emits a one-time deprecation warning; it will be removed in v1.0.
@@ -10,8 +12,17 @@
   * `:preserve` — keep source prefixes (e.g. `"atom:rel"`) and surface `xmlns` / `xmlns:*` declarations as attributes
 * Fix REXML keeping attribute prefixes (`"gd:etag"`) while other backends stripped them ([#31](https://github.com/sferik/multi_xml/issues/31))
 * Fix Ox prepending namespace prefixes to element names (`"aws:Item"`) when other backends didn't ([#30](https://github.com/sferik/multi_xml/issues/30))
+* Handle namespaced attribute name collisions consistently across backends. When attributes with different prefixes strip to the same local name (e.g. `foo:id` and `bar:id` both becoming `id`), values are collected in an array in document order, with attribute values ahead of any colliding child elements. The libxml SAX parser falls back to its DOM backend in this case since the SAX callback drops attribute prefixes.
+* Fix Ox mixed-content text aggregation in the SAX parser
 * Raise `ArgumentError` on an unknown `:namespaces` mode
 * `undasherize_keys` now runs only in `:strip` mode so prefixed keys aren't rewritten under `:preserve`
+* Reorder `PARSER_PREFERENCE` so `oga` is tried before `rexml`, matching the throughput ranking in the bundled benchmark suite. Affects auto-detection only when neither `ox`, `libxml-ruby`, nor `nokogiri` is available; explicitly selecting a parser is unchanged.
+* Use a TruffleRuby-specific `PARSER_PREFERENCE` ordering (`rexml`, `libxml`, `oga`, `nokogiri`) since TruffleRuby's JIT favors pure-Ruby parsers and penalizes FFI-bound ones. On other engines the default ordering is unchanged.
+* Add a parser benchmark suite (`rake benchmark`) and document per-engine throughput rankings in the README. CI verifies that `PARSER_PREFERENCE` matches the benchmark ranking on MRI, JRuby, and TruffleRuby.
+* Restore JRuby support (dropped in 0.8.0) and add TruffleRuby (native + JVM) to the CI matrix, matching the test coverage of MultiJSON. TruffleRuby is excluded from Windows runners since the `setup-ruby` action doesn't support it there.
+* Add Ruby 4.0 to the CI matrix
+* Support libxml-ruby 6.0.0 by switching from `require "libxml"` (removed in 6.0) to `require "libxml-ruby"`, which is present in both 5.x and 6.x
+* Drop redundant `::Psych::SyntaxError` declaration from the RBS signature to fix a "Different superclasses are specified" type-checking error under rbs v4
 
 0.8.1
 -----
