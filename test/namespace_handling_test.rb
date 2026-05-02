@@ -178,6 +178,15 @@ require_parser = lambda do |name|
 end
 
 NAMESPACE_PARSERS.each do |parser_name, require_name|
+  # Skip Ox on TruffleRuby — see https://github.com/truffleruby/truffleruby/issues/4236.
+  # When earlier tests in the same process call Minitest's `stub` on a class
+  # method (e.g. `DateTime.stub(:parse, ...)`), TruffleRuby's JIT can drop
+  # attribute callbacks from subsequent `Ox.sax_parse` invocations, and the
+  # collision fixtures here exercise exactly that path. Bare-trace SAX
+  # handlers are unaffected, and explicit `MultiXML.parser = :ox` in user
+  # code outside a test harness using Minitest stubs works correctly.
+  next if parser_name == "Ox" && truffleruby?
+
   require_parser.call(require_name)
 
   klass = Class.new(Minitest::Test) do

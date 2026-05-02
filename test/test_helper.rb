@@ -39,6 +39,13 @@ SimpleCov.start do
     add_filter "lib/multi_xml/parsers/libxml_sax.rb"
     add_filter "lib/multi_xml/parsers/ox.rb"
   end
+  # Ox tests are skipped on TruffleRuby — see
+  # https://github.com/truffleruby/truffleruby/issues/4236 — because Minitest
+  # stubs elsewhere in the suite cause TruffleRuby's JIT to drop SAX
+  # attribute callbacks. Filter the parser file out of coverage to match
+  # the skip; the uncovered lines reflect the platform workaround, not
+  # a real test gap.
+  add_filter "lib/multi_xml/parsers/ox.rb" if truffleruby?
   enable_coverage :branch unless jruby? || truffleruby?
   unless ENV["MUTANT"]
     if truffleruby?
