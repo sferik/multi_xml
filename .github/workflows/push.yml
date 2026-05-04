@@ -35,3 +35,10 @@ jobs:
         run: gem push pkg/*.gem --attestation pkg/multi_xml.gem.sigstore.json
       - name: Wait for release
         run: gem exec rubygems-await pkg/*.gem
+      - name: Create GitHub release
+        run: |
+          tag_name="$(git describe --tags --abbrev=0)"
+          gh release view "${tag_name}" >/dev/null 2>&1 || \
+            gh release create "${tag_name}" --verify-tag --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
