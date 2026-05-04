@@ -157,45 +157,35 @@ require_relative "multi_xml/deprecated"
 #
 # Downstream code that still writes MultiXml.parse(...) or
 # rescue MultiXml::ParseError continues to work, but emits a one-time
-# deprecation warning pointing at MultiXML. The module forwards every
-# method call to {MultiXML} via {.method_missing} and resolves constant
-# access via {.const_missing}, so both dotted calls and :: constant
-# lookups (including rescue clauses) route through the canonical module.
+# deprecation warning pointing at MultiXML. Each public method on
+# {MultiXML} gets an explicit forwarder defined on this module, and
+# constant access resolves via {.const_missing}, so both dotted calls
+# and :: constant lookups (including rescue clauses) route through
+# the canonical module.
 #
 # @api public
 # @deprecated Use {MultiXML} (all-caps) instead. Will be removed in v1.0.
 module MultiXml
-  class << self
-    # Forward method calls to {MultiXML}, emitting a one-time warning
-    #
-    # @api public
-    # @return [Object] the delegated call's return value
-    # @example
-    #   MultiXml.parse("<a>1</a>")  # delegates to MultiXML.parse
-    # rubocop:disable Naming/BlockForwarding, Style/ArgumentsForwarding
-    def method_missing(name, *args, **kwargs, &block)
+  # Forward every public method MultiXML exposes through an explicit
+  # singleton method on the legacy MultiXml module, so callers that
+  # capture the method as a Method object (``MultiXml.method(:load)``)
+  # find this forwarder instead of falling back to inherited methods like
+  # ``Kernel#load``. The earlier ``method_missing``-based shim left
+  # ``MultiXml.method(:load)`` resolving to ``Kernel#load`` (because
+  # ``Module#method`` doesn't consult ``method_missing``) so a captured
+  # ``MultiXml.method(:load)`` would interpret the XML payload as a file
+  # path and crash with ``LoadError``. Forwarding eagerly fixes the
+  # capture path while preserving the one-time deprecation warning each
+  # call emits.
+  (::MultiXML.public_methods - ::Module.public_methods).each do |forwarded|
+    define_singleton_method(forwarded) do |*args, **kwargs, &block|
       ::MultiXML.warn_deprecation_once(:multi_xml_constant,
         "The MultiXml constant is deprecated and will be removed in v1.0. Use MultiXML instead.")
-      if ::MultiXML.respond_to?(name)
-        ::MultiXML.public_send(name, *args, **kwargs, &block)
-      else
-        super
-      end
+      ::MultiXML.public_send(forwarded, *args, **kwargs, &block)
     end
-    # rubocop:enable Naming/BlockForwarding, Style/ArgumentsForwarding
+  end
 
-    # Respond to any method {MultiXML} responds to
-    #
-    # @api public
-    # @param name [Symbol] method name
-    # @param include_private [Boolean] include private methods
-    # @return [Boolean] true if {MultiXML} responds to the method
-    # @example
-    #   MultiXml.respond_to?(:parse)  #=> true
-    def respond_to_missing?(name, include_private)
-      ::MultiXML.respond_to?(name, include_private)
-    end
-
+  class << self
     # Resolve missing constants to their {MultiXML} counterparts
     #
     # The lookup is performed with ``inherit: false`` so a stray

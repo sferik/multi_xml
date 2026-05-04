@@ -37,6 +37,21 @@ class DeprecationTest < Minitest::Test
     assert_raises(NoMethodError) { MultiXml.no_such_method }
   end
 
+  # Regression: `MultiXml.method(:load)` used to resolve to `Kernel#load`
+  # because `method_missing` doesn't participate in `Module#method` lookup,
+  # so a captured `MultiXml.method(:load)` would interpret the XML payload
+  # as a file path and crash with `LoadError`. See sferik/multi_json#66
+  # for the analogous JSON-side report.
+  def test_multi_xml_constant_method_object_resolves_to_forwarder
+    refute_equal Kernel, MultiXml.method(:load).owner
+    assert_equal({"a" => "1"}, MultiXml.method(:load).call("<a>1</a>"))
+  end
+
+  def test_multi_xml_constant_method_object_resolves_for_canonical_verbs
+    refute_equal Kernel, MultiXml.method(:parse).owner
+    assert_equal({"a" => "1"}, MultiXml.method(:parse).call("<a>1</a>"))
+  end
+
   def test_multi_xml_constant_const_get_resolves_to_multi_xml_module
     require "multi_xml/parsers/nokogiri"
 
