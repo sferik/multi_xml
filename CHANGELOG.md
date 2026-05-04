@@ -1,3 +1,7 @@
+0.9.1
+-----
+* Fix `MultiXml.method(:load)` resolving to `Kernel#load`. The legacy `MultiXml` constant forwarded calls to `MultiXML` via `method_missing`, but `Module#method` doesn't consult `method_missing`, so `MultiXml.method(:load)` resolved to the inherited `Kernel#load` and crashed with `LoadError` when invoked. Replaces `method_missing` with explicit singleton-method forwarders for every public method on `MultiXML`, mirroring the [analogous fix in MultiJSON](https://github.com/sferik/multi_json/issues/66).
+
 0.9.0
 -----
 * Add `MultiXML.with_parser` for fiber-local scoped parser overrides, matching `MultiJSON.with_adapter`. The override lives in `Fiber[:multi_xml_parser]`, so concurrent fibers and threads each see their own parser without racing on a shared module variable; nested calls save and restore the previous value.
