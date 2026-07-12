@@ -29,15 +29,15 @@ end
 require "simplecov"
 
 SimpleCov.start do
-  add_filter "/test"
-  add_filter "/benchmark"
-  add_filter "/benchmark.rb"
+  skip "/test"
+  skip "/benchmark"
+  skip "/benchmark.rb"
   # libxml-ruby and ox are :ruby-only gems, so their parser files are
   # unreachable on Windows / JRuby and would drag coverage below 100%.
   if windows? || jruby?
-    add_filter "lib/multi_xml/parsers/libxml.rb"
-    add_filter "lib/multi_xml/parsers/libxml_sax.rb"
-    add_filter "lib/multi_xml/parsers/ox.rb"
+    skip "lib/multi_xml/parsers/libxml.rb"
+    skip "lib/multi_xml/parsers/libxml_sax.rb"
+    skip "lib/multi_xml/parsers/ox.rb"
   end
   # Ox tests are skipped on TruffleRuby — see
   # https://github.com/truffleruby/truffleruby/issues/4236 — because Minitest
@@ -45,7 +45,7 @@ SimpleCov.start do
   # attribute callbacks. Filter the parser file out of coverage to match
   # the skip; the uncovered lines reflect the platform workaround, not
   # a real test gap.
-  add_filter "lib/multi_xml/parsers/ox.rb" if truffleruby?
+  skip "lib/multi_xml/parsers/ox.rb" if truffleruby?
   enable_coverage :branch unless jruby? || truffleruby?
   unless ENV["MUTANT"]
     if truffleruby?

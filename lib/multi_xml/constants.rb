@@ -79,7 +79,7 @@ module MultiXML
   # @return [Array<Array>] pairs of [require_path, parser_symbol]
   # @example View parser order
   #   PARSER_PREFERENCE.first #=> ["ox", :ox]
-  # :nocov:
+  # simplecov:disable
   PARSER_PREFERENCE = if RUBY_ENGINE == "truffleruby"
     [
       ["ox", :ox],
@@ -97,7 +97,7 @@ module MultiXML
       ["rexml/document", :rexml]
     ].freeze
   end
-  # :nocov:
+  # simplecov:enable
 
   # Parses datetime strings, trying Time first then DateTime
   #
