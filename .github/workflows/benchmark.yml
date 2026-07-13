@@ -23,4 +23,8 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby-version }}
         bundler-cache: true
-    - run: BENCHMARK_ARGS=--verify-preference bundle exec rake benchmark
+    # Longer warmup and measurement windows than the benchmark defaults:
+    # with the default 0.03s warmup the JIT engines (TruffleRuby in
+    # particular) are measured cold, which flips close parser pairs and
+    # flakes the ranking assertion.
+    - run: BENCHMARK_ARGS="--verify-preference --warmup 2 --time 1 --samples 3" bundle exec rake benchmark
