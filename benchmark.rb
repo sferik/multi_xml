@@ -6,10 +6,10 @@ require "multi_xml"
 
 # Benchmark harness for comparing MultiXML parsers across representative XML workloads.
 class MultiXMLBenchmark
-  ParserEntry = Struct.new(:name, :module_ref, keyword_init: true)
-  PayloadCase = Struct.new(:shape, :bucket, :label, :xml, :bytes, :options, keyword_init: true)
-  Measurement = Struct.new(:payload, :parser, :ips, :allocations_per_parse, keyword_init: true)
-  RunResults = Struct.new(:parsers, :measurements, :excluded_parsers, keyword_init: true)
+  ParserEntry = Struct.new(:name, :module_ref)
+  PayloadCase = Struct.new(:shape, :bucket, :label, :xml, :bytes, :options)
+  Measurement = Struct.new(:payload, :parser, :ips, :allocations_per_parse)
+  RunResults = Struct.new(:parsers, :measurements, :excluded_parsers)
 
   PARSER_NAMES = %i[ox libxml libxml_sax nokogiri nokogiri_sax rexml oga].freeze
   BYTES_PER_MEGABYTE = 1024.0 * 1024.0
