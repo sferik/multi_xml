@@ -44,9 +44,7 @@ class MultiXMLBenchmark
       verifier.valid? ? 0 : 1
     end
   end
-end
 
-class MultiXMLBenchmark
   # Command-line option parsing for the benchmark script.
   class CLI
     QUICK_OPTIONS = {
@@ -129,9 +127,7 @@ class MultiXMLBenchmark
       raise OptionParser::InvalidArgument, "--samples must be > 0" unless value.positive?
     end
   end
-end
 
-class MultiXMLBenchmark
   # Resolves benchmarkable parsers from the current Ruby environment.
   class ParserLoader
     def load(selected = nil)
@@ -152,9 +148,7 @@ class MultiXMLBenchmark
       nil
     end
   end
-end
 
-class MultiXMLBenchmark
   # Builds the benchmark payload matrix across XML shapes and sizes.
   class PayloadCatalog
     CASES = [
@@ -373,9 +367,7 @@ class MultiXMLBenchmark
       end
     end
   end
-end
 
-class MultiXMLBenchmark
   # Runs the benchmark matrix across parsers and XML payloads.
   class Runner
     # JRuby surfaces parser backend incompatibilities (e.g. Oga's Java
@@ -487,9 +479,7 @@ class MultiXMLBenchmark
       (text.length > 140) ? "#{text[0, 137]}..." : text
     end
   end
-end
 
-class MultiXMLBenchmark
   # Measures throughput for a single parser/payload combination.
   class Sampler
     def initialize(options)
@@ -589,9 +579,7 @@ class MultiXMLBenchmark
       GC.enable unless already_disabled
     end
   end
-end
 
-class MultiXMLBenchmark
   # Prints the benchmark summary and detailed result tables.
   class Reporter
     SUMMARY_HEADERS = ["parser", "overall score", "alloc score", "wins"].freeze
@@ -657,9 +645,7 @@ class MultiXMLBenchmark
       )
     end
   end
-end
 
-class MultiXMLBenchmark
   # Asserts MultiXML::PARSER_PREFERENCE matches benchmark throughput ranking.
   #
   # Compares only the parsers that both appear in PARSER_PREFERENCE and were
@@ -750,9 +736,7 @@ class MultiXMLBenchmark
       (TOLERANCE * 100).to_i
     end
   end
-end
 
-class MultiXMLBenchmark
   # Computes overall parser scores and benchmark wins.
   class Summary
     def initialize(parsers, measurements)
@@ -847,9 +831,7 @@ class MultiXMLBenchmark
       value / [peak, MultiXMLBenchmark::EPSILON].max
     end
   end
-end
 
-class MultiXMLBenchmark
   # Builds the per-benchmark detail table rows.
   class Details
     def initialize(parsers, measurements)
@@ -905,9 +887,7 @@ class MultiXMLBenchmark
       @grouped_measurements ||= measurements.group_by { |measurement| measurement.payload.label }
     end
   end
-end
 
-class MultiXMLBenchmark
   # Renders plain-text and markdown tables for benchmark output.
   class TableRenderer
     def initialize(format:)
@@ -963,9 +943,7 @@ class MultiXMLBenchmark
       (alignment == :right) ? text.rjust(width) : text.ljust(width)
     end
   end
-end
 
-class MultiXMLBenchmark
   # Shared numeric and display formatting helpers for benchmark output.
   class Formatter
     class << self
