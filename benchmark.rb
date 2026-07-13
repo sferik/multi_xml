@@ -884,7 +884,7 @@ class MultiXMLBenchmark
     end
 
     def index_entries(entries)
-      entries.each_with_object({}) { |entry, hash| hash[entry.parser] = entry }
+      entries.to_h { |entry| [entry.parser, entry] }
     end
 
     def parser_rates(indexed)
