@@ -97,6 +97,10 @@ class LoadParserRequirePathTest < Minitest::Test
   cover "MultiXML*"
 
   def test_load_parser_requires_lowercase_path
+    # JRuby's require-site caching keeps warm call sites bound to the
+    # original Kernel#require, so the stub below cannot intercept them
+    skip "Kernel#require cannot be stubbed reliably on JRuby" if jruby?
+
     required_paths = []
     stub_require(required_paths) { MultiXML.send(:load_parser, "REXML") }
 
