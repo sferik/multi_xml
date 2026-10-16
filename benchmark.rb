@@ -141,6 +141,13 @@ class MultiXMLBenchmark
     end
 
     def load_entry(name)
+      # Ox crashes TruffleRuby inside its SAX callbacks, which no rescue
+      # can recover from, so honor the same platform skip as detection.
+      if MultiXML.send(:skip_on_platform?, name)
+        warn "Skipping parser #{name.inspect}: unsupported on #{RUBY_ENGINE}"
+        return nil
+      end
+
       module_ref = MultiXML.send(:resolve_parser, name)
       MultiXMLBenchmark::ParserEntry.new(name: name, module_ref: module_ref)
     rescue MultiXML::ParserLoadError
