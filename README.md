@@ -144,8 +144,8 @@ table:
 | rank | CRuby/MRI  | JRuby      | TruffleRuby |
 | ---- | ---------- | ---------- | ----------- |
 | 1    | `ox`       | —          | —           |
-| 2    | `libxml`   | —          | `rexml`     |
-| 3    | `nokogiri` | `nokogiri` | `libxml`    |
+| 2    | `libxml`   | —          | `libxml`    |
+| 3    | `nokogiri` | `nokogiri` | `rexml`     |
 | 4    | `oga`      | —          | `oga`       |
 | 5    | `rexml`    | `rexml`    | `nokogiri`  |
 
@@ -153,8 +153,8 @@ A dash means the parser isn't usable on that runtime. `ox` has no JRuby
 build and is filtered out of TruffleRuby auto-detection (its SAX callbacks
 miscompile under the JIT after warmup); `libxml-ruby` has no JRuby build;
 `oga` 3.x crashes on JRuby 10 (its precompiled Java backend was built
-against an older JRuby API). TruffleRuby's JIT inverts the FFI-vs-pure-Ruby
-tradeoff for the remaining backends, so `rexml` rises to the top and
+against an older JRuby API). TruffleRuby's JIT narrows the FFI-vs-pure-Ruby
+gap for the remaining backends, so `rexml` moves ahead of `oga` and
 `nokogiri` falls to last.
 
 ## Supported Ruby Versions

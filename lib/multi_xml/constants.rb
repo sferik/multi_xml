@@ -70,10 +70,10 @@ module MultiXML
 
   # Parser libraries in preference order (fastest first)
   #
-  # TruffleRuby's JIT favors pure-Ruby parsers and penalizes FFI-bound
-  # ones, so rexml jumps to the head of the list (after ox, which is
-  # filtered out of auto-detection by ParserResolution#skip_on_platform?)
-  # and nokogiri falls to last.
+  # TruffleRuby's JIT narrows the gap between pure-Ruby and FFI-bound
+  # parsers, so rexml moves ahead of oga and nokogiri falls to last;
+  # libxml stays ahead of rexml. ox leads the list but is filtered out
+  # of auto-detection by ParserResolution#skip_on_platform?.
   #
   # @api public
   # @return [Array<Array>] pairs of [require_path, parser_symbol]
@@ -83,8 +83,8 @@ module MultiXML
   PARSER_PREFERENCE = if RUBY_ENGINE == "truffleruby"
     [
       ["ox", :ox],
-      ["rexml/document", :rexml],
       ["libxml-ruby", :libxml],
+      ["rexml/document", :rexml],
       ["oga", :oga],
       ["nokogiri", :nokogiri]
     ].freeze
