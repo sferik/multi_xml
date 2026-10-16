@@ -87,13 +87,11 @@ module MultiXML
         # @param _uri [String, nil] Element namespace URI (unused)
         # @param ns [Array] Namespace declarations as [prefix, uri] pairs
         # @return [void]
-        # rubocop:disable Metrics/ParameterLists, Naming/MethodParameterName
-        def start_element_namespace(local, attrs = [], prefix = nil, _uri = nil, ns = [])
+        def start_element_namespace(local, attrs = [], prefix = nil, _uri = nil, ns = []) # rubocop:disable Metrics/ParameterLists, Naming/MethodParameterName
           ns_decls = ns.map { |p, u| [normalize(p), u] }
           attr_tuples = attrs.map { |a| [normalize(a.prefix), a.localname, a.value] }
           handle_start_element_ns(local, normalize(prefix), attr_tuples, ns_decls)
         end
-        # rubocop:enable Metrics/ParameterLists, Naming/MethodParameterName
 
         # Handle end of a namespaced element
         #
