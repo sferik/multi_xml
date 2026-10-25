@@ -6,6 +6,7 @@
 [![Typecheck](https://github.com/sferik/multi_xml/actions/workflows/typecheck.yml/badge.svg)][typecheck]
 [![Docs](https://github.com/sferik/multi_xml/actions/workflows/docs.yml/badge.svg)][docs]
 [![Gem Version](https://badge.fury.io/rb/multi_xml.svg)][gem]
+[![Duel](https://raw.githubusercontent.com/sferik/duel-ruby/main/assets/badge.svg)](https://github.com/sferik/duel-ruby)
 
 Lots of Ruby libraries parse XML and everyone has their favorite XML parser.
 Instead of choosing a single XML parser and forcing users of your library to

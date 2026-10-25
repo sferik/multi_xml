@@ -28,4 +28,10 @@ gem "steep", ">= 2", platforms: :ruby
 gem "yard", ">= 0.9.38"
 gem "yardstick", ">= 0.9.9"
 
+group :development do
+  # Duel requires Ruby 3.4 or later
+  gem "duel" if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.4")
+  gem "stackprof", platforms: :mri
+end
+
 gemspec

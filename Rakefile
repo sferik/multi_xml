@@ -66,3 +66,10 @@ default_tasks = %i[test lint verify_measurements mutant]
 default_tasks << :steep unless RUBY_PLATFORM == "java" || Gem.win_platform?
 
 task default: default_tasks
+
+begin
+  require "duel/rake_task"
+  Duel::RakeTask.new
+rescue LoadError
+  # Duel requires Ruby 3.4 or later
+end
