@@ -9,7 +9,6 @@ Duel.configure do |c|
   # this says otherwise).
   # c.library = "multi_xml"
 
-  # Compare a change to the benchmarks, this file or the Perf workflow
-  # too, not only to lib/ and ext/.
-  c.watch += %w[duel .duel.rb .github/workflows/perf.yml]
+  # Compare a change to only the Perf workflow too.
+  c.watch += %w[.github/workflows/perf.yml]
 end
